@@ -1,0 +1,5 @@
+PASS: Release build, TypeScript, frontend production, shortcuts, note drag/resize math.
+PASS: native groove placement, pitch/channel/velocity, preserving existing notes, atomic overlap/corrupt/SMPTE/bounds rejection.
+PASS: VST3 host/MIDI playback, session persistence, clip and automation suites.
+PASS: ZIP integrity and packaged native binary hashes.
+PENDING: native visual interaction, direct drag from specific drum programs, hardware listening.

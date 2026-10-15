@@ -1,40 +1,47 @@
 # Tracksmith
 
-Private project reference for **Tracksmith DAW** and **Tracksmith Groove**, owned by guitarshreadr260.
+Private development reference for **Tracksmith DAW** and the optional **Tracksmith Groove** VST3, owned by guitarshreadr260.
 
-## Start here while away from your PC
+Updated October 14, 2026 — **Selection and Shortcuts build**.
 
-- [Where we left off and what's next](PROJECT-STATUS.md)
+## Start here
+
+- [Current progress, decisions and next steps](PROJECT-STATUS.md)
+- [Latest Windows DAW build](Tracksmith-Windows-Selection-Shortcuts.zip)
+- [Latest DAW source snapshot](Tracksmith-Source-Selection-Shortcuts.zip)
+- [How to highlight notes, delete tracks and use the new shortcuts](Tracksmith-Selection-Shortcuts-Guide.md)
 - [Build history](BUILD-HISTORY.md)
-- [How to use this GitHub repository](WORKING-AWAY-FROM-PC.md)
-- [Download the DAW automation build](Tracksmith-Windows-Automation.zip)
-- [Groove plugin downloads](../../releases)
+- [Working away from your PC](WORKING-AWAY-FROM-PC.md)
 
-This first upload is a reference collection with source snapshots, guides and tested builds. Source snapshots are ZIP archives; download and extract them to browse or build locally. They are not yet a normal, fully expanded Git working tree. Updates appear here when we publish them; this does not automatically mirror the home PC or its live chat.
+Download and extract the complete Windows ZIP, save and close the older Tracksmith, then open Tracksmith.exe. Keep Stock Plugins beside the application. Windows x64 and WebView2 required. Session format is now **9**, reading versions 1–9. Earlier builds may not open newer saves; use a session copy for review.
 
-## Current work
+## What is included
 
-**Tracksmith DAW:** Windows audio/MIDI DAW with native audio processing, recording and monitoring, retake replacement, fades, track playlists, VST3 inserts, aux/bus routing, WAV export and volume/pan automation. Custom UI work is deferred until the core workflow is further along.
+Audio recording and monitoring, retake replacement, fades/crossfades, audio and MIDI playlists, group range editing, VST3 hosting, aux buses and pre/post sends, separate hardware cue outputs, volume/pan/plugin automation, latency alignment, autosave/recovery, WAV export and the Edit grid.
 
-**Tracksmith Groove 0.18:** The preserved AVRX Groove 0.17 studio renamed and converted to a separate VST3 instrument. Includes the supplied kits and groove library in its release bundle. It follows the DAW transport/tempo, accepts MIDI and saves kit/pattern settings in the DAW session. Groove is optional; the DAW has no built-in drum engine.
+Instrument tracks now have a piano roll directly in the Edit window. Draw and edit notes, import MIDI grooves from compatible drum programs, highlight groups with a rectangle or Shift-click, delete/move/resize them together, copy/cut/paste/duplicate, transpose and nudge. Right-click track names in Edit or Mix for New/Delete. The Arrangement toolbar includes a Shortcuts panel.
 
-## Guides
+Automated checks pass. Latest mouse/context-menu behavior and hardware listening still need review. Broader realtime reliability, Windows installer and custom UI are pending. Plugin scanning improvements remain deferred.
 
-- [DAW automation](Tracksmith-Automation-Guide.md)
-- [Track playlists, retakes and fades](Tracksmith-Takes-Playlists-Guide.md)
-- [Mixer and aux/bus routing](Tracksmith-Mixer-Routing-Guide.md)
-- [Recording and input monitoring](Tracksmith-Recording-Guide.md)
-- [WAV export](Tracksmith-Export-Guide.md)
-- [Plugin browser and New Tracks dialog](Tracksmith-Plugin-Browser-Guide.md)
+## Current guides
+
+- [Selection, track deletion and shortcuts](Tracksmith-Selection-Shortcuts-Guide.md)
+- [Instrument piano roll and MIDI groove drops](Tracksmith-Instrument-Piano-Roll-Guide.md)
+- [Autosave/recovery review guide](Tracksmith-Review-Build-Guide.md)
+- [Playlist management and group edits](Tracksmith-Playlist-Group-Editing-Guide.md)
+- [Monitoring, routing and hardware cues](Tracksmith-Monitoring-Routing-Guide.md)
+- [Plugin parameter automation](Tracksmith-Plugin-Automation-Guide.md)
 - [Tracksmith Groove VST3](Tracksmith-Groove-VST3-Guide.md)
+- [Latest validation and limits](Tracksmith-Selection-Shortcuts-Validation.txt)
 
-## Source snapshots
+Track deletion is not undoable and clears prior edit histories; source audio files remain on disk. MIDI note-group edits support Undo. See the guide before removing a track.
 
-- [Tracksmith DAW automation source](Tracksmith-Source-Automation.zip)
-- [Tracksmith Groove 0.18 code](Tracksmith-Groove-Source-Code-v0.18.zip)
+## Tracksmith Groove
 
-The Groove source archive excludes the large supplied audio/MIDI/capture libraries. They are included inside the VST3 release bundle under Contents/Resources. To build Groove with these libraries, copy Drum Packs, Grooves and Captures from that folder into the extracted source folder. External JUCE/toolchain setup is still required by the CMake projects. Repository visibility is private; no public/open-source license has been assigned to the project's own code. Third-party components retain their supplied licenses.
+Tracksmith Groove 0.18 remains a separate optional VST3 instrument; [its release downloads](../../releases/tag/groove-v0.18.0) and [code snapshot](Tracksmith-Groove-Source-Code-v0.18.zip) are preserved. Original AVRX Groove 0.17 is retained locally. AVRX Drums remains excluded from the DAW.
 
-## Validation
+## About this repository
 
-See the validation files for the automated checks and their limits. These checks do not replace listening and hardware tests on the user's interface. Keep copies of older sessions: new DAW automation saves use format 7 and cannot be opened by older DAW builds.
+This repository stores source ZIP snapshots, builds, guides and progress notes. Source is not yet an expanded Git working tree; extract the source ZIP to browse or build it. Third-party licenses remain applicable. Repository visibility stays private. Older archives remain for reference; README links point to the current DAW build.
+
+GitHub receives updates when we publish them. It does not automatically mirror the home PC or the live development conversation.

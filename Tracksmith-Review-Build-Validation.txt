@@ -1,0 +1,9 @@
+Native Release / production frontend / TypeScript / shortcut checks: PASS
+Recovery snapshot rotation, corrupt-newest fallback, clean markers and retention: PASS
+Original manual save preservation, invalid/write-failure protection, media rebasing and reopening: PASS
+Background worker overlap/result-delivery guards and autosave idle/cadence policy: PASS
+128-track playlist/automation metadata snapshot and WAV reopening: PASS
+Existing playlist/group editing, real VST3, automation, aligned recording, monitoring/routing, session, clips and WAV export: PASS
+ZIP integrity and native binary hashes: PASS
+Native visual/gesture, physical hardware timing/listening and broad realtime stress checks: PENDING
+No deliberate user-app crash performed. Existing user session left untouched. Earlier builds retained.

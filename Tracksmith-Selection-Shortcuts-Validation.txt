@@ -1,0 +1,7 @@
+PASS: Native Release / TypeScript / production frontend.
+PASS: MIDI marquee/group edit math, MIDI keyboard dispatch and text/focus guards, existing/new global shortcuts.
+PASS: Native atomic MIDI group delete/update/paste, invalid/repeated IDs and overlap rollback.
+PASS: Track removal audio/clips/automation, MIDI/instrument identity, master identity, inputs/monitor remap, bus disconnect/remap, first/middle/last and minimum-track guard.
+PASS: VST3/MIDI host, session/recovery, routing, clips and automation suites.
+PASS: ZIP integrity and native binary hashes.
+PENDING: Native gesture/context-menu visual check and hardware listening.

@@ -1,40 +1,53 @@
 # Where we left off
 
-Updated: October 14, 2026.
+Updated October 14, 2026. Latest delivery: **Selection and Shortcuts build**.
 
-## Latest deliveries
+## Most recent request and result
 
-### Tracksmith DAW — Automation build
+The user reported being unable to highlight/delete MIDI notes and requested right-click track deletion plus more Pro Tools-style controls. The latest build adds rectangle and Shift-click MIDI selection, atomic group deletion with Undo, group movement/resizing, an internal MIDI clipboard, duplicate, transpose, velocity, note navigation and nudge shortcuts. Instrument tracks default to Select; F8 selects and F10 draws. Right-click a track name in Edit/Mix for New/Delete. A Shortcuts panel is inside the Arrangement toolbar.
 
-- Volume and pan lanes on audio, MIDI/instrument and aux/bus tracks.
-- Off / Read / Write modes; Write returns to Read on Stop.
-- Editable points, separate automation undo/redo, session saving and WAV export.
-- Source and bus automation aligned with plugin latency.
-- Session format 7; older formats 1–6 still open.
-- Build, native audio, session, routing and export regression tests passed. User fader/listening checks remain.
+The controls were checked against Avid documentation; this is a supported subset, with Tracksmith-specific behavior documented in the [guide](Tracksmith-Selection-Shortcuts-Guide.md). Track deletion cannot Undo, stops playback and clears histories. Source audio is retained; surviving track media, instruments, inputs and bus routes are remapped.
 
-### Tracksmith Groove — VST3 0.18
+[Latest Windows build](Tracksmith-Windows-Selection-Shortcuts.zip) · [Current source snapshot](Tracksmith-Source-Selection-Shortcuts.zip) · [Validation](Tracksmith-Selection-Shortcuts-Validation.txt)
 
-- Saved AVRX Groove 0.17 retained unchanged, renamed in this separate development copy.
-- VST3 instrument for insert A on a MIDI/instrument track.
-- DAW tempo, play/stop, seeks and loop returns; external MIDI or manual groove preview.
-- Full kit/pattern/mix state recall, independent instances and rendered WAV audio tested.
-- Bundled Luke Holland and Time Traveller packs: 383 WAVs. GGD Rock library: 225 MIDI grooves across 15 songs.
-- Supplied media verified against the preserved original source archive.
-- Native window gestures and hardware listening remain user checks.
+## Recent progress since the initial GitHub upload
+
+- Plugin parameter automation and Read/Write/Touch/Latch; native Touch/Latch requires plugin gesture reporting.
+- Recording alignment using reported driver input/output and plugin latency; hardware timing still needs listening/calibration checks.
+- Armed-track monitoring with assigned inputs, pre/post sends and separate physical stereo cue outputs.
+- Playlist create/duplicate/rename/reorder/delete, alternate lanes, range promotion and explicit multi-track range edits.
+- Edit grid and corrected silent meter display.
+- Autosave/recovery with background guards, rotating snapshots, corrupt-snapshot fallback and recovered-copy Save As. Snapshots reference audio files; they do not copy media.
+- Instrument-track choice and inline piano roll in the Edit window.
+- MIDI groove file drops at the drop position from drum programs exposing .mid/.midi; proprietary drag formats need export first.
+- Latest MIDI selection fix, batch editing, context menus and keyboard workflow.
+
+## Validation and current limits
+
+Native Release and production frontend compile. TypeScript, keyboard/focus checks and note-edit math pass. Native tests cover atomic batch edits, MIDI groove imports, track deletion/remapping and existing VST3/MIDI playback, sessions/recovery, routing, clips and automation.
+
+The 128-track recovery fixture tests session metadata with WAV references, playlists and automation. It does not demonstrate realtime performance with 128 heavy plugin tracks.
+
+The user said the previous Instrument build was working, then reported the selection issue. The latest Selection and Shortcuts build has been delivered; its mouse gestures, native menus and hardware listening have not yet been confirmed by the user. Do not mark those manual checks complete.
+
+Session format is **9**, opening versions 1–9. Keep older session copies. Plugins run in-process. MIDI keyboard recording and note audition are still future work. The MIDI clipboard is internal to the current app run.
+
+## Next
+
+1. Review the latest selection/deletion/context-menu workflow and fix any findings.
+2. Run the broader realtime reliability and hardware pass.
+3. Prepare the Windows installer.
+4. Continue with the custom UI after core behavior and reliability are ready.
+
+Plugin scanning improvements remain deferred by user request. This list records the direction, not an instruction to start unrelated work automatically.
 
 ## Decisions to preserve
 
-- Keep the DAW core separate from the optional Groove instrument.
-- Leave plugin scanner improvements for later, as requested.
-- Custom UI redesign is deferred until the core DAW is further developed.
-- Preserve original recordings and older builds/session copies.
-- Keep the AVRX Groove 0.17 standalone/source backups.
+- Keep the DAW core separate from Tracksmith Groove 0.18, the optional VST3.
+- Preserve original AVRX Groove 0.17 and existing source/build backups.
+- AVRX Drums stays excluded.
+- Core workflow before custom UI.
+- Retakes replace the covered audio range; source audio files stay intact.
+- Maintain portable review builds while the installer is pending.
 
-## Next development options
-
-1. Collect user test feedback on automation and Groove inside Tracksmith.
-2. Add plugin parameter automation, followed by Touch/Latch modes.
-3. Later: improve plugin discovery/scanning and recovery, hardware MIDI recording, hardware recording-latency alignment and broader plugin isolation.
-
-No new development item is authorized just by listing it here. Choose the next item in the working chat.
+This is a saved handoff. GitHub is not a live mirror of the development PC or conversation.
