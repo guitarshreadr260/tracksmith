@@ -1,0 +1,10 @@
+Release native and production frontend build: PASS
+TypeScript and keyboard shortcut checks: PASS
+Automation interpolation, ordering, overwrite preservation, capture simplification/overflow, sample playback, seeks, Off/Read/Write, mute, aux and post-fader sends: PASS
+Loop-range automation time with fractional and full-loop plugin delay: PASS
+Session version 7 curves/modes, invalid data rejection, version 1-6 loading: PASS
+Full/selection WAV automation samples and idle Write export: PASS
+Real VST3 source/aux/master latency automated export vs no-latency reference, all stereo samples: PASS
+Existing clip, session, monitoring, recording, routing, VST3, WAV export, playback and shortcut regressions: PASS
+ZIP integrity and native binary hashes: PASS
+Current user session left open and unchanged; native interface/fader gesture tests and hardware listening remain for the user.
