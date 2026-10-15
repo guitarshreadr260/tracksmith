@@ -1,0 +1,9 @@
+PASS: native Release / TypeScript / production frontend.
+PASS: all 225 saved GGD Rock MIDI grooves import at a nonzero drop beat.
+PASS: duplicate hits, strongest velocity, distinct flam timing, retrigger gating and zero gates.
+PASS: atomic conflict rollback and import after deleting the previous selection.
+PASS: drop bytes, request IDs, beat snapping, size/type guards and unreadable-file feedback.
+PASS: note selection/edit math, automatic drum-register positioning, MIDI/global keyboard guards.
+PASS: native VST3/MIDI host and sessions/recovery suites.
+PASS: ZIP integrity and native binary hashes.
+PENDING: direct mouse drag from live GGD and hardware listening.

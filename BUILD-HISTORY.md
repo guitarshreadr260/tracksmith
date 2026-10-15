@@ -25,3 +25,14 @@ Versioned archives remain saved on the development PC. This repository starts wi
 | Selection and Shortcuts — current | Box/Shift note selection, group delete/Undo, clipboard and more shortcuts; track-name context menu | Automated checks passed; latest manual review pending |
 
 The latest source/build links are in README. Session format is now 9; older Automation archive documentation describes that older build's format 7. Earlier archives and Groove downloads remain preserved.
+
+
+## GGD fix and first reliability checkpoint — October 14, 2026
+
+| Stage | Result |
+| --- | --- |
+| GGD MIDI fix | Duplicate/zero-gate normalization, preserved distinct attacks, explicit drop results and automatic note-register view. All 225 saved grooves import; user confirmed working. |
+| Reliability first pass | 60-second and 120-second paced synthetic runs: 80 tracks, 16 controlled VST3 effects, 152 WAVs, 20 session reopens, 20 recovery snapshots, 90 edits and 10 plugin reloads. Passed; no production change required. |
+| Next | Longer hardware/interface, representative-plugin and normal UI tests remain; then installer and custom UI. |
+
+README now points to GGD MIDI Fix and a newer source checkpoint containing the test harness. The report distinguishes synthetic processing-budget results from device/xrun performance. Previous source/build archives and the optional Groove VST3 release remain preserved.

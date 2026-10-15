@@ -2,13 +2,13 @@
 
 Private development reference for **Tracksmith DAW** and the optional **Tracksmith Groove** VST3, owned by guitarshreadr260.
 
-Updated October 14, 2026 — **Selection and Shortcuts build**.
+Updated October 14, 2026 — **GGD MIDI Fix + first reliability checkpoint**.
 
 ## Start here
 
 - [Current progress, decisions and next steps](PROJECT-STATUS.md)
-- [Latest Windows DAW build](Tracksmith-Windows-Selection-Shortcuts.zip)
-- [Latest DAW source snapshot](Tracksmith-Source-Selection-Shortcuts.zip)
+- [Latest Windows DAW build](Tracksmith-Windows-GGD-MIDI-Fix.zip)
+- [Latest DAW source snapshot](Tracksmith-Source-Reliability-Checkpoint.zip)
 - [How to highlight notes, delete tracks and use the new shortcuts](Tracksmith-Selection-Shortcuts-Guide.md)
 - [Build history](BUILD-HISTORY.md)
 - [Working away from your PC](WORKING-AWAY-FROM-PC.md)
@@ -21,7 +21,15 @@ Audio recording and monitoring, retake replacement, fades/crossfades, audio and 
 
 Instrument tracks now have a piano roll directly in the Edit window. Draw and edit notes, import MIDI grooves from compatible drum programs, highlight groups with a rectangle or Shift-click, delete/move/resize them together, copy/cut/paste/duplicate, transpose and nudge. Right-click track names in Edit or Mix for New/Delete. The Arrangement toolbar includes a Shortcuts panel.
 
-Automated checks pass. Latest mouse/context-menu behavior and hardware listening still need review. Broader realtime reliability, Windows installer and custom UI are pending. Plugin scanning improvements remain deferred.
+The user confirmed the GGD MIDI Fix build works. The first bounded automated reliability pass also passed: two runs totaling about three minutes with 80 synthetic tracks and 16 controlled VST3 effects. Longer hardware/interface, representative-plugin and normal-UI checks remain before final installer readiness. Windows installer and custom UI are pending. Plugin scanning improvements remain deferred.
+
+## Latest checkpoint
+
+- [GGD import fix and its checks](Tracksmith-GGD-MIDI-Fix-Guide.md): all 225 saved GGD Rock grooves now import; duplicates and retriggers are normalized, import results are visible and imported notes scroll into view.
+- [Reliability report](Tracksmith-Reliability-Report.md): 152 recorded WAVs checked, 20 session reopens, 20 recovery snapshots, 10 plugin reloads and 90 edit cycles. No crashes, recording warnings or timed blocks over budget in these runs.
+- [Reliability raw results and reusable harness](Tracksmith-Reliability-Results.zip)
+
+The current source checkpoint includes the reliability harness. The working application is the GGD MIDI Fix build; reliability testing required no production-code changes. These are synthetic engine tests, not measured ASIO/device xruns or a multi-hour heavy-instrument test.
 
 ## Current guides
 
