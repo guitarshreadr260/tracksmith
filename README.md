@@ -1,55 +1,60 @@
 # Tracksmith
 
-Private development reference for **Tracksmith DAW** and the optional **Tracksmith Groove** VST3, owned by guitarshreadr260.
+Private development reference for Tracksmith DAW and the separate optional Tracksmith Groove VST3. Updated October 15, 2026.
 
-Updated October 14, 2026 — **GGD MIDI Fix + first reliability checkpoint**.
+## Current build: stock plugin test suite
 
-## Start here
+[Download the Windows DAW test build](Tracksmith-Windows-Stock-Plugins-Test.zip) · [Current source snapshot](Tracksmith-Source-Stock-Plugins.zip) · [Plugin-only VST3 bundle](Tracksmith-Stock-Plugins-VST3.zip)
 
-- [Current progress, decisions and next steps](PROJECT-STATUS.md)
-- [Latest Windows DAW build](Tracksmith-Windows-GGD-MIDI-Fix.zip)
-- [Latest DAW source snapshot](Tracksmith-Source-Reliability-Checkpoint.zip)
-- [How to highlight notes, delete tracks and use the new shortcuts](Tracksmith-Selection-Shortcuts-Guide.md)
+Extract the whole Windows ZIP, close the other Tracksmith, and run Tracksmith.exe from the extracted folder. Keep Stock Plugins beside the application. Choose **Add stock Tracksmith ...** from a track/aux/master insert menu. This is a portable test build, not an installer update.
+
+The build includes nine stock VST3 plugins:
+
+| Plugin | Current features |
+| --- | --- |
+| Tracksmith EQ 7 | Seven-band EQ with response graph, filters, shelves and bells |
+| Tracksmith Gate | Threshold, attack, hold, release, range and hysteresis |
+| Tracksmith Bus Compressor | Compression, Auto release, makeup, detector high pass and parallel mix |
+| Tracksmith FET Compressor | Input-driven fast compression, four ratios and custom Slam mode |
+| Tracksmith Limiter | Sample-peak ceiling, input drive and release |
+| Tracksmith De-Esser | Selective-band reduction, adaptive threshold and band listen |
+| Tracksmith Plate | Plate-style reverb with decay, pre-delay, damping, low cut and stereo width |
+| Tracksmith Digital Delay | Clean stereo repeats, feedback and repeat tone; no modulation |
+| Tracksmith NAM | Renamed AVRX NAM, with post-model EQ and preset save/load |
+
+[Build guide and current limits](Tracksmith-Stock-Plugins-Guide.md) · [Automated results](Tracksmith-Stock-Plugin-Test-Results.json) · [Dynamics development notes](Tracksmith-Dynamics-Test-Update.md) · [Current status and next steps](PROJECT-STATUS.md)
+
+NAM presets store the model location and settings; keep the .nam model available. Old AVRX NAM identity and original parameter IDs are preserved. The DAW redirects old AVRX NAM session entries to the renamed bundled plugin.
+
+Automated processing, VST3 loading/state, editor rendering and existing DAW regression checks passed. Listening and real-session checks of this latest combined build are pending. The compressors are original behavioral designs, not verified analog models. The limiter is sample-peak, not true-peak.
+
+## Preview
+
+![Tracksmith NAM](Tracksmith-NAM-Preview.png)
+![Plate reverb](Tracksmith-Plate-Preview.png)
+![Digital delay](Tracksmith-Digital-Delay-Preview.png)
+
+## Earlier milestones
+
+The user confirmed the GGD MIDI fix works. [GGD guide](Tracksmith-GGD-MIDI-Fix-Guide.md) · [First synthetic reliability report](Tracksmith-Reliability-Report.md) · [Reliability raw results](Tracksmith-Reliability-Results.zip)
+
+The first Windows installer trial also went well according to the user. [Earlier 0.1.0 installer](Tracksmith-Setup-0.1.0-x64.msi) · [Installer guide](Tracksmith-Installer-Guide.md) · [Installer validation](Tracksmith-Installer-Validation.md). That earlier installer predates the stock-plugin suite; use the portable ZIP above for current plugins. Longer hardware/interface testing remains before reliability is considered complete.
+
+## Core workflow guides
+
+- [MIDI selection, track deletion and shortcuts](Tracksmith-Selection-Shortcuts-Guide.md)
+- [Instrument tracks and inline piano roll](Tracksmith-Instrument-Piano-Roll-Guide.md)
+- [Playlist management and group edits](Tracksmith-Playlist-Group-Editing-Guide.md)
+- [Monitoring, routing and hardware cues](Tracksmith-Monitoring-Routing-Guide.md)
+- [Plugin automation](Tracksmith-Plugin-Automation-Guide.md)
+- [Recording](Tracksmith-Recording-Guide.md)
 - [Build history](BUILD-HISTORY.md)
 - [Working away from your PC](WORKING-AWAY-FROM-PC.md)
 
-Download and extract the complete Windows ZIP, save and close the older Tracksmith, then open Tracksmith.exe. Keep Stock Plugins beside the application. Windows x64 and WebView2 required. Session format is now **9**, reading versions 1–9. Earlier builds may not open newer saves; use a session copy for review.
+Session format 9 reads versions 1–9. Keep session copies when testing. Plugins run in-process. Plugin scanning improvements and the main DAW custom UI remain deferred.
 
-## What is included
+## Groove and preserved work
 
-Audio recording and monitoring, retake replacement, fades/crossfades, audio and MIDI playlists, group range editing, VST3 hosting, aux buses and pre/post sends, separate hardware cue outputs, volume/pan/plugin automation, latency alignment, autosave/recovery, WAV export and the Edit grid.
+Tracksmith Groove 0.18 remains a separate optional instrument: [release downloads](https://github.com/guitarshreadr260/tracksmith/releases/tag/groove-v0.18.0) · [source snapshot](Tracksmith-Groove-Source-Code-v0.18.zip). Original AVRX Groove 0.17 is preserved locally. AVRX Drums stays excluded from the DAW package.
 
-Instrument tracks now have a piano roll directly in the Edit window. Draw and edit notes, import MIDI grooves from compatible drum programs, highlight groups with a rectangle or Shift-click, delete/move/resize them together, copy/cut/paste/duplicate, transpose and nudge. Right-click track names in Edit or Mix for New/Delete. The Arrangement toolbar includes a Shortcuts panel.
-
-The user confirmed the GGD MIDI Fix build works. The first bounded automated reliability pass also passed: two runs totaling about three minutes with 80 synthetic tracks and 16 controlled VST3 effects. Longer hardware/interface, representative-plugin and normal-UI checks remain before final installer readiness. Windows installer and custom UI are pending. Plugin scanning improvements remain deferred.
-
-## Latest checkpoint
-
-- [GGD import fix and its checks](Tracksmith-GGD-MIDI-Fix-Guide.md): all 225 saved GGD Rock grooves now import; duplicates and retriggers are normalized, import results are visible and imported notes scroll into view.
-- [Reliability report](Tracksmith-Reliability-Report.md): 152 recorded WAVs checked, 20 session reopens, 20 recovery snapshots, 10 plugin reloads and 90 edit cycles. No crashes, recording warnings or timed blocks over budget in these runs.
-- [Reliability raw results and reusable harness](Tracksmith-Reliability-Results.zip)
-
-The current source checkpoint includes the reliability harness. The working application is the GGD MIDI Fix build; reliability testing required no production-code changes. These are synthetic engine tests, not measured ASIO/device xruns or a multi-hour heavy-instrument test.
-
-## Current guides
-
-- [Selection, track deletion and shortcuts](Tracksmith-Selection-Shortcuts-Guide.md)
-- [Instrument piano roll and MIDI groove drops](Tracksmith-Instrument-Piano-Roll-Guide.md)
-- [Autosave/recovery review guide](Tracksmith-Review-Build-Guide.md)
-- [Playlist management and group edits](Tracksmith-Playlist-Group-Editing-Guide.md)
-- [Monitoring, routing and hardware cues](Tracksmith-Monitoring-Routing-Guide.md)
-- [Plugin parameter automation](Tracksmith-Plugin-Automation-Guide.md)
-- [Tracksmith Groove VST3](Tracksmith-Groove-VST3-Guide.md)
-- [Latest validation and limits](Tracksmith-Selection-Shortcuts-Validation.txt)
-
-Track deletion is not undoable and clears prior edit histories; source audio files remain on disk. MIDI note-group edits support Undo. See the guide before removing a track.
-
-## Tracksmith Groove
-
-Tracksmith Groove 0.18 remains a separate optional VST3 instrument; [its release downloads](../../releases/tag/groove-v0.18.0) and [code snapshot](Tracksmith-Groove-Source-Code-v0.18.zip) are preserved. Original AVRX Groove 0.17 is retained locally. AVRX Drums remains excluded from the DAW.
-
-## About this repository
-
-This repository stores source ZIP snapshots, builds, guides and progress notes. Source is not yet an expanded Git working tree; extract the source ZIP to browse or build it. Third-party licenses remain applicable. Repository visibility stays private. Older archives remain for reference; README links point to the current DAW build.
-
-GitHub receives updates when we publish them. It does not automatically mirror the home PC or the live development conversation.
+This private repository stores ZIP source snapshots, builds, guides and progress notes. Source is not an expanded Git working tree; extract the current source ZIP to browse or build it. Third-party licenses still apply. GitHub is updated when requested; it does not automatically mirror the PC or chat.

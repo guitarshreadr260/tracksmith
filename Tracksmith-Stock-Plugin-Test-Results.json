@@ -1,0 +1,91 @@
+[
+  {
+    "plugin": "Tracksmith EQ 7",
+    "exit": 0,
+    "output": "PASS: EQ responses, slopes, extremes, stereo isolation, unity, bypass, polarity, VST3 discovery, state, silence and editor render\n",
+    "error": ""
+  },
+  {
+    "plugin": "Tracksmith Gate",
+    "exit": 0,
+    "output": "PASS: gate opening, attenuation, range, hysteresis, hold, bypass, stereo link, silence, 5 sample rates, VST3 discovery/load, state recall and editor render\n",
+    "error": ""
+  },
+  {
+    "plugin": "Tracksmith Bus Compressor",
+    "exit": 0,
+    "output": "PASS: transfer curve, ratio, makeup, stereo linking, dry mix, bypass, auto release, silence, sidechain HPF, 5 sample rates, VST3 loading/state and editor render\n",
+    "error": ""
+  },
+  {
+    "plugin": "Tracksmith FET Compressor",
+    "exit": 0,
+    "output": "PASS: FET ratios/Slam, input-driven compression, stereo linking, attack ordering, dry mix, bypass, silent recovery, five sample rates, VST3 load/state and native editor render\n",
+    "error": ""
+  },
+  {
+    "plugin": "Tracksmith Limiter",
+    "exit": 0,
+    "output": "PASS: limiter ceiling under drive/ceiling changes, stereo link, bypass, no crosstalk and 5 sample rates\n",
+    "error": ""
+  },
+  {
+    "plugin": "Tracksmith De-Esser",
+    "exit": 0,
+    "output": "PASS: deesser band selectivity, manual/auto threshold, input-level invariance, stereo linking, bypass, finite parameter changes and 5 sample rates\n",
+    "error": ""
+  },
+  {
+    "plugin": "Tracksmith Plate",
+    "exit": 0,
+    "output": "PASS: plate predelay, decay-energy ordering, diffuse tail density, stereo width, reset, bounded parameter changes, bypass and 5 sample rates\n",
+    "error": ""
+  },
+  {
+    "plugin": "Tracksmith Digital Delay",
+    "exit": 0,
+    "output": "PASS: digital delay repeat timing, feedback decay, channel isolation, static-time impulse, reset, parameter changes, bypass and 5 sample rates\n",
+    "error": ""
+  },
+  {
+    "test": "AutomationTests.exe",
+    "exit": 0,
+    "output": "Automation curves, pass capture, bounds, sample playback, seek, modes and aux/send tests passed.\n",
+    "error": ""
+  },
+  {
+    "test": "MixerRoutingTests.exe",
+    "exit": 0,
+    "output": "Mixer routing, buses, post-fader sends and solo tests passed.\n",
+    "error": ""
+  },
+  {
+    "test": "ClipEditingTests.exe",
+    "exit": 0,
+    "output": "Overwrite, fades, crossfades, handles and clip undo data tests passed.\n",
+    "error": ""
+  },
+  {
+    "test": "SessionTests_artefacts/Release/SessionTests.exe",
+    "exit": 0,
+    "output": "All session format tests passed.\n",
+    "error": ""
+  },
+  {
+    "test": "MixExportTests_artefacts/Release/MixExportTests.exe",
+    "exit": 0,
+    "output": "WAV export tests passed\n",
+    "error": ""
+  },
+  {
+    "test": "VST3 host integration and NAM",
+    "exit": 0,
+    "output": "All VST3 hosting, wet input monitoring, delay compensation, NAM, session and MIDI and WAV export tests passed.\n",
+    "error": ""
+  },
+  {
+    "test": "NAM stock EQ/preset tests",
+    "exit": 0,
+    "output": "PASS: model load, post-model EQ audio gain, preset save/recall/overwrite, missing/malformed/nonfinite presets, relative model path lookup, legacy flat EQ restore and editor render"
+  }
+]

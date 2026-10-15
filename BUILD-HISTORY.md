@@ -36,3 +36,14 @@ The latest source/build links are in README. Session format is now 9; older Auto
 | Next | Longer hardware/interface, representative-plugin and normal UI tests remain; then installer and custom UI. |
 
 README now points to GGD MIDI Fix and a newer source checkpoint containing the test harness. The report distinguishes synthetic processing-budget results from device/xrun performance. Previous source/build archives and the optional Groove VST3 release remain preserved.
+
+
+## Windows installer and stock plugin suite — October 15, 2026
+
+The user reported that the first 0.1.0 Windows installer trial went well. That installer predates the current stock suite and remains an earlier milestone.
+
+The new portable test build packages nine VST3 plugins: EQ 7, Gate, Bus Compressor, FET Compressor, Limiter, De-Esser, Plate, Digital Delay and NAM. Reverb is plate-style with stereo diffusion; delay is clean and unmodulated. NAM was renamed from AVRX NAM, gained post-model EQ and preset file save/load, and retained its original VST3 identities and parameter IDs for compatibility.
+
+DSP, VST3 loading/state, native editor rendering, NAM preset compatibility and existing DAW regression suites passed. Package hashes and nine included bundles verified. The current stock suite has not yet received the user's listening pass. Earlier source/build snapshots and the separate Groove release are preserved.
+
+[Current Windows test build](Tracksmith-Windows-Stock-Plugins-Test.zip) · [Current source](Tracksmith-Source-Stock-Plugins.zip) · [Guide](Tracksmith-Stock-Plugins-Guide.md) · [Test results](Tracksmith-Stock-Plugin-Test-Results.json)

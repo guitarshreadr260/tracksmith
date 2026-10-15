@@ -1,74 +1,53 @@
 # Where we left off
 
-Updated October 14, 2026. Latest app: **GGD MIDI Fix**, user confirmed working. Latest checkpoint: **first automated reliability pass completed**.
+Updated October 15, 2026. Latest delivery: **combined stock-plugin test build**.
 
-## Current checkpoint
+## Current delivery
 
-The user confirmed the GGD fix works and asked for a reliability test. The first bounded automated reliability pass passed. Two paced synthetic runs lasted about three minutes total: 80 tracks (64 audio, 8 aux, 8 MIDI), 16 controlled delay-test VST3 instances, eight simultaneous recording writers, repeated seeks/edits, plugin replacement and file lifecycles.
+[Windows portable build](Tracksmith-Windows-Stock-Plugins-Test.zip) · [Source snapshot](Tracksmith-Source-Stock-Plugins.zip) · [Plugin-only bundle](Tracksmith-Stock-Plugins-VST3.zip) · [Guide](Tracksmith-Stock-Plugins-Guide.md)
 
-- 17,833 audio blocks; 0 exceeded their individual processing-time budgets.
-- 152 recorded WAV files checked across 19 recording passes.
-- 20 session save/reopen cycles and 20 validated recovery snapshots.
-- 90 edit cycles and 10 VST3 unload/reloads.
-- No test failures, production crashes or recording writer warnings observed.
-- Second-run average render/capture processing: 13.9% of available frame time. Peak private process memory: 49.25 MiB. Detailed measurements and short-run limits are in the report.
+Nine bundled plugins: Tracksmith EQ 7, Gate, Bus Compressor, FET Compressor, Limiter, De-Esser, Plate, Digital Delay and NAM. All have native editors, host parameters, state saving and mono/stereo support. The delay has no modulation and uses milliseconds rather than tempo sync. For aux sends, set Plate/Delay Mix to 100%.
 
-The 16 effects are controlled delay fixtures; MIDI lanes are not eight heavy third-party instruments. This does not measure device callbacks, ASIO xruns, real microphone timing or multi-hour behavior. No production changes were needed for this reliability pass. The running user DAW/session was untouched.
+Tracksmith NAM replaces the displayed AVRX NAM name, adds bass/mid/treble, sweepable mid frequency and high pass after the model, and saves/loads .tsnampreset files. Model contents are not embedded. Missing/invalid preset files are rejected before settings change. VST3 component/controller IDs and original six parameter IDs/order remain unchanged. Old state defaults to flat EQ; DAW restore redirects old AVRX NAM descriptions to the bundled Tracksmith NAM path.
 
-[Working Windows build](Tracksmith-Windows-GGD-MIDI-Fix.zip) · [Current source with test harness](Tracksmith-Source-Reliability-Checkpoint.zip) · [Reliability report](Tracksmith-Reliability-Report.md) · [Raw results and harness](Tracksmith-Reliability-Results.zip)
+## Latest validation
 
-## GGD import regression — fixed
+- Automated DSP checks for the eight effects passed at 8, 44.1, 48, 96 and 192 kHz.
+- VST3 discovery/loading and parameter state round trips passed; native editors rendered and were visually inspected.
+- Plate: pre-delay shift, decay-energy ordering, dense tail, stereo decorrelation/width, reset, finite extreme settings and bypass.
+- Delay: first-repeat timing, feedback decay, channel isolation, no static-time impulse spread, reset, finite parameter changes and bypass.
+- Actual VST3 rendering produced reverb/delay tails.
+- NAM: model loading, post-model EQ audio gain, preset save/load/overwrite, relative model lookup, missing/malformed/nonfinite preset rejection, legacy state and stable VST3 IDs.
+- Existing VST3 hosting, NAM, wet monitoring, delay compensation, MIDI/session and WAV export checks passed, as did automation, routing and clip-edit suites.
+- Package integrity and payload hashes verified; nine bundles included, legacy AVRX Drums and AVRX NAM bundles excluded.
 
-The user reported accepted groove drops with no visible notes. Saved GGD files reproduced an import rejection involving duplicate same-pitch/channel hits at the same tick and zero-duration gates produced by note matching. The fix merges identical-tick duplicates with the strongest velocity, retains distinct flams/retriggers and normalizes gates without changing source MIDI files. All 225 saved GGD Rock grooves import. Clear/reimport and conflict rollback tests pass. Imports now report success or failure and scroll/select imported notes. The user confirmed everything works.
+[Raw stock test results](Tracksmith-Stock-Plugin-Test-Results.json) · [Dynamics notes and implementation limits](Tracksmith-Dynamics-Test-Update.md)
 
-[GGD guide](Tracksmith-GGD-MIDI-Fix-Guide.md) · [GGD validation](Tracksmith-GGD-MIDI-Fix-Validation.txt)
+User listening tests of this new combined stock-plugin build are still pending. Do not mark them complete. Bus/FET processors are original behavioral implementations, not verified circuit emulations. The limiter is sample-peak, not true-peak. The de-esser uses a manually selected band and adaptive threshold, not SPL's proprietary scanning system. Extreme delay feedback can outlast the export dialog's 30-second tail limit.
 
-## Previous milestone: selection and shortcuts
+## Previous confirmed milestones
 
-The user reported being unable to highlight/delete MIDI notes and requested right-click track deletion plus more Pro Tools-style controls. The latest build adds rectangle and Shift-click MIDI selection, atomic group deletion with Undo, group movement/resizing, an internal MIDI clipboard, duplicate, transpose, velocity, note navigation and nudge shortcuts. Instrument tracks default to Select; F8 selects and F10 draws. Right-click a track name in Edit/Mix for New/Delete. A Shortcuts panel is inside the Arrangement toolbar.
+- GGD groove import fix: all 225 saved grooves imported; the user confirmed it works. Duplicate hits are normalized and imported notes are selected/scrolled into view.
+- First synthetic reliability pass completed: 60- and 120-second runs, 80 tracks, 16 controlled delay fixtures, 152 recorded WAVs, 20 session reopens, 20 recovery snapshots, 90 edits and 10 plugin reloads; 17,833 audio blocks with none over their processing budgets. This does not measure device xruns or a multi-hour heavy-instrument workload.
+- First Windows installer trial went well according to the user. The earlier 0.1.0 MSI is archived here, but it does not include the new stock suite. Automated installer lifecycle testing was limited by Windows Installer service access; the user subsequently tested the installer manually.
 
-The controls were checked against Avid documentation; this is a supported subset, with Tracksmith-specific behavior documented in the [guide](Tracksmith-Selection-Shortcuts-Guide.md). Track deletion cannot Undo, stops playback and clears histories. Source audio is retained; surviving track media, instruments, inputs and bus routes are remapped.
+## Core workflow retained
 
-[Selection and Shortcuts Windows archive](Tracksmith-Windows-Selection-Shortcuts.zip) · [Selection and Shortcuts source archive](Tracksmith-Source-Selection-Shortcuts.zip) · [Validation](Tracksmith-Selection-Shortcuts-Validation.txt)
-
-## Recent progress since the initial GitHub upload
-
-- Plugin parameter automation and Read/Write/Touch/Latch; native Touch/Latch requires plugin gesture reporting.
-- Recording alignment using reported driver input/output and plugin latency; hardware timing still needs listening/calibration checks.
-- Armed-track monitoring with assigned inputs, pre/post sends and separate physical stereo cue outputs.
-- Playlist create/duplicate/rename/reorder/delete, alternate lanes, range promotion and explicit multi-track range edits.
-- Edit grid and corrected silent meter display.
-- Autosave/recovery with background guards, rotating snapshots, corrupt-snapshot fallback and recovered-copy Save As. Snapshots reference audio files; they do not copy media.
-- Instrument-track choice and inline piano roll in the Edit window.
-- MIDI groove file drops at the drop position from drum programs exposing .mid/.midi; proprietary drag formats need export first.
-- Latest MIDI selection fix, batch editing, context menus and keyboard workflow.
-
-## Validation and current limits
-
-Native Release and production frontend compile. TypeScript, keyboard/focus checks and note-edit math pass. Native tests cover atomic batch edits, MIDI groove imports, track deletion/remapping and existing VST3/MIDI playback, sessions/recovery, routing, clips and automation.
-
-The 128-track recovery fixture tests session metadata with WAV references, playlists and automation. It does not demonstrate realtime performance with 128 heavy plugin tracks.
-
-The user said the previous Instrument build was working, then reported the selection issue. The GGD fix subsequently superseded Selection and Shortcuts, and the user confirmed the working build. Formal hardware listening and longer representative-plugin/UI checks remain pending.
-
-Session format is **9**, opening versions 1–9. Keep older session copies. Plugins run in-process. MIDI keyboard recording and note audition are still future work. The MIDI clipboard is internal to the current app run.
+Recording and input monitoring with file playback, retake replacement, fades/crossfades, playlists, explicit group range editing, aux buses, pre/post sends, physical cue outputs, automation Read/Write/Touch/Latch, latency alignment, autosave/recovery, MIDI instrument tracks and inline piano roll, MIDI file drops, batch note selection/editing and shortcuts. Track deletion is not undoable and clears edit histories; source media remains. Session format 9 opens formats 1–9.
 
 ## Next
 
-1. Run a longer hardware/interface session with representative plugins and normal UI use. The initial synthetic reliability pass is complete.
-2. Fix any findings before treating reliability as finished.
-3. Prepare the Windows installer when those checks are satisfactory.
-4. Continue with the custom UI after core behavior and reliability are ready.
-
-Plugin scanning improvements remain deferred by user request. This list records the direction, not an instruction to start unrelated work automatically.
+1. User tests all stock effects in the portable build, including NAM EQ/presets and plate/delay on inserts and sends.
+2. Fix listening/workflow findings and run a longer interface session with representative plugins.
+3. Update the installer for the current build after testing is satisfactory.
+4. Continue the main DAW custom UI later. Plugin scanner improvements remain deferred.
 
 ## Decisions to preserve
 
-- Keep the DAW core separate from Tracksmith Groove 0.18, the optional VST3.
-- Preserve original AVRX Groove 0.17 and existing source/build backups.
-- AVRX Drums stays excluded.
-- Core workflow before custom UI.
-- Retakes replace the covered audio range; source audio files stay intact.
-- Maintain portable review builds while the installer is pending.
+- Keep the DAW separate from optional Tracksmith Groove 0.18; preserve original AVRX Groove 0.17 and earlier snapshots.
+- AVRX Drums remains excluded.
+- Source media stays intact when retakes replace ranges.
+- Preserve compatibility and portable review builds.
+- Do not claim a hardware listening pass or exact analog emulation based on automated tests alone.
 
-This is a saved handoff. GitHub is not a live mirror of the development PC or conversation.
+This is a saved handoff, not a live mirror of the PC or chat. Source is stored as ZIP snapshots.
