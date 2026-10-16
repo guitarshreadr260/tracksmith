@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {previewClip,editPosition} from '../src/clipEditing.ts';
+const clip={id:1,track:0,source:0,start:2,offset:1,length:2,sourceDuration:5,name:'Guitar'};
+assert.equal(previewClip(clip,'move',.17,true,120,.25).start,2.125);
+assert.equal(previewClip(clip,'move',.17,false,120,.25).start,2.17);
+assert.equal(previewClip(clip,'move',-99,false,120,.25).start,0);
+assert.equal(previewClip(clip,'trimLeft',-99,false,120,.25).offset,0);
+assert.equal(previewClip(clip,'trimRight',99,false,120,.25).length,4);
+assert.ok(previewClip(clip,'trimLeft',99,false,120,.25).length>=.000999);
+assert.equal(previewClip(clip,'fadeIn',99,false,120,.25).fadeIn,2);
+assert.equal(previewClip(clip,'fadeOut',-99,false,120,.25).fadeOut,2);
+assert.equal(editPosition(previewClip(clip,'trimRight',.5,false,120,.25),'trimRight'),4.5);
+assert.deepEqual(clip,{id:1,track:0,source:0,start:2,offset:1,length:2,sourceDuration:5,name:'Guitar'});
+console.log('Clip preview: snapping/override, source and timeline bounds, fade clamps, trim endpoints and immutable source PASS');

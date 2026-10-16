@@ -1,0 +1,1 @@
+PASS: Native insert copy retains independent instance, parameter state, bypass and automation; move clears source; occupied/invalid destinations preserve plugins.

@@ -19,5 +19,9 @@ int main()
     t.clips={{1,1,0,0,1},{2,0,1,.2,.8}};require(ClipLayout::crossfade(t.clips,2,.1,[&](int id){return t.sourceDuration(id);})&&near(t.sample(.95,false),.5f),"crossfade uses left handles when outgoing source ends");
     t.clips={{1,1,0,0,1},{2,1,1,0,1}};require(!ClipLayout::crossfade(t.clips,2,.1,[&](int id){return t.sourceDuration(id);}),"missing source handles reject without fabricating audio");
     auto invalid=t.clips[0];invalid.fadeIn=.8;invalid.fadeOut=.5;require(!ClipLayout::valid(invalid),"invalid fade bounds reject");
+    std::vector<TimelineClip> duplicates{{1,0,1,.2,.5,.1,.1,0,0,false}};const auto originalDuplicate=duplicates[0];
+    require(ClipLayout::edit(duplicates,1,"duplicate",3,2)&&duplicates.size()==2&&duplicates[0].start==1&&duplicates[1].start==3&&duplicates[1].offset==.2&&duplicates[1].fadeIn==.1,"duplicate preserves source, offset and fades");
+    require(!ClipLayout::edit(duplicates,1,"duplicate",4,2)&&duplicates.size()==2,"duplicate ID collision rejects");
+    require(!ClipLayout::edit(duplicates,1,"duplicate",86400,3)&&duplicates.size()==2,"out of bounds duplicate rejects without mutation");
     std::cout<<"Overwrite, fades, crossfades, handles and clip undo data tests passed.\n";
 }

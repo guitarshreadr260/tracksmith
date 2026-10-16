@@ -12,7 +12,7 @@ const block=source.slice(source.indexOf(' const available='),source.indexOf(' re
 const js=ts.transpileModule(block+';return registry;', {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
 function fixture(overrides={}){
  const sent=[],changes=[];
- const context={disabled:false,audio:{recording:false,seconds:2,canMidiUndo:true},chosen:{id:3,kind:'MIDI'},selection:{id:8,track:3,midi:true},selected:3,tracks:[{}],rangeStart:0,rangeEnd:4,rangeTrack:null,view:'edit',native:true,bpm:120,play:()=>sent.push({type:'play'}),record:()=>sent.push({type:'record'}),editor:false,playlist:false,zoom:1,snap:true,command:c=>sent.push(c),addInstrument:()=>changes.push('add'),createCommandRegistry,...overrides};
+ const context={disabled:false,audio:{recording:false,seconds:2,canMidiUndo:true},chosen:{id:3,kind:'MIDI'},selection:{id:8,track:3,midi:true},selected:3,tracks:[{}],rangeStart:0,rangeEnd:4,rangeTrack:null,view:'edit',clips:[{id:5,track:3,start:1,length:2,offset:0,sourceDuration:8}],gridStep:.25,native:true,bpm:120,play:()=>sent.push({type:'play'}),record:()=>sent.push({type:'record'}),editor:false,playlist:false,zoom:1,snap:true,command:c=>sent.push(c),addInstrument:()=>changes.push('add'),createCommandRegistry,...overrides};
  for(const key of ['setLauncher','setNewSetup','setSelection','setRangeTrack','setView','setLibraryOpen','setEditor','setZoom','setPlaylist','setSnap','setIOOpen','setDetails','setNotice'])context[key]=v=>changes.push([key,v]);
  return {registry:new Function(...Object.keys(context),js)(...Object.values(context)),sent,changes};
 }
@@ -37,3 +37,7 @@ const mix=fixture({view:'mix'});mix.registry.shortcut(key('KeyT'));assert.equal(
 const file=fixture();assert.equal(file.registry.shortcut(key('KeyS')),false);file.registry.shortcut(key('KeyS',{ctrlKey:true}));assert.deepEqual(file.sent,[{type:'saveSession'}]);
 file.registry.shortcut(key('KeyS',{ctrlKey:true,repeat:true}));assert.equal(file.sent.length,1);
 console.log('R/T zoom direction, repeat, bounds, mixer guard, modifiers, Ctrl-only save and repeat suppression PASS');
+
+const duplicate=fixture({selection:{id:5,track:3}});duplicate.registry.shortcut(key('KeyD',{ctrlKey:true}));assert.deepEqual(duplicate.sent,[{type:'clipEdit',track:3,id:5,action:'duplicate',position:3}]);
+const mixer=fixture();assert.equal(mixer.registry.shortcut(key('Equal',{ctrlKey:true})),false);assert.equal(mixer.registry.shortcut(key('KeyM',{ctrlKey:true,shiftKey:true})),true);
+console.log('Build 18 duplicate and non-conflicting mixer shortcuts PASS');

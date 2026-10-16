@@ -1,0 +1,47 @@
+MSBuild version 18.10.1-1.26427.6+3cd27c13e for .NET Framework
+
+  Checking File Globs
+  Tracksmith_rc_lib.vcxproj -> C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\Tracksmith_rc_lib.dir\Release\Tracksmith_rc_lib.lib
+  TracksmithGrooveArtwork.vcxproj -> C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\Release\TracksmithGrooveArtwork.lib
+  Generating juce_binarydata_TracksmithWebAssets/JuceLibraryCode/BinaryData1.cpp, juce_binarydata_TracksmithWebAssets/JuceLibraryCode/BinaryData2.cpp, juce_binarydata_TracksmithWebAssets/JuceLibraryCode/BinaryData3.cpp, juce_binarydata_TracksmithWebAssets/JuceLibraryCode/BinaryData.h
+  TracksmithNativeNamCore.vcxproj -> C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\Release\TracksmithNativeNamCore.lib
+  BinaryData1.cpp
+  BinaryData2.cpp
+  Generating Code...
+  TracksmithWebAssets.vcxproj -> C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\Release\TracksmithWebAssets.lib
+  Main.cpp
+C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\outputs\Tracksmith-Build-18\Tracksmith\source\SessionFile.h(155,119): warning C4456: declaration of 'path' hides previous local declaration [C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\Tracksmith.vcxproj]
+  (compiling source file '../../outputs/Tracksmith-Build-18/Tracksmith/source/Main.cpp')
+      C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\outputs\Tracksmith-Build-18\Tracksmith\source\SessionFile.h(147,20):
+      see declaration of 'path'
+  
+C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\outputs\Tracksmith-Build-18\Tracksmith\source\SessionFile.h(181,24): warning C4456: declaration of 'list' hides previous local declaration [C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\Tracksmith.vcxproj]
+  (compiling source file '../../outputs/Tracksmith-Build-18/Tracksmith/source/Main.cpp')
+      C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\outputs\Tracksmith-Build-18\Tracksmith\source\SessionFile.h(132,16):
+      see declaration of 'list'
+  
+C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\outputs\Tracksmith-Build-18\Tracksmith\source\SessionFile.h(186,74): warning C4456: declaration of 'name' hides previous local declaration [C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\Tracksmith.vcxproj]
+  (compiling source file '../../outputs/Tracksmith-Build-18/Tracksmith/source/Main.cpp')
+      C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\outputs\Tracksmith-Build-18\Tracksmith\source\SessionFile.h(138,20):
+      see declaration of 'name'
+  
+C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\outputs\Tracksmith-Build-18\Tracksmith\source\CountIn.h(19,30): warning C4244: 'initializing': conversion from 'int64_t' to 'double', possible loss of data [C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\Tracksmith.vcxproj]
+  (compiling source file '../../outputs/Tracksmith-Build-18/Tracksmith/source/Main.cpp')
+  
+C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\outputs\Tracksmith-Build-18\Tracksmith\source\CountIn.h(19,30): warning C4244: 'initializing': conversion from 'int64_t' to 'const double', possible loss of data [C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\Tracksmith.vcxproj]
+  (compiling source file '../../outputs/Tracksmith-Build-18/Tracksmith/source/Main.cpp')
+  
+C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\outputs\Tracksmith-Build-18\Tracksmith\source\Main.cpp(1104,28): warning C4458: declaration of 'error' hides class member [C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\Tracksmith.vcxproj]
+      C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\outputs\Tracksmith-Build-18\Tracksmith\source\Main.cpp(1681,17):
+      see declaration of 'MainComponent::error'
+  
+  Tracksmith.vcxproj -> C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\Tracksmith_artefacts\Release\Tracksmith.exe
+MSBuild version 18.10.1-1.26427.6+3cd27c13e for .NET Framework
+
+  Checking File Globs
+  StudioClipTests.vcxproj -> C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\Release\StudioClipTests.exe
+MSBuild version 18.10.1-1.26427.6+3cd27c13e for .NET Framework
+
+  Checking File Globs
+  StudioSessionTests_rc_lib.vcxproj -> C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\StudioSessionTests_rc_lib.dir\Release\StudioSessionTests_rc_lib.lib
+  StudioSessionTests.vcxproj -> C:\Users\tiaii\Documents\Codex\2026-10-16\referenced-chatgpt-conversation-this-is-an\work\build18-native\StudioSessionTests_artefacts\Release\StudioSessionTests.exe

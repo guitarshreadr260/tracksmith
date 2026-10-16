@@ -55,6 +55,11 @@ inline bool edit(std::vector<TimelineClip>& clips, int id, const char* operation
     auto changed=*found;
     const std::string action(operation);
     if(action=="delete") {clips.erase(found);return true;}
+    if(action=="duplicate")
+    {
+        if(clips.size()>=maximumClips||newId<=0||std::any_of(clips.begin(),clips.end(),[&](const auto& c){return c.id==newId;}))return false;
+        changed.id=newId;changed.start=position;changed.blend=false;if(!valid(changed))return false;clips.push_back(changed);return true;
+    }
     if(action=="move") changed.start=position;
     else if(action=="trimLeft")
     { if(position<changed.start){const auto delta=changed.start-position;changed.start=position;changed.offset-=delta;changed.length+=delta;changed.fadeSpan=0;changed.fadeOffset=0;changed.fadeIn=changed.fadeOut=0;}else changed=slice(changed,position,changed.start+changed.length,changed.id); }

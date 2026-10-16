@@ -240,6 +240,24 @@ public:
         if(automationPassActive){automationTick();engine.playback.playing=false;finishAutomation();}
         confirmDiscard("Close Tracksmith?", [safe=juce::Component::SafePointer<MainComponent>(this)] {if(safe){safe->cleanRecovery();juce::JUCEApplication::getInstance()->quit();}});
     }
+    bool insertTransferRegression(const juce::File& report)
+    {
+        juce::String failure;auto check=[](bool ok,const char* text){if(!ok)throw std::runtime_error(text);};
+        auto send=[&](const char* json){command(juce::JSON::parse(json));};
+        try{
+            trackCount=2;createInsert(0,0,NativeInstruments::description(false));auto& source=engine.plugins.channels[0][0];
+            check(source&&source->instance,"native NAM source created");const auto& parameters=source->instance->getParameters();check(!parameters.isEmpty(),"source exposes parameters");parameters[0]->setValueNotifyingHost(.37f);source->bypass=true;
+            source->automation.push_back({PluginRack::parameterId(parameters[0]),parameters[0]->getName(512),{{0,.2f},{1,.8f}},true,1});source->bindAutomation();
+            send(R"({"type":"pluginTransfer","channel":0,"slot":0,"targetChannel":1,"targetSlot":1,"copy":true})");auto& copy=engine.plugins.channels[1][1];
+            check(copy&&copy->instance&&source&&copy->instance.get()!=source->instance.get(),"copy creates independent instance and preserves source");
+            check(std::abs(copy->instance->getParameters()[0]->getValue()-parameters[0]->getValue())<.0001f&&copy->bypass.load(),"copy retains parameter and bypass");
+            check(copy->automation.size()==1&&copy->automation[0].points.size()==2&&copy->automation[0].points[1].value==.8f,"copy retains automation");
+            const auto token=copy->token;send(R"({"type":"pluginTransfer","channel":0,"slot":0,"targetChannel":1,"targetSlot":1,"copy":true})");check(copy->token==token,"occupied destination preserved");
+            send(R"({"type":"pluginTransfer","channel":1,"slot":1,"targetChannel":1,"targetSlot":2,"copy":false})");check(!copy&&engine.plugins.channels[1][2]&&engine.plugins.channels[1][2]->token==token,"move transfers instance and clears source");
+            send(R"({"type":"pluginTransfer","channel":0,"slot":0,"targetChannel":-1,"targetSlot":1,"copy":true})");check(source&&source->instance,"invalid channel preserves source");
+        }catch(const std::exception& e){failure=e.what();}
+        report.replaceWithText(failure.isEmpty()?"PASS: Native insert copy retains independent instance, parameter state, bypass and automation; move clears source; occupied/invalid destinations preserve plugins.":"FAIL: "+failure);return failure.isEmpty();
+    }
     bool editingRegression(const juce::File& reference,const juce::File& report)
     {
         juce::String failure;auto check=[&](bool ok,const char* text){if(!ok)throw std::runtime_error(text);};
@@ -253,6 +271,7 @@ public:
             send(R"({"type":"clipEdit","track":0,"id":1,"action":"delete","position":0})");check(t.clips.empty(),"audio delete");
             send(R"({"type":"undo","track":1})");check(t.clips.size()==1,"undo audio after selecting MIDI");
             send(R"({"type":"redo","track":1})");check(t.clips.empty(),"redo audio");send(R"({"type":"undo"})");
+            send(R"({"type":"clipEdit","track":0,"id":1,"action":"duplicate","position":8})");check(t.clips.size()==2&&t.clips[0].start==0&&t.clips[1].start==8,"duplicate preserves source and destination");send(R"({"type":"undo"})");check(t.clips.size()==1,"duplicate undo");send(R"({"type":"redo"})");check(t.clips.size()==2,"duplicate redo");send(R"({"type":"undo"})");
             send(R"({"type":"midiEdit","track":1,"id":1,"action":"add","pitch":36,"channel":10,"start":2,"length":1,"velocity":0.8})");
             send(R"({"type":"midiEdit","track":1,"id":1,"action":"delete"})");check(engine.plugins.midiLanes[1].notes.empty(),"MIDI delete");
             send(R"({"type":"undo","track":0})");check(engine.plugins.midiLanes[1].notes.size()==1,"undo MIDI after selecting audio");
@@ -263,7 +282,7 @@ public:
             check(!nativeAnalysisPending&&!engine.plugins.midiLanes[2].notes.empty(),"timeline analysis writes drum MIDI");check(nativeAnalysisMessage.contains("GrooVAE"),"Actual pretrained neural inference committed song MIDI");
             check(wav.waveform.size()>512&&static_cast<double>(wav.waveform[0])<=0,"high resolution signed waveform");
         }catch(const std::exception& e){failure=e.what();}
-        report.replaceWithText(failure.isEmpty()?"PASS: Native command audio/MIDI delete undo/redo across track changes, scoped range deletion/undo, signed waveform extraction, timeline analysis to drum MIDI.":"FAIL: "+failure);
+        report.replaceWithText(failure.isEmpty()?"PASS: Native clip duplicate/undo/redo and audio/MIDI delete undo/redo across track changes, scoped range deletion/undo, signed waveform extraction, timeline analysis to drum MIDI.":"FAIL: "+failure);
         return failure.isEmpty();
     }
 
@@ -493,6 +512,29 @@ private:
         else {const auto t=message.getProperty("time",{}),v=message.getProperty("value",{});if((t.isInt()||t.isInt64()||t.isDouble())&&std::isfinite(static_cast<double>(t))){const double time=static_cast<double>(t);if(action=="put"&&(v.isInt()||v.isDouble())){ok=Automation::put(found->points,{time,static_cast<float>(v)},0,1);found->read=true;found->mode=1;}else if(action=="delete"){auto point=std::find_if(found->points.begin(),found->points.end(),[time](const auto& p){return std::abs(p.time-time)<1.e-8;});if(point!=found->points.end()){found->points.erase(point);ok=true;}}}}
         if(ok){engine.detach();slot->rememberAutomation();slot->automation=std::move(lanes);slot->bindAutomation();engine.attach();markDirty();status="Plugin automation saved. Read follows the curve; Off leaves the current control value.";}else status="Choose a valid plugin automation point.";
         publish(true);
+    }
+    void transferInsert(const juce::var& message)
+    {
+        if(loading||recordingBusy||sessionBusy||pluginBusy||exportBusy||chooser||recoveryWorker.isBusy()||automationPassActive){status="Finish recording, automation or the current task before transferring inserts.";publish();return;}
+        const auto from=message.getProperty("channel",{}),slot=message.getProperty("slot",{}),to=message.getProperty("targetChannel",{}),target=message.getProperty("targetSlot",{}),copy=message.getProperty("copy",{});
+        if(!from.isInt()||!slot.isInt()||!to.isInt()||!target.isInt()||!copy.isBool())return;
+        const int sourceChannel=from,sourceIndex=slot,targetChannel=to,targetIndex=target;
+        const auto validChannel=[&](int channel){return channel>=0&&(channel<trackCount||channel==128);};
+        if(!validChannel(sourceChannel)||!validChannel(targetChannel)||sourceIndex<0||sourceIndex>=5||targetIndex<0||targetIndex>=5||(sourceChannel==targetChannel&&sourceIndex==targetIndex))return;
+        auto& source=engine.plugins.channels[sourceChannel][static_cast<size_t>(sourceIndex)];auto& destination=engine.plugins.channels[targetChannel][static_cast<size_t>(targetIndex)];
+        if(!source||!source->instance){status="The source plugin is unavailable.";publish();return;}
+        const auto token=message.getProperty("sourceToken",{});if(!token.isVoid()&&(!(token.isInt()||token.isInt64()||token.isDouble())||static_cast<juce::int64>(token)!=static_cast<juce::int64>(source->token))){status="The source insert changed. Drag it again.";publish();return;}
+        if(destination){status="Choose an empty destination insert. Existing plugins were kept.";publish();return;}
+        if(source->description.fileOrIdentifier=="tracksmith-native-click"){status="Use Create Click Track to add another click instrument.";publish();return;}
+        if(source->description.isInstrument&&(targetChannel==128||targetIndex!=0||!engine.plugins.midiLanes[targetChannel].enabled)){status="Instrument plugins require insert A of an Instrument track.";publish();return;}
+        engine.playback.playing=false;
+        if(static_cast<bool>(copy)){
+            juce::MemoryBlock state;engine.detach();source->instance->getStateInformation(state);engine.attach();
+            const auto description=source->description;const bool bypass=source->bypass.load();const juce::var automation(PluginAutomation::encode(source->automation));
+            createInsert(static_cast<size_t>(targetChannel),targetIndex,description,state,bypass,false,automation);
+        }else{
+            engine.detach();source->window.reset();destination=std::move(source);destination->resetGestures();engine.plugins.resetGraph();engine.playback.seekSeconds=engine.playback.seconds.load();engine.attach();markDirty();status="Plugin moved with its settings and automation.";publish(true);
+        }
     }
     void createInsert(size_t channel, int index, juce::PluginDescription description,
                       juce::MemoryBlock state = {}, bool bypass = false, bool restoring = false, juce::var automation = {})
@@ -962,7 +1004,7 @@ private:
         juce::Array<juce::var> midiNotes;
         for(int track=0;track<trackCount;++track)if(engine.plugins.midiLanes[track].enabled)for(const auto& n:engine.plugins.midiLanes[track].notes){auto* item=new juce::DynamicObject();item->setProperty("track",track);item->setProperty("id",n.id);item->setProperty("pitch",n.pitch);item->setProperty("channel",n.channel);item->setProperty("start",n.start);item->setProperty("length",n.length);item->setProperty("velocity",n.velocity);midiNotes.add(juce::var(item));}object->setProperty("midiNotes",midiNotes);
         object->setProperty("canBatchUndo",!groupUndo.empty()||!playlistUndo.empty());object->setProperty("canBatchRedo",!groupRedo.empty()||!playlistRedo.empty());
-        object->setProperty("clips",clips);object->setProperty("canUndo",!undoClips.empty());object->setProperty("canRedo",!redoClips.empty());object->setProperty("canMidiUndo",!midiUndo.empty());object->setProperty("canMidiRedo",!midiRedo.empty());
+        object->setProperty("clipEditResult",clipEditResult);object->setProperty("clips",clips);object->setProperty("canUndo",!undoClips.empty());object->setProperty("canRedo",!redoClips.empty());object->setProperty("canMidiUndo",!midiUndo.empty());object->setProperty("canMidiRedo",!midiRedo.empty());
         object->setProperty("loading", loading || sessionBusy || pluginBusy || (recordingBusy && !engine.recorder.isActive()));
         object->setProperty("sessionRevision",sessionRevision);
         object->setProperty("sessionName", sessionFile == juce::File() ? (recoveredName.isEmpty()?(newSessionName.isEmpty()?juce::String("Untitled session"):newSessionName):recoveredName) : sessionFile.getFileNameWithoutExtension());
@@ -1215,6 +1257,7 @@ private:
             {if(!ClipLayout::crossfade(after,static_cast<int>(id),static_cast<double>(position),[&](int source){return engine.playback.tracks[track].sourceDuration(source);})){status="Crossfade needs a touching or overlapping previous clip with enough source audio handles.";publish();return;}}
             else if(!ClipLayout::edit(after,static_cast<int>(id),action.toRawUTF8(),static_cast<double>(position),next))return;
             for(const auto& c:after){const auto duration=engine.playback.tracks[track].sourceDuration(c.source);if(duration>0 && c.offset+c.length>duration+1.e-6)return;}
+            if(action=="duplicate"){auto* result=new juce::DynamicObject();result->setProperty("revision",++clipEditRevision);result->setProperty("track",track);result->setProperty("id",next);clipEditResult=juce::var(result);}
             clearBatchHistory();undoClips.push_back({track,std::move(before),after,activePlaylists[track]});if(undoClips.size()>64)undoClips.erase(undoClips.begin());redoClips.clear();midiRedo.clear();
             engine.detach();engine.playback.tracks[track].clips=std::move(after);syncPlaylist(track);finishClipEdit();markDirty();status="Clip "+action+" applied. Playback stopped for editing.";publish(true);return;
         }
@@ -1321,6 +1364,7 @@ private:
             }
             discoverPlugin(file,static_cast<size_t>(channel),index);return;
         }
+        if(type=="pluginTransfer"){transferInsert(message);return;}
         if (type.startsWith("plugin"))
         {
             const auto channelValue = message.getProperty("channel", {}), slotValue = message.getProperty("slot", {});
@@ -1594,6 +1638,7 @@ private:
     {
         const auto position=engine.playback.seconds.load();engine.playback.refreshDuration();engine.playback.reset();engine.plugins.resetGraph();engine.playback.seekSeconds=std::min(position,engine.playback.duration());engine.attach();
     }
+    juce::var clipEditResult;int clipEditRevision=0;
     struct ClipChange { int track=0;std::vector<TimelineClip> before,after;int playlist=0; uint64_t serial=nextTimelineEdit(); };
     std::vector<ClipChange> undoClips,redoClips;
     SessionControls controls; // Must outlive the browser callbacks.
@@ -1670,11 +1715,12 @@ public:
     void initialise(const juce::String& args) override {
         juce::StringArray tokens;tokens.addTokens(args,true);tokens.removeEmptyStrings();
         if(tokens.size()==3&&tokens[0]=="--scan-vst3"){PluginDiscovery::scan(tokens[1].unquoted(),tokens[2].unquoted());quit();return;}
+        if(tokens.size()==2&&tokens[0]=="--insert-transfer-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->insertTransferRegression(juce::File(tokens[1].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==3&&tokens[0]=="--editing-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->editingRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         PluginDiscovery::recover();
         mainWindow=std::make_unique<MainWindow>();
     }
-    bool moreThanOneInstanceAllowed() override { return getCommandLineParameters().contains("--scan-vst3")||getCommandLineParameters().contains("--editing-regression"); }
+    bool moreThanOneInstanceAllowed() override { return getCommandLineParameters().contains("--scan-vst3")||getCommandLineParameters().contains("--editing-regression")||getCommandLineParameters().contains("--insert-transfer-regression"); }
     void shutdown() override { mainWindow.reset(); }
     void systemRequestedQuit() override { if (mainWindow) mainWindow->requestClose(); else quit(); }
 private:
