@@ -1,0 +1,5 @@
+out/
+.vs/
+ui/node_modules/
+backups/
+vendor/

@@ -1,0 +1,52 @@
+import { readFileSync } from 'node:fs';
+import ts from 'typescript';
+import assert from 'node:assert/strict';
+const source = readFileSync(new URL('../src/main.tsx', import.meta.url), 'utf8');
+const start = source.indexOf('const key=(e:KeyboardEvent)=>{');
+const end = source.indexOf(';window.addEventListener', start);
+assert(start >= 0 && end > start);
+const handler = ts.transpileModule(source.slice(start, end) + ';return key;', {compilerOptions: {target: ts.ScriptTarget.ES2022}}).outputText;
+function press(code, {playing=false, recording=false, recordingBusy=false, editable=false, repeat=false, ctrl=false, shift=false, alt=false, meta=false, loading=false, focus=false}={}) {
+ const commands=[];let toggles=0;
+ const key = new Function('audio','playing','recordMode','isNative','send','transport','seek','setMixer','commitName','editSelected','keyboardFocus','setZoom','selected','newTrackKind','setSnap','tracks',handler)(
+  {loading,recording,recordingBusy,dynamicTransport:false},playing,1,()=>true,c=>commands.push(c),playing=>commands.push({type:'transport',playing}),beat=>commands.push({type:'seek',beat}),()=>++toggles,()=>{},action=>commands.push({action}),focus,()=>commands.push({zoom:true}),0,'AUDIO',value=>commands.push({snap:value}),[{id:0,kind:'AUDIO'}]);
+ key({code,key:code==='Space'?' ':code.startsWith('Key')?code.slice(3).toLowerCase():code==='Equal'?'=':'',repeat,ctrlKey:ctrl,metaKey:meta,altKey:alt,shiftKey:shift,target:{matches:()=>editable},preventDefault(){}});
+ return {commands,toggles};
+}
+assert.deepEqual(press('Numpad3').commands,[{type:'record',channels:1}]);
+assert.deepEqual(press('F12').commands,[{type:'record',channels:1}]);
+assert.deepEqual(press('Space',{ctrl:true}).commands,[{type:'record',channels:1}]);
+assert.deepEqual(press('Numpad3',{recording:true,recordingBusy:true}).commands,[{type:'stop'}]);
+assert.deepEqual(press('Space',{playing:true,recording:true,recordingBusy:true}).commands,[{type:'stop'}]);
+assert.deepEqual(press('Space',{recordingBusy:true}).commands,[]);
+assert.deepEqual(press('Space').commands,[{type:'transport',playing:true}]);
+assert.deepEqual(press('Numpad0').commands,[{type:'transport',playing:true}]);
+assert.deepEqual(press('Space',{playing:true}).commands,[{type:'stop'}]);
+assert.deepEqual(press('KeyE',{ctrl:true}).commands,[{action:'split'}]);
+assert.deepEqual(press('KeyT',{ctrl:true}).commands,[{action:'trimSelection'}]);
+assert.deepEqual(press('KeyN',{ctrl:true,shift:true}).commands,[{type:'newTrackDialog'}]);
+assert.deepEqual(press('KeyN',{ctrl:true,shift:true,editable:true}).commands,[{type:'newTrackDialog'}]);
+assert.deepEqual(press('KeyN',{ctrl:true,shift:true,loading:true}).commands,[]);
+assert.deepEqual(press('KeyN',{ctrl:true,shift:true,recordingBusy:true}).commands,[]);
+assert.deepEqual(press('Digit7',{alt:true,shift:true}).commands,[{action:'trimLeft'}]);
+assert.deepEqual(press('Digit8',{alt:true,shift:true}).commands,[{action:'trimRight'}]);
+assert.deepEqual(press('KeyZ',{ctrl:true}).commands,[{type:'undo',track:0}]);
+assert.deepEqual(press('KeyZ',{ctrl:true,shift:true}).commands,[{type:'redo',track:0}]);
+assert.deepEqual(press('KeyB',{ctrl:true}).commands,[{action:'delete'}]);
+assert.deepEqual(press('KeyA',{focus:true}).commands,[{action:'trimLeft'}]);
+assert.deepEqual(press('KeyS',{focus:true}).commands,[{action:'trimRight'}]);
+assert.deepEqual(press('KeyB',{focus:true}).commands,[{action:'split'}]);
+assert.deepEqual(press('KeyA').commands,[]);
+assert.deepEqual(press('KeyP',{ctrl:true,meta:true}).commands,[{type:'dynamicTransport',enabled:true}]);
+assert.deepEqual(press('KeyP',{ctrl:true,shift:true}).commands,[]);
+for(const code of ['Numpad3','Space','KeyE','KeyZ','Digit7','Delete','KeyT'])assert.deepEqual(press(code,{editable:true,ctrl:true,alt:true,shift:true}).commands,[]);
+assert.deepEqual(press('KeyE',{ctrl:true,recordingBusy:true}).commands,[]);
+assert.deepEqual(press('Numpad3',{repeat:true}).commands,[]);
+assert.deepEqual(press('Digit3').commands,[]);
+assert.equal(press('Equal',{ctrl:true}).toggles,1);
+console.log('Pro Tools Windows transport/edit mappings, focus mode, conflicts and typing guards passed.');
+
+assert.deepEqual(press('F2').commands,[{snap:false}]);
+assert.deepEqual(press('F4').commands,[{snap:true}]);
+assert.deepEqual(press('KeyI',{ctrl:true,shift:true}).commands,[{type:'import',id:0}]);
+assert.deepEqual(press('F4',{editable:true}).commands,[]);

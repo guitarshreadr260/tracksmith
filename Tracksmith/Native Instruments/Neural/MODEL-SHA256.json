@@ -1,0 +1,8 @@
+{
+  "config.json": "9d8b28c29eda854e1a64cd5c05364c4c0ae93544cbb768b051ffef91a7572cbd",
+  "group1-shard1of4": "a63569b8eb3fce7d87aafd05ff58bc0d727e15918df071eea2ed68b56cf331ce",
+  "group1-shard2of4": "9fe133f601c7bdb7f74493e00d74eb02f32e35f1f0f9dca632f76a1746386a95",
+  "group1-shard3of4": "4a9ea3a75d0683f79ad44065b663692bc7018a52b806223651faf33cf2935899",
+  "group1-shard4of4": "92d29f984be6f2ad921d0eeae8a599c01adb929df8b88bac871ba3c7a8f4f560",
+  "weights_manifest.json": "add4e1d29362ca1469bb352edf5374f90ece729dbb77934c8f90de27f9662c2e"
+}

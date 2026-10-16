@@ -1,0 +1,1 @@
+AVRX NAM uses NeuralAmpModelerCore (MIT), Eigen (see its COPYING files), and nlohmann JSON (MIT). Complete dependency sources and notices are in plugins/AvrxNam/ThirdParty in the Tracksmith source update. The Tracksmith application does not link NAMCore.

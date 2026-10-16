@@ -1,0 +1,1 @@
+Prototype 16 code snapshot. Native sample packs, NAM model, neural weights and node.exe are excluded from this GitHub code archive. See external-assets.json for exact paths, sizes and hashes. The complete local source ZIP and portable build retain these resources. Build the UI before configuring CMake. See BUILD.md alongside this archive.
