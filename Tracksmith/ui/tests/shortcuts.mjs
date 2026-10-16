@@ -7,7 +7,7 @@ const start=source.indexOf('function key(e:KeyboardEvent)'),end=source.indexOf('
 assert.ok(start>=0&&end>start);
 const handler=ts.transpileModule(source.slice(start,end)+';return key;', {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
 function press(code,options={}){
- const actions=[],context={ioOpen:false,launcher:false,details:false,instrumentPicker:false,shuttle:d=>actions.push(d),lastShuttle:{current:0},...options};
+ const actions=[],context={audio:{},ioOpen:false,launcher:false,details:false,instrumentPicker:false,shuttle:d=>actions.push(d),lastShuttle:{current:0},...options};
  context.registry=createCommandRegistry([{id:'zoom.in',menu:'View',label:'In',shortcut:'T',repeatable:true,enabled:true,run:()=>actions.push('in')},{id:'zoom.out',menu:'View',label:'Out',shortcut:'R',repeatable:true,enabled:true,run:()=>actions.push('out')}]);
  let prevented=false;
  const key=new Function(...Object.keys(context),handler)(...Object.values(context));
@@ -20,3 +20,5 @@ for(const option of ['editable','menu','ioOpen','launcher','details','instrument
 assert.equal(press('KeyT').prevented,true);assert.equal(press('KeyQ').prevented,false);
 assert.deepEqual(press('Numpad1').actions,[-1]);assert.deepEqual(press('Numpad2').actions,[1]);
 console.log('Current Studio shortcut handler: R/T, repeat, typing/modifier/modal/menu/IME/handled-event guards and shuttle PASS');
+
+assert.deepEqual(press('KeyT',{audio:{stemPlan:{stage:'ready'}}}).actions,[]);

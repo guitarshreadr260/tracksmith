@@ -1,0 +1,1 @@
+PASS: audio copy/cut/range paste, cross-track source and fade preservation, audio and MIDI overwrite undo, MIDI clipboard properties, clear/undo and incompatible paste safety.

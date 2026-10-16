@@ -60,6 +60,11 @@ target_link_libraries(Tracksmith PRIVATE TracksmithWebAssets
 
 option(TRACKSMITH_STUDIO_TESTS "Build UI-prototype native regression checks" OFF)
 if(TRACKSMITH_STUDIO_TESTS)
+    juce_add_console_app(StudioStemTests PRODUCT_NAME "Studio drum stem tests")
+    target_sources(StudioStemTests PRIVATE tests/DrumStemTests.cpp)
+    target_compile_definitions(StudioStemTests PRIVATE JUCE_USE_CURL=0 JUCE_WEB_BROWSER=0)
+    target_link_libraries(StudioStemTests PRIVATE juce::juce_audio_utils)
+
     juce_add_console_app(StudioInstrumentTests PRODUCT_NAME "Studio instrument tests")
     juce_generate_juce_header(StudioInstrumentTests)
     target_sources(StudioInstrumentTests PRIVATE tests/FullGrooveInstrumentTests.cpp source/NativeInstruments.cpp source/GrooveFull/PluginProcessor.cpp source/GrooveFull/PluginEditor.cpp source/GrooveFull/Preset.cpp source/GrooveFull/DrumPack.cpp source/GrooveFull/GuitarEngine.cpp source/GrooveFull/GuitarPanel.cpp source/GrooveFull/NativeNam.cpp source/GrooveFull/Tone3000.cpp plugins/AvrxNam/Plugin.cpp plugins/AvrxNam/NativeNam.cpp)

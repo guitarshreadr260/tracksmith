@@ -1,0 +1,2 @@
+PASS: multi-output capture, mono/stereo 24-bit WAVs, shared duration/start, exact MIDI attacks with 128-sample latency compensation, separated kick/snare channels, manifest, silence detection, cancel cleanup, destination preservation and invalid-layout safety.
+Fixture instrument only; a loaded GGD kit was not rendered.

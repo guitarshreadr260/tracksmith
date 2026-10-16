@@ -18,6 +18,7 @@
 #include "PluginCatalog.h"
 #include "NativeInstruments.h"
 #include "ElasticWorker.h"
+#include "DrumStemExport.h"
 
 static uint64_t nextTimelineEdit() { static uint64_t serial=0; return ++serial; }
 
@@ -87,6 +88,7 @@ public:
     {
         setSize(1280, 820);
         elasticWorker.onFinished=[this](ElasticWorker::Result result){if(result.analysis)finishAttackAnalysis(std::move(result));else finishElastic(std::move(result.wav));};
+        stemWorker.onFinished=[this](StemResult result){stemActive=stemRendering=loading=pluginBusy=false;stemPlan=juce::var();stemInstance.reset();status=result.cancelled?"Drum stem render cancelled. No export folder was published.":result.error.isNotEmpty()?result.error:"Rendered drum stems to "+result.folder.getFullPathName()+(result.clipped?". Some outputs clipped; lower their instrument levels and render again.":"")+(result.silent.isEmpty()?"":". Silent outputs: "+result.silent.joinIntoString(", "));publish(true);};
         if(diagnostic)return;
         if (! juce::WebBrowserComponent::areOptionsSupported(makeOptions()))
         {
@@ -230,10 +232,11 @@ public:
         startupScan.onProgress=[safe=juce::Component::SafePointer<MainComponent>(this)](StartupScan::Progress p){if(!safe)return;safe->startupProgress=p;safe->pluginBusy=p.active;if(!p.active)safe->status=p.failed?"Studio ready. "+juce::String(p.failed)+" plugin(s) skipped after failed discovery; manual rescan is available in the insert menu.":"Studio ready. VST3 library checked.";safe->publish();};
         pluginBusy=true;startupScan.begin();
     }
-    ~MainComponent() override { elasticWorker.shutdown();startupScan.shutdown();stopTimer();recoveryWorker.onFinished={};recoveryWorker.shutdown(); }
+    ~MainComponent() override { stemWorker.shutdown(); elasticWorker.shutdown();startupScan.shutdown();stopTimer();recoveryWorker.onFinished={};recoveryWorker.shutdown(); }
     void resized() override { browser.setBounds(getLocalBounds()); error.setBounds(getLocalBounds().reduced(30)); }
     void requestClose()
     {
+        if(stemActive){status="Cancel or finish drum stem export before closing.";publish();return;}
         if(elasticPreview){status="Apply or discard the Time Warp preview before closing.";publish();return;}
         if(elasticBusy){status="Cancel Time Warp or wait for the render before closing.";publish();return;}
         if(recoveryWorker.isBusy()){status="Wait for the recovery snapshot to finish before closing.";publish();return;}
@@ -556,6 +559,26 @@ private:
         else {const auto t=message.getProperty("time",{}),v=message.getProperty("value",{});if((t.isInt()||t.isInt64()||t.isDouble())&&std::isfinite(static_cast<double>(t))){const double time=static_cast<double>(t);if(action=="put"&&(v.isInt()||v.isDouble())){ok=Automation::put(found->points,{time,static_cast<float>(v)},0,1);found->read=true;found->mode=1;}else if(action=="delete"){auto point=std::find_if(found->points.begin(),found->points.end(),[time](const auto& p){return std::abs(p.time-time)<1.e-8;});if(point!=found->points.end()){found->points.erase(point);ok=true;}}}}
         if(ok){engine.detach();slot->rememberAutomation();slot->automation=std::move(lanes);slot->bindAutomation();engine.attach();markDirty();status="Plugin automation saved. Read follows the curve; Off leaves the current control value.";}else status="Choose a valid plugin automation point.";
         publish(true);
+    }
+    void updateStemPlan(const juce::String& stage,const juce::String& error={}){auto* plan=new juce::DynamicObject();plan->setProperty("stage",stage);plan->setProperty("track",stemTrack);plan->setProperty("instrument",stemName);plan->setProperty("error",error);plan->setProperty("seconds",DrumStems::endBeat(stemNotes)*60/controls.bpm);juce::Array<juce::var> items;for(const auto& output:stemOutputs){auto* item=new juce::DynamicObject();item->setProperty("id",output.id);item->setProperty("name",output.name);item->setProperty("channels",output.channels);items.add(juce::var(item));}plan->setProperty("outputs",items);stemPlan=juce::var(plan);publish();}
+    void stemCommand(const juce::var& message){
+        const auto action=message.getProperty("action",{}).toString();
+        if(action=="cancel"){
+            if(!stemActive)return;if(stemRendering){stemWorker.cancel();status="Cancelling drum stems…";publish();return;}if(stemPreparing){stemCancelled=true;updateStemPlan("cancelling");return;}if(chooser)return;stemInstance.reset();stemActive=loading=pluginBusy=false;stemPlan=juce::var();status="Drum stem setup closed.";publish();return;
+        }
+        if(action=="openInstrument"&&stemActive&&!stemPreparing&&!stemRendering&&!chooser){const int track=stemTrack;stemInstance.reset();stemActive=loading=pluginBusy=false;stemPlan=juce::var();auto* open=new juce::DynamicObject();open->setProperty("type","pluginEditor");open->setProperty("channel",track);open->setProperty("slot",0);command(juce::var(open));return;}
+        if(action=="prepare"){
+            if(stemActive||loading||recordingBusy||sessionBusy||pluginBusy||exportBusy||chooser||recoveryWorker.isBusy()||automationPassActive)return;const auto trackValue=message.getProperty("track",{});if(!trackValue.isInt())return;const int track=trackValue;if(track<0||track>=trackCount||!engine.plugins.midiLanes[track].enabled)return;
+            auto& slot=engine.plugins.channels[track][0];if(!slot||!slot->instance||!slot->description.isInstrument||slot->bypass.load()){status="Load and enable the GGD/Kontakt instrument in insert A first.";publish();return;}stemNotes=engine.plugins.midiLanes[track].notes;if(stemNotes.empty()){status="Add or import MIDI notes on this instrument track first.";publish();return;}
+            if(DrumStems::endBeat(stemNotes)*60/controls.bpm>3600){status="Choose an instrument MIDI part up to one hour for stem rendering.";publish();return;}stemTrack=track;stemName=slot->description.name;stemOutputs.clear();stemActive=stemPreparing=loading=pluginBusy=true;stemCancelled=false;engine.playback.playing=false;juce::MemoryBlock state;engine.detach();slot->instance->getStateInformation(state);engine.attach();const auto description=slot->description;const double rate=engine.playback.deviceRate;updateStemPlan("preparing");
+            auto ready=[safe=juce::Component::SafePointer<MainComponent>(this),state,rate](std::unique_ptr<juce::AudioProcessor> instance,const juce::String& error){if(!safe)return;safe->stemPreparing=false;if(safe->stemCancelled){safe->stemActive=safe->loading=safe->pluginBusy=false;safe->stemPlan=juce::var();safe->status="Drum stem preparation cancelled.";safe->publish();return;}if(!instance){safe->updateStemPlan("failed",error.isEmpty()?"Could not create an export instance of the instrument.":error);return;}int count=2;PluginRack::configure(*instance,count,true);instance->setRateAndBufferSizeDetails(rate,512);if(state.getSize())instance->setStateInformation(state.getData(),static_cast<int>(state.getSize()));safe->stemOutputs=DrumStems::outputs(*instance);safe->stemInstance=std::move(instance);if(safe->stemOutputs.size()<2){safe->updateStemPlan("failed","Only a stereo mix is available. Configure separate outputs in GGD/Kontakt, then prepare stems again.");return;}safe->updateStemPlan("ready");};
+            if(description.pluginFormatName=="Tracksmith Native")ready(NativeInstruments::create(description),{});else engine.plugins.formats.createPluginInstanceAsync(description,rate,512,[ready](std::unique_ptr<juce::AudioPluginInstance> instance,const juce::String& error){ready(std::move(instance),error);});return;
+        }
+        if(action=="render"&&stemActive&&!stemPreparing&&!stemRendering&&stemInstance&&!chooser){
+            const auto values=message.getProperty("outputs",{});const auto* selected=values.getArray();const auto tailValue=message.getProperty("tail",2);if(!selected||selected->isEmpty()||selected->size()>64||!(tailValue.isDouble()||tailValue.isInt()))return;const double tail=tailValue;if(!std::isfinite(tail)||tail<0||tail>30)return;std::vector<StemOutput> outputs;
+            for(const auto& value:*selected){const auto id=value.getProperty("id",{}),name=value.getProperty("name",{});if(!id.isInt()||!name.isString()||name.toString().trim().isEmpty()||name.toString().length()>80)return;const auto found=std::find_if(stemOutputs.begin(),stemOutputs.end(),[&](auto output){return output.id==static_cast<int>(id);});if(found==stemOutputs.end()||std::any_of(outputs.begin(),outputs.end(),[&](auto output){return output.id==found->id;}))return;auto output=*found;output.name=name.toString().trim();outputs.push_back(std::move(output));}
+            chooser=std::make_unique<juce::FileChooser>("Choose a parent folder for the drum stems",juce::File::getSpecialLocation(juce::File::userDocumentsDirectory),"*");updateStemPlan("choosing");chooser->launchAsync(juce::FileBrowserComponent::openMode|juce::FileBrowserComponent::canSelectDirectories,[safe=juce::Component::SafePointer<MainComponent>(this),outputs,tail](const juce::FileChooser& fc){if(!safe)return;const auto parent=fc.getResult();safe->chooser.reset();if(parent==juce::File()){safe->updateStemPlan("ready");return;}StemWorker::Job job;job.instrument=std::move(safe->stemInstance);job.notes=safe->stemNotes;job.outputs=outputs;job.rate=safe->engine.playback.deviceRate;job.bpm=safe->controls.bpm;job.tail=tail;job.folder=parent.getNonexistentChildFile("Tracksmith Drum Stems "+juce::Time::getCurrentTime().formatted("%Y-%m-%d %H-%M-%S"),"",false);safe->stemRendering=true;safe->stemWorker.progress=0;safe->updateStemPlan("rendering");if(!safe->stemWorker.start(std::move(job))){safe->stemRendering=false;safe->updateStemPlan("failed","Could not start the drum stem renderer. Close and prepare again.");}});return;
+        }
     }
     void timelineClipboard(const juce::var& message){
         if(loading||recordingBusy||sessionBusy||pluginBusy||exportBusy||chooser||recoveryWorker.isBusy()||automationPassActive)return;
@@ -988,6 +1011,7 @@ private:
     {
         if(elasticPreview&&previewPlaying&&(!engine.playback.playing.load()||(engine.playback.seekSeconds.load()<0&&engine.playback.seconds.load()>=previewCorrected.start+previewCorrected.length))){engine.playback.playing=false;previewPlaying=false;}
 
+        if(stemActive){publish();return;}
         automationTick();checkNativeAnalysis();bool nativeChanged=false;for(auto& channel:engine.plugins.channels)for(auto& slot:channel)if(slot&&slot->instance&&NativeInstruments::consumeGrooveChanges(slot->instance.get())){slot->changed=true;nativeChanged=true;}if(nativeChanged)publish(true);
         if (exportBusy) { publish(); return; }
         if (engine.plugins.consumeChanges()) { markDirty(); ++pluginChangeSerial; }
@@ -1041,6 +1065,7 @@ private:
         auto* device = engine.devices.getCurrentAudioDevice();
         object->setProperty("autosaveEnabled",autosaveEnabled);object->setProperty("autosaveBusy",recoveryWorker.isBusy());object->setProperty("autosaveTime",static_cast<double>(lastAutosaveTime));object->setProperty("autosaveNotice",autosaveNotice);
         juce::Array<juce::var> recoveryItems;for(const auto& entry:recoveries){auto* item=new juce::DynamicObject();item->setProperty("id",entry.id);item->setProperty("name",entry.name);item->setProperty("time",static_cast<double>(entry.time));recoveryItems.add(juce::var(item));}object->setProperty("recoveries",recoveryItems);
+        object->setProperty("stemPlan",stemPlan);object->setProperty("stemProgress",stemWorker.progress.load());
         object->setProperty("exportBusy", false);
         object->setProperty("exportProgress", 0.0);
         object->setProperty("playing", engine.playback.playing.load());
@@ -1262,6 +1287,8 @@ private:
     {
         if (! message.isObject()) return;
         const auto type = message.getProperty("type", {}).toString();
+        if(type=="drumStems"){stemCommand(message);return;}
+        if(stemActive){if(type=="ready")publish();return;}
         if(type=="elasticPreview"){timeWarpPreviewAction(message.getProperty("action",{}).toString());return;}
         if(elasticPreview){if(type=="stop")timeWarpPreviewAction("stop");else if(type=="ready")publish(true);else{status="Apply or discard the Time Warp preview first.";publish();}return;}
         if(type=="cancelElastic"){if(elasticBusy){elasticCancelled=true;elasticWorker.cancel();status="Cancelling Time Warp…";publish();}return;}
@@ -1835,6 +1862,7 @@ private:
     std::unique_ptr<juce::FileChooser> chooser;
     std::unique_ptr<AudioSettingsWindow> settings;
     juce::File elasticMediaFolder;
+    StemWorker stemWorker;bool stemActive=false,stemPreparing=false,stemRendering=false,stemCancelled=false;int stemTrack=-1;juce::String stemName;juce::var stemPlan;std::unique_ptr<juce::AudioProcessor> stemInstance;std::vector<MidiNote> stemNotes;std::vector<StemOutput> stemOutputs;
     int clipboardTrack=-1,clipboardSession=-1;bool clipboardMidi=false;double clipboardSpan=0;std::vector<MidiNote> clipboardNotes;std::vector<TimelineClip> clipboardClips;std::vector<juce::File> clipboardFiles;
     juce::var attackResult;int attackRevision=0;bool attackRunning=false,elasticPreviewRequest=false;
     bool elasticPreview=false,previewPlaying=false,previewOriginal=false,previewOldLoop=false;int previewTrack=-1;size_t previewSourceCount=0,previewMediaCount=0;TimelineClip previewCorrected;std::vector<TimelineClip> previewBefore;
