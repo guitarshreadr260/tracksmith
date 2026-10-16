@@ -1,0 +1,21 @@
+.studio-reference .studio-track.midi-notes-track{height:277px;min-height:277px}
+.midi-notes-track .studio-track-head{position:relative;align-content:start;grid-template-rows:24px 20px}
+.midi-notes-track .edit-track-meter{display:none}
+.inline-midi-keys{position:absolute;right:0;top:60px;width:42px;height:216px;overflow:hidden;border-left:1px solid #5c7380;background:#cdd6db;z-index:2}
+.inline-midi-keys>div{height:9px;border-bottom:1px solid #42515c;font-size:7px;text-align:right;padding-right:3px;color:#20303a}
+.inline-midi-keys>div.black{background:#19252d;color:#a8bdca;width:72%}
+.inline-midi-keys>div.white{background:#b9cbd2}
+.inline-midi-tools{position:absolute;left:10px;right:48px;top:70px;display:flex;flex-wrap:wrap;gap:5px;align-content:start;font-size:10px;color:#9ebbc7}
+.inline-midi-tools strong{width:100%;font-size:11px;color:#d2edf3}.inline-midi-tools small{width:100%;line-height:1.8}
+.inline-midi-tools button{background:#142b36;border:1px solid #3a5968;border-radius:3px;padding:4px}
+.inline-midi-notes{position:absolute;left:0;right:0;top:60px;height:216px;overflow:hidden;touch-action:none;cursor:crosshair}
+.inline-midi-row{position:absolute;left:0;right:0;height:9px;border-bottom:1px solid #9bb8ca19;pointer-events:none}
+.inline-midi-row.black{background:#10233060}.inline-midi-row.white{background:#28425130}
+.inline-midi-note{position:absolute;height:7px;min-width:3px;padding:0;border:1px solid #a9e1ef80;border-radius:1px;background:var(--track-color);z-index:2;cursor:grab}
+.inline-midi-note.selected{outline:1px solid #fff;background:#d5f4ff}.inline-midi-empty{position:absolute;top:90px;left:18px;color:#7e9ca9;font-size:11px;pointer-events:none}
+.timeline-cursor{position:absolute;top:0;bottom:0;border-left:1px solid #f5d27a;pointer-events:none;z-index:9;box-shadow:0 0 4px #f5d27a50}
+.timeline-cursor span{position:absolute;left:4px;top:4px;white-space:nowrap;background:#342b11;color:#fff0bb;border:1px solid #c5a95b;border-radius:3px;padding:4px 7px;font-size:11px;font-variant-numeric:tabular-nums}
+.timeline-cursor.near-end span{left:auto;right:4px}.timeline-cursor.drop{border-left:2px solid #a7f4eb}.timeline-cursor.drop span{background:#11362f;border-color:#6fe1c8;color:#e7fff9}
+.studio-lane{cursor:crosshair}
+
+.inline-midi-resize{position:absolute;right:0;top:0;bottom:0;width:25%;max-width:4px;cursor:ew-resize;background:#ffffff25}
