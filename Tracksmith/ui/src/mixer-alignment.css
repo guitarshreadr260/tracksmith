@@ -1,0 +1,13 @@
+.studio-reference .mix-scroll{align-items:stretch;overflow:auto}
+.studio-reference .studio-channel{overflow:visible;min-height:max-content}
+.studio-reference .studio-channel .mix-input-block{height:74px;min-height:74px;display:grid;grid-template-rows:10px 24px 24px;gap:6px;margin:0}
+.studio-reference .studio-channel select{height:24px;min-height:24px}
+.studio-reference .studio-channel .mix-input-selector{height:24px;min-height:24px}
+.studio-reference .studio-channel .mix-input-selector select{height:24px}
+.studio-reference .studio-channel .studio-fader-area{height:240px;min-height:240px;flex:0 0 240px}
+.studio-reference .precision-meter{height:230px;min-height:230px;max-height:230px}
+.studio-reference .studio-master .precision-meter{flex:0 0 230px;margin-top:auto}
+.studio-reference .precision-meter .meter-columns{min-height:0}
+.studio-reference .precision-meter .meter-column{min-height:0}
+.studio-reference .precision-meter>b,.studio-reference .studio-master .precision-meter b{font-size:9px;line-height:12px}
+.studio-reference .precision-meter>small{font-size:7px;line-height:9px}

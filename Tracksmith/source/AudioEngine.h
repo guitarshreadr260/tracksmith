@@ -196,11 +196,12 @@ public:
     std::atomic<bool> monitorArmed{false};std::array<std::atomic<bool>,128> armedMonitorMask{};
     std::array<std::atomic<int>,128> monitorOverrides{}; // 0 auto, 1 explicit on, -1 explicit off
     std::array<std::atomic<float>,128> monitorLevels{};
-    bool wantsMonitor(size_t id)const noexcept {const int choice=monitorOverrides[id].load();return choice>0||(choice==0&&((monitorArmed.load()&&armedMonitorMask[id].load())||(monitor.enabled.load()&&monitor.track.load()==(int)id)));}
+    bool wantsMonitor(size_t id)const noexcept {const int choice=monitorOverrides[id].load();return choice>0||(choice==0&&(((monitorArmed.load()||PluginInput::encoded(trackInputs[id].load()))&&armedMonitorMask[id].load())||(monitor.enabled.load()&&monitor.track.load()==(int)id)));}
     void clearTrackMonitoring(){for(auto& choice:monitorOverrides)choice=0;for(auto& gain:monitorLevels)gain=1;}
     std::array<std::array<const float*,2>,128> liveTrackSources{};
     std::array<int,128> liveTrackChannels{};
     std::array<float,128> liveTrackSmooth{};
+    const float* const* captureInputs=nullptr;int captureInputCount=0;bool captureThisBlock=false;
     float monitorInputSmooth=0;
     std::array<const float*,2> liveSources {};int liveChannels=1;
     std::atomic<float> inputPeak { 0.0f };
@@ -224,6 +225,7 @@ public:
     void detach() { devices.removeAudioCallback(this); }
     void attach()
     {
+        for(size_t i=0;i<128;++i){playback.pluginInputTracks[i]=PluginInput::encoded(trackInputs[i].load());plugins.pluginInputSources[i]=playback.pluginInputTracks[i]?PluginInput::track(trackInputs[i].load()):-1;}
         plugins.rebuildCompensation(playback); playback.playbackLatencyFrames = plugins.totalLatency;
         devices.addAudioCallback(this);
     }
@@ -245,6 +247,7 @@ public:
     static juce::File deviceSettingsFile()
     { return juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile("Tracksmith/audio-device.xml"); }
     juce::Result ensureMonitorInputs(int first,int width){
+        if(PluginInput::encoded(first))return plugins.inputAvailable(first,width)?juce::Result::ok():juce::Result::fail("The assigned instrument output is unavailable.");
         auto* device=devices.getCurrentAudioDevice();if(!device)return juce::Result::fail("Choose an audio input device in Audio settings.");
         if(!ioDeviceMatches.load())return juce::Result::fail("Review the interface change in Setup > I/O before monitoring.");
         if(first<0||first+width>InputRouting::maximumInputs||width<1||width>2)return juce::Result::fail("Choose a valid input pair.");
@@ -275,7 +278,8 @@ public:
         const auto activeInputs=device->getActiveInputChannels();const int physicalInputs=device->getInputChannelNames().size();
         if (recordingRoutes.empty() && !InputRouting::available(inputSource.load(),channels,physicalInputs,[&](int ch){return activeInputs[ch];})) return juce::Result::fail("The selected recording input is unavailable. Choose an enabled physical input in Setup > I/O.");
         for(const auto& route:recordingRoutes)
-            if(!InputRouting::available(route.input,route.channels,physicalInputs,[&](int ch){return activeInputs[ch];}))return juce::Result::fail("An armed track has an unavailable input or stereo pair.");
+            if(!(PluginInput::encoded(route.input)?plugins.inputAvailable(route.input,route.channels):InputRouting::available(route.input,route.channels,physicalInputs,[&](int ch){return activeInputs[ch];})))return juce::Result::fail("An armed track has an unavailable input or stereo pair.");
+        int pluginSource=-1;bool hardware=false;for(const auto& route:recordingRoutes){if(PluginInput::encoded(route.input)){if(pluginSource>=0&&pluginSource!=PluginInput::track(route.input))return juce::Result::fail("Record outputs from one instrument at a time.");pluginSource=PluginInput::track(route.input);}else hardware=true;}if(pluginSource>=0&&hardware)return juce::Result::fail("Record plugin outputs and hardware inputs in separate passes.");
         const auto rate = device->getCurrentSampleRate();
         const auto selectedStart=selectionStart.load(),selectedEnd=selectionEnd.load();
         const auto pendingSeek=playback.seekSeconds.load();const auto insertion=pendingSeek>=0?pendingSeek:playback.seconds.load();
@@ -294,7 +298,7 @@ public:
             punchBegin=punching?static_cast<int64_t>(std::llround((selectedStart-origin)*rate)):0;
             punchEnd=punching?static_cast<int64_t>(std::llround((selectedEnd-origin)*rate)):std::numeric_limits<int64_t>::max();
             plugins.rebuildCompensation(playback);
-            recordingCorrection=RecordingAlignment::correction(device->getInputLatencyInSamples(),device->getOutputLatencyInSamples(),plugins.totalLatency,alignRecording.load());stopAfterLatency=false;
+            recordingCorrection=RecordingAlignment::correction(device->getInputLatencyInSamples(),device->getOutputLatencyInSamples(),plugins.totalLatency,alignRecording.load());if(pluginSource>=0)recordingCorrection=alignRecording.load()?std::max(0,plugins.channels[pluginSource][0]->instance->getLatencySamples()):0;stopAfterLatency=false;
             playback.seekSeconds=origin;
             countIn.start(preRollBars.load(), rate, playback.bpm.load()); countInBeats = countIn.beatsLeft(); playback.playing = countIn.total == 0; }
         attach(); return started;
@@ -475,7 +479,8 @@ public:
         for (int channel = 0; channel < captureChannels; ++channel)
             for (int frame = 0; frame < count; ++frame) peak = std::max(peak, std::abs(InputRouting::sample(selected[static_cast<size_t>(channel)], frame)));
         inputPeak.store(peak, std::memory_order_relaxed);
-        if (capture) recorder.capture(inputs, inputChannels, count, first);
+        if(capture&&recordingRoutes.empty())recorder.capture(inputs,inputChannels,count,first);captureInputs=inputs;captureInputCount=inputChannels;captureThisBlock=capture&&!recordingRoutes.empty();
+        playback.sourceStageContext=this;playback.sourceStage=[](void* context,int frames,int offset){auto& e=*static_cast<AudioEngine*>(context);if(e.captureThisBlock&&e.playback.offlineSourceEnd<0&&e.recorder.isActive())e.recorder.captureResolved(&e,[](void* ctx,const RecordRoute& route,int off){auto& engine=*static_cast<AudioEngine*>(ctx);if(PluginInput::encoded(route.input))return engine.plugins.inputPointers(route.input,route.channels);auto pointers=InputRouting::select(engine.captureInputs,engine.captureInputCount,route.input,route.channels);for(auto& pointer:pointers)if(pointer)pointer+=off;return pointers;},frames,offset);};
         const int liveTrack = monitor.track.load(std::memory_order_relaxed);
         const bool live = monitor.enabled.load(std::memory_order_relaxed)
             && (!(punchEnabled.load()||takeWasPunch) || !playback.playing.load() || ((recordPlanActive?logicalRecordGate.load():capture) && recorder.isActive())) && liveTrack >= 0 && liveTrack < static_cast<int>(PlaybackCore::maxTracks)
@@ -488,13 +493,14 @@ public:
             for(int n=0;n<frames;++n){e.monitorInputSmooth+=smooth*(e.monitor.gain.load()-e.monitorInputSmooth);left[n]+=InputRouting::sample(e.liveSources[0],offset+n)*e.monitorInputSmooth;right[n]+=InputRouting::sample(e.liveSources[e.liveChannels==2?1:0],offset+n)*e.monitorInputSmooth;}
         };
         for(size_t id=0;id<PlaybackCore::maxTracks;++id){
-            const bool enabled=wantsMonitor(id);
+            const bool plugin=PluginInput::encoded(trackInputs[id].load());const bool enabled=wantsMonitor(id)||(plugin&&armedMonitorMask[id].load()&&monitorOverrides[id].load()>=0);
             const bool gate=!(punchEnabled.load()||takeWasPunch)||!playback.playing.load()||((recordPlanActive?logicalRecordGate.load():capture)&&recorder.isActive());
             const bool legacy=live&&static_cast<int>(id)==liveTrack&&monitorOverrides[id].load()==0;const int width=legacy?captureChannels:trackInputChannels[id].load();const auto source=legacy?selected:InputRouting::select(inputs,inputChannels,trackInputs[id].load(),width);
-            const bool active=enabled&&gate&&!playback.tracks[id].midiTrack&&!playback.tracks[id].routing.aux&&source[0]&&(width==1||source[1]);
-            playback.inputMonitorTracks[id]=active;plugins.monitorChannels[id]=active;liveTrackSources[id]=source;liveTrackChannels[id]=width;if(!active)liveTrackSmooth[id]=0;
+            const bool validInput=plugin?plugins.inputAvailable(trackInputs[id].load(),width):source[0]&&(width==1||source[1]);
+            const bool active=enabled&&gate&&!playback.tracks[id].midiTrack&&!playback.tracks[id].routing.aux&&validInput;
+            playback.pluginInputTracks[id]=plugin;playback.inputMonitorTracks[id]=active;plugins.monitorChannels[id]=active&&!plugin;liveTrackSources[id]=source;liveTrackChannels[id]=width;if(!active)liveTrackSmooth[id]=0;
         }
-        playback.trackLiveInput=[](void* context,size_t id,float* left,float* right,int frames,int offset){auto& e=*static_cast<AudioEngine*>(context);const float smooth=static_cast<float>(1-std::exp(-1.0/(e.playback.deviceRate*.005)));for(int n=0;n<frames;++n){e.liveTrackSmooth[id]+=smooth*((e.monitorOverrides[id].load()>0?e.monitorLevels[id].load():e.monitor.gain.load())-e.liveTrackSmooth[id]);left[n]+=InputRouting::sample(e.liveTrackSources[id][0],offset+n)*e.liveTrackSmooth[id];right[n]+=InputRouting::sample(e.liveTrackSources[id][e.liveTrackChannels[id]==2?1:0],offset+n)*e.liveTrackSmooth[id];}};
+        playback.trackLiveInput=[](void* context,size_t id,float* left,float* right,int frames,int offset){auto& e=*static_cast<AudioEngine*>(context);const bool plugin=PluginInput::encoded(e.trackInputs[id].load());const auto source=plugin?e.plugins.inputPointers(e.trackInputs[id].load(),e.trackInputChannels[id].load()):e.liveTrackSources[id];const int at=plugin?0:offset;const float smooth=static_cast<float>(1-std::exp(-1.0/(e.playback.deviceRate*.005)));for(int n=0;n<frames;++n){e.liveTrackSmooth[id]+=smooth*((e.monitorOverrides[id].load()>0?e.monitorLevels[id].load():e.monitor.gain.load())-e.liveTrackSmooth[id]);left[n]+=InputRouting::sample(source[0],at+n)*e.liveTrackSmooth[id];right[n]+=InputRouting::sample(source[e.liveTrackChannels[id]==2?1:0],at+n)*e.liveTrackSmooth[id];}};
         playback.clickContext=this;playback.extraClick=countClick?+[](void* context)->float{auto& e=*static_cast<AudioEngine*>(context);return e.countIn.next()*e.playback.metronomeGain.load();}:nullptr;
         if(!live)monitorInputSmooth=0;
         playback.render(outputs,channels,count);

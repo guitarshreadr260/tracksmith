@@ -68,9 +68,10 @@ public:
     void setRouting(size_t id,const MixerRoute& route) { tracks[id].routing=route;for(size_t n=0;n<2;++n)tracks[id].sendLevels[n]=route.sends[n].gain; }
     using Input = void(*)(void*,float*,float*,int,int);
     using TrackInput=void(*)(void*,size_t,float*,float*,int,int);
+    using SourceStage=void(*)(void*,int,int);SourceStage sourceStage=nullptr;void* sourceStageContext=nullptr;
     TrackInput trackLiveInput=nullptr;
-    std::array<bool,maxTracks> inputMonitorTracks{};
-    bool monitored(size_t id)const noexcept{return offlineSourceEnd<0&&(inputMonitorTracks[id]||static_cast<int>(id)==inputMonitorTrack.load());}
+    std::array<bool,maxTracks> inputMonitorTracks{},pluginInputTracks{};
+    bool monitored(size_t id)const noexcept{return (offlineSourceEnd<0||pluginInputTracks[id])&&(inputMonitorTracks[id]||static_cast<int>(id)==inputMonitorTrack.load());}
     Input liveInput=nullptr;void* liveContext=nullptr;
     using Click = float(*)(void*);
     Click extraClick=nullptr;void* clickContext=nullptr;
@@ -278,15 +279,16 @@ private:
             buses->left[target][n]+=left;buses->right[target][n]+=right;
         };
         std::array<float,processBlockSize> left {},right {};
+        for(int pass=0;pass<2;++pass){if(pass==1&&sourceStage)sourceStage(sourceStageContext,frames,offset);
         for(size_t id=0;id<maxTracks;++id)
         {
-            auto& t=tracks[id];const bool live=this->monitored(id)&&(trackLiveInput||liveInput);
+            auto& t=tracks[id];if(t.midiTrack!=(pass==0))continue;const bool live=this->monitored(id)&&(trackLiveInput||liveInput);
             if(t.routing.aux||(!t.loaded()&&!live)||(!readSources&&!t.midiTrack&&!live))continue;
             const bool suppressed=recording.load()&&suppressRecordedPlayback&&recordingTrack(id);
             if(suppressed&&!live)continue;
             for(int n=0;n<frames;++n)
             {
-                const bool source=readSources&&!suppressed&&(offlineSourceEnd<0||positions[n]<offlineSourceEnd-.5/deviceRate);
+                const bool source=readSources&&!suppressed&&(!live||!pluginInputTracks[id])&&(offlineSourceEnd<0||positions[n]<offlineSourceEnd-.5/deviceRate);
                 left[n]=source?t.sample(positions[n],false):0;right[n]=source?t.sample(positions[n],true):0;
             }
             if(live){if(trackLiveInput)trackLiveInput(liveContext,id,left.data(),right.data(),frames,offset);else liveInput(liveContext,left.data(),right.data(),frames,offset);}
@@ -311,6 +313,7 @@ private:
                     if(t.routing.sends[send].target>=0)add(t.routing.sends[send].target,n,(t.routing.sends[send].pre?(audible?left[n]:0):l)*t.smoothSends[send],(t.routing.sends[send].pre?(audible?right[n]:0):r)*t.smoothSends[send]);
                 }
             }
+        }
         }
         // Align direct output with the extra latency introduced by the aux stage.
         if(process)process(processContext,maxTracks+2,mixedLeft,mixedRight,frames,positions[0],bpm.load(),transport);

@@ -60,6 +60,12 @@ target_link_libraries(Tracksmith PRIVATE TracksmithWebAssets
 
 option(TRACKSMITH_STUDIO_TESTS "Build UI-prototype native regression checks" OFF)
 if(TRACKSMITH_STUDIO_TESTS)
+    juce_add_console_app(StudioPluginRoutingTests PRODUCT_NAME "Studio plugin routing tests")
+    juce_generate_juce_header(StudioPluginRoutingTests)
+    target_sources(StudioPluginRoutingTests PRIVATE tests/PluginRoutingTests.cpp)
+    target_compile_definitions(StudioPluginRoutingTests PRIVATE JUCE_USE_CURL=0 JUCE_WEB_BROWSER=0 JUCE_PLUGINHOST_VST3=1 JUCE_VST3_CAN_REPLACE_VST2=0)
+    target_link_libraries(StudioPluginRoutingTests PRIVATE juce::juce_audio_utils)
+
     juce_add_console_app(StudioStemTests PRODUCT_NAME "Studio drum stem tests")
     target_sources(StudioStemTests PRIVATE tests/DrumStemTests.cpp)
     target_compile_definitions(StudioStemTests PRIVATE JUCE_USE_CURL=0 JUCE_WEB_BROWSER=0)

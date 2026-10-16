@@ -1134,6 +1134,7 @@ private:
         if(includeWaveform)object->setProperty("pluginAutomation",engine.plugins.automationSnapshot(pluginAutomationChannel,pluginAutomationSlot,pluginAutomationParameter));
         object->setProperty("inserts", engine.plugins.snapshot(trackCount));
         object->setProperty("pluginBusy", pluginBusy);
+        juce::Array<juce::var> pluginInputs;for(int track=0;track<trackCount;++track){const auto& slot=engine.plugins.channels[track][0];if(!slot||!slot->instance||!slot->description.isInstrument||slot->bypass.load())continue;int first=0;for(int bus=0;bus<slot->instance->getBusCount(false);++bus){const auto* output=slot->instance->getBus(false,bus);const int count=output->getNumberOfChannels();for(int offset=0;offset<count;offset+=2){auto* item=new juce::DynamicObject();item->setProperty("id",PluginInput::encode(track,first+offset));item->setProperty("track",track);item->setProperty("token",static_cast<juce::int64>(slot->token));item->setProperty("group",trackNames[track]+" / "+slot->description.name);item->setProperty("name",output->getName()+" · "+juce::String(first+offset+1)+(count-offset>1?"–"+juce::String(first+offset+2):""));item->setProperty("channels",std::min(2,count-offset));pluginInputs.add(juce::var(item));}first+=count;}}object->setProperty("pluginInputs",pluginInputs);
         object->setProperty("clipboardKind",clipboardTrack>=0&&clipboardSession==sessionRevision?(clipboardMidi?"midi":"audio"):"");object->setProperty("midiDropResult",midiDropResult);
         object->setProperty("playbackLatency", engine.playback.playbackLatencyFrames);
         if (groove.valid)
@@ -1442,11 +1443,12 @@ private:
         }
         if(type=="inputSource"||type=="recordMode")
         {
+            if(recordingBusy||loading||sessionBusy||pluginBusy||exportBusy)return;
             const auto lane=message.getProperty("id",0),value=message.getProperty(type=="inputSource"?"index":"channels",{});
             if(!lane.isInt()||!value.isInt()||static_cast<int>(lane)<0||static_cast<int>(lane)>=trackCount)return;
             const int id=static_cast<int>(lane),v=static_cast<int>(value);
-            if(type=="inputSource"){if(v<-1||v>=InputRouting::maximumInputs)return;engine.trackInputs[id]=v;}
-            else {if(v<1||v>2)return;engine.trackInputChannels[id]=v;}
+            if(type=="inputSource"){if(engine.playback.tracks[id].midiTrack||engine.playback.tracks[id].routing.aux)return;if(v<-1||(v>=InputRouting::maximumInputs&&!PluginInput::encoded(v)))return;int width=engine.trackInputChannels[id].load();if(PluginInput::encoded(v)){if(PluginInput::track(v)==id)return;const auto& slot=engine.plugins.channels[PluginInput::track(v)][0];const auto token=message.getProperty("sourceToken",{});if(!slot||!slot->instance||(!token.isVoid()&&static_cast<juce::int64>(token)!=static_cast<juce::int64>(slot->token)))return;width=engine.plugins.inputWidth(v);if(!engine.plugins.inputAvailable(v,width))return;}engine.detach();engine.trackInputs[id]=v;engine.trackInputChannels[id]=width;engine.attach();}
+            else {if(v<1||v>2)return;if(PluginInput::encoded(engine.trackInputs[id].load())&&!engine.plugins.inputAvailable(engine.trackInputs[id].load(),v))return;engine.trackInputChannels[id]=v;}
             if(!engine.monitor.enabled.load()||engine.monitor.track.load()==id)
             {engine.inputSource=engine.trackInputs[id].load();engine.inputMeterChannels=engine.trackInputChannels[id].load();}
             markDirty();publish(true);return;

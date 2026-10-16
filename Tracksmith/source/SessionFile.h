@@ -1,4 +1,5 @@
 #pragma once
+#include "PluginInput.h"
 #include <juce_core/juce_core.h>
 #include <cmath>
 #include <vector>
@@ -69,7 +70,7 @@ inline bool decodeNote(const juce::var& entry,MidiNote& n)
 inline juce::var encode(const SavedSession& session, const juce::File& destination)
 {
     auto* root = new juce::DynamicObject();
-    root->setProperty("format", "TracksmithSession"); root->setProperty("version", 11);
+    root->setProperty("format", "TracksmithSession"); root->setProperty("version", 12);
     root->setProperty("mainOutputPair",session.mainOutputPair);root->setProperty("ioDeviceKey",session.ioDeviceKey);
     juce::Array<juce::var> inserts;for(const auto& original:session.inserts){auto item=original.clone();if(!item.hasProperty("automation"))item.getDynamicObject()->setProperty("automation",juce::Array<juce::var>());inserts.add(item);}root->setProperty("inserts", inserts);
     root->setProperty("preRollBars", session.preRollBars); root->setProperty("metronomeGain", session.metronomeGain);
@@ -105,7 +106,7 @@ inline juce::Result decode(const juce::var& root, const juce::File& source, Save
     auto fail = [] { return juce::Result::fail("Invalid or unsupported Tracksmith session."); };
     if (!root.isObject() || root.getProperty("format", {}).toString() != "TracksmithSession") return fail();
     const auto version = root.getProperty("version", {});
-    if (!version.isInt() || (static_cast<int>(version) != 1 && static_cast<int>(version) != 2 && static_cast<int>(version) != 3 && static_cast<int>(version) != 4 && static_cast<int>(version) != 5 && static_cast<int>(version) != 6 && static_cast<int>(version) != 7 && static_cast<int>(version) != 8 && static_cast<int>(version) != 9 && static_cast<int>(version) != 10 && static_cast<int>(version) != 11)) return fail();
+    if (!version.isInt() || (static_cast<int>(version) != 1 && static_cast<int>(version) != 2 && static_cast<int>(version) != 3 && static_cast<int>(version) != 4 && static_cast<int>(version) != 5 && static_cast<int>(version) != 6 && static_cast<int>(version) != 7 && static_cast<int>(version) != 8 && static_cast<int>(version) != 9 && static_cast<int>(version) != 10 && static_cast<int>(version) != 11 && static_cast<int>(version) != 12)) return fail();
     const auto number = [](const juce::var& object, const char* key, double low, double high, double& result)
     {
         const auto value = object.getProperty(key, {});
@@ -144,7 +145,7 @@ inline juce::Result decode(const juce::var& root, const juce::File& source, Save
             || !boolean(item,"muted",track.muted) || !boolean(item,"solo",track.solo) || !boolean(item,"armed",track.armed)) return fail();
         track.gain = static_cast<float>(gain); track.pan = static_cast<float>(pan);
         double pl=-1,pr=1;if(item.hasProperty("stereoLeft")&&!number(item,"stereoLeft",-1,1,pl))return fail();if(item.hasProperty("stereoRight")&&!number(item,"stereoRight",-1,1,pr))return fail();track.stereoLeft=static_cast<float>(pl);track.stereoRight=static_cast<float>(pr);
-        if(item.hasProperty("inputSource")){const auto value=item.getProperty("inputSource",{});if(!value.isInt()||static_cast<int>(value)<(parsed.legacyInputRouting?0:-1)||static_cast<int>(value)>(parsed.legacyInputRouting?3:31))return fail();track.inputSource=static_cast<int>(value);}
+        if(item.hasProperty("inputSource")){const auto value=item.getProperty("inputSource",{});if(!value.isInt()||static_cast<int>(value)<(parsed.legacyInputRouting?0:-1)||(static_cast<int>(value)>(parsed.legacyInputRouting?3:31)&&!(static_cast<int>(version)>=12&&PluginInput::encoded(static_cast<int>(value)))))return fail();track.inputSource=static_cast<int>(value);}
         if(item.hasProperty("inputChannels")){const auto value=item.getProperty("inputChannels",{});if(!value.isInt()||static_cast<int>(value)<1||static_cast<int>(value)>2)return fail();track.inputChannels=static_cast<int>(value);}
         const auto path = audio.toString();
         if (path.isNotEmpty()) track.audioFile = juce::File::isAbsolutePath(path) ? juce::File(path) : source.getParentDirectory().getChildFile(path);

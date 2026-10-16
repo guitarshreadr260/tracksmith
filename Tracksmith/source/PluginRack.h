@@ -5,6 +5,8 @@
 #include "MidiLane.h"
 #include "NativeClick.h"
 #include "PluginAutomation.h"
+#include "PluginInput.h"
+#include "DrumStemExport.h"
 
 // Ownership and editor operations run on the message thread with audio detached.
 // Only process() runs in the device callback. Instances are never replaced there.
@@ -71,6 +73,7 @@ public:
         Slot(){midi.ensureSize(65536);}
         std::atomic<bool> bypass { false };
         int channels = 2;
+        bool multiOutput=false;
         bool occupied = false;
         std::atomic<bool> changed { false };
         void audioProcessorParameterChanged(juce::AudioProcessor*, int index, float value) override { changed = true;if(index>=0&&index<parameterCount&&activity[index].latched.load())activity[index].value=value; }
@@ -83,8 +86,13 @@ public:
     std::array<std::array<std::unique_ptr<Slot>, slotsPerChannel>, PlaybackCore::maxTracks + 1> channels;
     juce::AudioPluginFormatManager formats;
     Clock clock;
+    std::array<int,PlaybackCore::maxTracks> pluginInputSources;
+    int inputWidth(int value)const noexcept{if(!PluginInput::encoded(value))return 0;const auto& slot=channels[PluginInput::track(value)][0];if(!slot||!slot->instance||!slot->description.isInstrument||slot->bypass.load())return 0;const int first=PluginInput::channel(value);if(first>=slot->channels||slot->instance->getTotalNumOutputChannels()!=slot->channels)return 0;int offset=0;for(int i=0;i<slot->instance->getBusCount(false);++i){const int count=slot->instance->getBus(false,i)->getNumberOfChannels();if(first>=offset&&first<offset+count)return (first-offset)%2==0?std::min(2,offset+count-first):0;offset+=count;}return 0;}
+    bool inputAvailable(int value,int width)const noexcept{return width>=1&&width<=2&&width<=inputWidth(value);}
+    std::array<const float*,2> inputPointers(int value,int width)const noexcept{if(!inputAvailable(value,width))return {};const auto& slot=channels[PluginInput::track(value)][0];const int first=PluginInput::channel(value);return {slot->buffer.getReadPointer(first),slot->buffer.getReadPointer(first+(width==2?1:0))};}
+
     uint64_t nextToken=1;
-    PluginRack() { formats.addFormat(new juce::VST3PluginFormat()); }
+    PluginRack() { pluginInputSources.fill(-1);formats.addFormat(new juce::VST3PluginFormat()); }
     ~PluginRack() { clear(); }
     void clear() { for (auto& channel : channels) for (auto& slot : channel) slot.reset(); }
     std::array<int, PlaybackCore::maxTracks + 1> reportedLatencies() const
@@ -93,12 +101,15 @@ public:
         for (size_t channel = 0; channel < channels.size(); ++channel) for (const auto& slot : channels[channel])
             if (slot && slot->instance && !slot->bypass.load())
                 result[channel] = static_cast<int>(std::min<int64_t>(static_cast<int64_t>(result[channel]) + std::max(0, slot->instance->getLatencySamples()), INT_MAX));
+        for(size_t id=0;id<pluginInputSources.size();++id){const int source=pluginInputSources[id];if(source>=0&&source<128){const auto& slot=channels[source][0];if(slot&&slot->instance&&!slot->bypass.load())result[id]+=std::max(0,slot->instance->getLatencySamples());}}
         return result;
     }
-    bool latencyChanged() const { return pathLatencies != reportedLatencies(); }
+    bool latencyChanged() const { for(const auto& channel:channels)for(const auto& slot:channel)if(slot&&slot->instance&&slot->description.isInstrument&&slot->instance->getTotalNumOutputChannels()!=slot->channels)return true;return pathLatencies != reportedLatencies(); }
     void rebuildCompensation(PlaybackCore& playback)
     {
         playbackClock=&playback;
+        for(auto& channel:channels)for(auto& slot:channel)if(slot&&slot->instance&&slot->description.isInstrument&&slot->instance->getTotalNumOutputChannels()!=slot->channels){slot->instance->releaseResources();const auto outputs=DrumStems::outputs(*slot->instance);if(outputs.empty()){if(!configure(*slot->instance,slot->channels,true)){slot->bypass=true;continue;}}else slot->channels=slot->instance->getTotalNumOutputChannels();slot->buffer.setSize(slot->channels,PlaybackCore::processBlockSize);slot->instance->setRateAndBufferSizeDetails(clock.rate.load(),PlaybackCore::processBlockSize);slot->instance->prepareToPlay(clock.rate.load(),PlaybackCore::processBlockSize);}
+
         bool hasClick=false;for(const auto& channel:channels)for(const auto& slot:channel)if(slot && slot->description.fileOrIdentifier==NativeClickProcessor::identifier)hasClick=true;playback.nativeClickTrackPresent.store(hasClick);
         for (auto& channel : channels)
         {
@@ -112,14 +123,14 @@ public:
                 }
         }
         pathLatencies=reportedLatencies();mixLatency=auxLatency=0;
-        const auto excluded=[&](size_t id){return playback.recording.load()&&playback.suppressRecordedPlayback&&playback.recordingTrack(id);};
+        const auto excluded=[&](size_t id){return playback.recording.load()&&playback.suppressRecordedPlayback&&playback.recordingTrack(id)&&pluginInputSources[id]<0;};
         for(size_t id=0;id<PlaybackCore::maxTracks;++id)
         {
             if(playback.tracks[id].routing.aux)auxLatency=std::max(auxLatency,pathLatencies[id]);
-            else if(playback.tracks[id].loaded()&&!excluded(id))mixLatency=std::max(mixLatency,pathLatencies[id]);
+            else if((playback.tracks[id].loaded()||pluginInputSources[id]>=0)&&!excluded(id))mixLatency=std::max(mixLatency,pathLatencies[id]);
         }
         for(size_t id=0;id<PlaybackCore::maxTracks;++id)
-            compensation[id].configure(playback.tracks[id].routing.aux?auxLatency-pathLatencies[id]:playback.tracks[id].loaded()&&!excluded(id)?mixLatency-pathLatencies[id]:0);
+            compensation[id].configure(playback.tracks[id].routing.aux?auxLatency-pathLatencies[id]:(playback.tracks[id].loaded()||pluginInputSources[id]>=0)&&!excluded(id)?mixLatency-pathLatencies[id]:0);
         compensation[clickChannel].configure(mixLatency);directCompensation.configure(auxLatency);
         totalLatency=mixLatency+auxLatency+pathLatencies[PlaybackCore::maxTracks];
         playback.automationSourceLatencyFrames=mixLatency;playback.automationAuxLatencyFrames=mixLatency+auxLatency;
@@ -130,7 +141,7 @@ public:
         for(auto& lane:midiLanes)lane.reset();
         for (auto& channel : channels) for (auto& slot : channel) if (slot && slot->instance)
         {
-            if(slot->description.isInstrument){slot->buffer.clear();slot->midi.clear();for(int ch=1;ch<=16;++ch)slot->midi.addEvent(juce::MidiMessage::allSoundOff(ch),0);float* data[]{slot->buffer.getWritePointer(0),slot->buffer.getWritePointer(1)};juce::AudioBuffer<float> view(data,slot->channels,PlaybackCore::processBlockSize);slot->instance->processBlock(view,slot->midi);}
+            if(slot->description.isInstrument){slot->buffer.clear();slot->midi.clear();for(int ch=1;ch<=16;++ch)slot->midi.addEvent(juce::MidiMessage::allSoundOff(ch),0);juce::AudioBuffer<float> view(slot->buffer.getArrayOfWritePointers(),slot->channels,PlaybackCore::processBlockSize);slot->instance->processBlock(view,slot->midi);}
             slot->instance->reset();
         }
     }
@@ -180,6 +191,7 @@ public:
             instance->setPlayHead(&clock);
             instance->setRateAndBufferSizeDetails(rate, PlaybackCore::processBlockSize);
             if (state.getSize()) instance->setStateInformation(state.getData(), static_cast<int>(state.getSize()));
+            if(description.isInstrument){const auto outputs=DrumStems::outputs(*instance);if(!outputs.empty()){slot->channels=instance->getTotalNumOutputChannels();slot->multiOutput=slot->channels>2;slot->buffer.setSize(slot->channels,PlaybackCore::processBlockSize);}else{if(!configure(*instance,slot->channels,true))return juce::Result::fail("Unsupported instrument output layout.");}}
             instance->prepareToPlay(rate, PlaybackCore::processBlockSize);
             slot->instance = std::move(instance);
             slot->parameterCount=slot->instance->getParameters().size();slot->activity=std::make_unique<Slot::Activity[]>(static_cast<size_t>(slot->parameterCount));
@@ -254,6 +266,7 @@ public:
         for (auto& slot : rack.channels[channel])
         {
             if (!slot || !slot->instance || slot->bypass.load(std::memory_order_relaxed)) continue;
+            if(slot->instance->getTotalNumOutputChannels()!=slot->channels){slot->buffer.clear();std::fill_n(left,frames,0);std::fill_n(right,frames,0);continue;}
             const double time=rack.playbackClock?rack.playbackClock->automationTime(seconds,upstream):std::max(0.0,seconds-upstream/rack.clock.rate.load());
             for(const auto& binding:slot->bindings){const auto& lane=slot->automation[binding.lane];if(Automation::reads(lane.read?lane.mode:0,slot->activity[binding.index].touched.load(),slot->activity[binding.index].latched.load(),rack.playbackClock&&rack.playbackClock->automationBypass.load(),rack.playbackClock&&rack.playbackClock->offlineSourceEnd>=0)&&!lane.points.empty())binding.parameter->setValue(Automation::value(lane.points,time,binding.parameter->getValue()));}
             upstream+=std::max(0,slot->instance->getLatencySamples());
@@ -261,8 +274,9 @@ public:
             if (slot->channels == 1)
                 for (int n = 0; n < frames; ++n) data[0][n] = (left[n] + right[n]) * 0.5f;
             else { std::copy_n(left, frames, data[0]); std::copy_n(right, frames, data[1]); }
+            if(slot->description.isInstrument)slot->buffer.clear();
             // This wrapper points to preallocated storage; MIDI output is discarded.
-            juce::AudioBuffer<float> view(data, slot->channels, frames);
+            juce::AudioBuffer<float> view(slot->buffer.getArrayOfWritePointers(), slot->channels, frames);
             slot->midi.clear();
             if(slot->description.isInstrument && channel<PlaybackCore::maxTracks)rack.midiLanes[channel].emit(slot->midi,seconds,bpm,rack.clock.rate.load(),frames,playing);
             if(auto* click=dynamic_cast<NativeClickProcessor*>(slot->instance.get())){const bool exporting=rack.playbackClock&&rack.playbackClock->offlineSourceEnd>=0;click->transportEnabled.store(exporting||!rack.playbackClock||rack.playbackClock->metronome.load());click->recording.store(rack.playbackClock&&rack.playbackClock->recording.load());click->offline.store(exporting);}
@@ -270,7 +284,7 @@ public:
             for (int n = 0; n < frames; ++n)
             {
                 left[n] = std::isfinite(data[0][n]) ? data[0][n] : 0.0f;
-                right[n] = std::isfinite(data[slot->channels - 1][n]) ? data[slot->channels - 1][n] : 0.0f;
+                right[n] = std::isfinite(slot->buffer.getReadPointer(slot->channels==1?0:1)[n]) ? slot->buffer.getReadPointer(slot->channels==1?0:1)[n] : 0.0f;
             }
         }
         if (channel < PlaybackCore::maxTracks && !((!rack.playbackClock||rack.playbackClock->offlineSourceEnd<0)&&(static_cast<int>(channel)==rack.monitorChannel||rack.monitorChannels[channel]))) rack.compensation[channel].process(left, right, frames);

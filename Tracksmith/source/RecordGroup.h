@@ -1,5 +1,6 @@
 #pragma once
 #include "Recorder.h"
+#include "PluginInput.h"
 struct RecordRoute { int track=0, input=0, channels=1; juce::File file; };
 struct TrackTake { int track=0; RecordedTake take; };
 // Fixed membership during capture; each disk queue is allocated before attachment.
@@ -16,7 +17,7 @@ public:
         entries.clear();explicitRoutes=routed;
         for(const auto& route:requested)
         {
-            if(route.track<0||route.track>=128||route.input<0||route.input>=InputRouting::maximumInputs||route.input+route.channels>InputRouting::maximumInputs||route.channels<1||route.channels>2)
+            if(route.track<0||route.track>=128||route.input<0||(!PluginInput::encoded(route.input)&&(route.input>=InputRouting::maximumInputs||route.input+route.channels>InputRouting::maximumInputs))||route.channels<1||route.channels>2||(PluginInput::encoded(route.input)&&PluginInput::channel(route.input)+route.channels>64))
                 return juce::Result::fail("Invalid recording input routing.");
             for(const auto& e:entries)if(e.route.track==route.track||e.route.file==route.file)return juce::Result::fail("Duplicate recording destination.");
             entries.push_back({route,std::make_unique<Recorder>()});
@@ -34,6 +35,8 @@ public:
         bool stopped=false;for(const auto& e:entries)stopped=stopped||!e.recorder->isActive();
         if(stopped)requestStop();
     }
+    using Resolver=std::array<const float*,2>(*)(void*,const RecordRoute&,int);
+    void captureResolved(void* context,Resolver resolve,int count,int offset)noexcept{for(auto& e:entries){const auto data=resolve(context,e.route,offset);e.recorder->capture(data.data(),e.route.channels,count,0);}for(const auto& e:entries)if(!e.recorder->isActive()){requestStop();break;}}
     void requestStop()noexcept{for(auto& e:entries)e.recorder->requestStop();}
     void inputStopped()noexcept{for(auto& e:entries)e.recorder->inputStopped();}
     bool isActive()const noexcept{for(const auto& e:entries)if(e.recorder->isActive())return true;return false;}

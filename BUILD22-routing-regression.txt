@@ -1,0 +1,2 @@
+PASS: live multi-output hosting; instrument-first graph; monitored mono/stereo routes; real-time separate WAVs; 128-sample alignment; 997-frame callbacks; routed offline mix; physical input recording; session routing round trip; unavailable/bus-width guards; deletion remapping.
+Controlled fixture instrument, not a loaded GGD kit.

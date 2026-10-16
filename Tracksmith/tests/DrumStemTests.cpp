@@ -2,17 +2,8 @@
 #include <iostream>
 #include <deque>
 static void require(bool ok,const char* text){if(!ok)throw std::runtime_error(text);}
-class DrumFixture:public juce::AudioProcessor{
- struct Hit{int64_t at;int pitch;};std::deque<Hit> hits;int64_t cursor=0;
-public:
- DrumFixture():AudioProcessor(BusesProperties().withOutput("Kick",juce::AudioChannelSet::stereo(),true).withOutput("Snare",juce::AudioChannelSet::mono(),false).withOutput("Room",juce::AudioChannelSet::stereo(),false).withOutput("Unused",juce::AudioChannelSet::stereo(),false)){setLatencySamples(128);}
- const juce::String getName()const override{return "Multichannel drum fixture";}bool acceptsMidi()const override{return true;}bool producesMidi()const override{return false;}double getTailLengthSeconds()const override{return 0;}
- int getNumPrograms()override{return 1;}int getCurrentProgram()override{return 0;}void setCurrentProgram(int)override{}const juce::String getProgramName(int)override{return {}; }void changeProgramName(int,const juce::String&)override{}
- bool hasEditor()const override{return false;}juce::AudioProcessorEditor* createEditor()override{return nullptr;}void getStateInformation(juce::MemoryBlock&)override{}void setStateInformation(const void*,int)override{}
- void prepareToPlay(double,int)override{reset();}void releaseResources()override{}void reset()override{hits.clear();cursor=0;}
- bool isBusesLayoutSupported(const BusesLayout& layout)const override{return layout.inputBuses.isEmpty()&&layout.outputBuses.size()==4&&layout.outputBuses[0]==juce::AudioChannelSet::stereo();}
- void processBlock(juce::AudioBuffer<float>& audio,juce::MidiBuffer& midi)override{for(auto event:midi)if(event.getMessage().isNoteOn())hits.push_back({cursor+event.samplePosition+128,event.getMessage().getNoteNumber()});audio.clear();for(int n=0;n<audio.getNumSamples();++n){while(!hits.empty()&&hits.front().at<=cursor+n){const auto hit=hits.front();hits.pop_front();if(hit.pitch==36){audio.setSample(0,n,.5f);audio.setSample(1,n,.25f);}if(hit.pitch==38)audio.setSample(2,n,.3f);audio.setSample(3,n,.1f);audio.setSample(4,n,.1f);}}cursor+=audio.getNumSamples();}
-};
+#include "DrumOutputFixture.h"
+
 int main(int argc,char** argv){juce::ScopedJuceInitialiser_GUI init;try{
  const juce::File parent=argc>1?juce::File(juce::String::fromUTF8(argv[1])):juce::File::getSpecialLocation(juce::File::tempDirectory).getChildFile("Tracksmith stem tests");parent.createDirectory();DrumFixture plugin;const auto outputs=DrumStems::outputs(plugin);require(outputs.size()==4&&outputs[1].channels==1&&outputs[2].first==3,"native output-bus mapping");
  const std::vector<MidiNote> notes{{1,36,10,.25,.1,.8f},{2,38,10,.5,.1,.8f}};const auto destination=parent.getNonexistentChildFile("Rendered stems","",false);const auto result=DrumStems::write(plugin,notes,outputs,48000,120,.25,destination,[]{return false;},{});require(result.error.isEmpty()&&!result.cancelled&&result.frames==108000&&result.silent.size()==1,"render succeeds with exact aligned duration and silent-bus report");
