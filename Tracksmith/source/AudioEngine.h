@@ -432,14 +432,17 @@ public:
         if(!recordPlanActive){renderNormal(inputs,inputChannels,outputs,channels,count,true);return;}
         int offset=0;
         if(stopAfterLatency.exchange(false)){
-            if(planPosition.load()<punchBegin){countInCancelled=true;recorder.requestStop();recordPlanActive=false;playback.recording=false;playback.recordTrack=-1;renderNormal(inputs,inputChannels,outputs,channels,count,false);return;}
+            if(planPosition.load()<punchBegin){countInCancelled=true;recorder.requestStop();recordPlanActive=false;playback.recording=false;playback.recordTrack=-1;playback.playing=false;renderNormal(inputs,inputChannels,outputs,channels,count,false);return;}
             punchEnd=planPosition.load();takeWasPunch=false;
         }
         const int delay=recordingCorrection.load();
         const auto captureBegin=RecordingAlignment::delayed(punchBegin,delay),captureEnd=RecordingAlignment::delayed(punchEnd,delay);
+        const auto finishCapture=[&]{recorder.requestStop();recordPlanActive=false;logicalRecordGate=false;playback.recording=false;playback.recordTrack=-1;if(!takeWasPunch)playback.playing=false;};
         while(offset<count)
         {
             const auto position=planPosition.load();
+            // Zero-latency Stop can land exactly on the boundary before any frames remain.
+            if(position>=captureEnd){finishCapture();break;}
             const bool capture=position>=captureBegin&&position<captureEnd;
             logicalRecordGate=position>=punchBegin&&position<punchEnd;
             int64_t boundary=captureEnd;for(const auto edge:{punchBegin,punchEnd,captureBegin,captureEnd})if(edge>position)boundary=std::min(boundary,edge);
@@ -450,7 +453,7 @@ public:
             playback.recordTrack=logicalRecordGate?planTrack:-1;
             renderNormal(in.data(),std::min(inputChannels,InputRouting::maximumInputs),out.data(),std::min(channels,16),frames,capture);
             offset+=frames;planPosition+=frames;
-            if(planPosition.load()>=captureEnd){recorder.requestStop();recordPlanActive=false;logicalRecordGate=false;playback.recording=false;playback.recordTrack=-1;break;}
+            if(planPosition.load()>=captureEnd){finishCapture();break;}
         }
         if(offset<count)
         {

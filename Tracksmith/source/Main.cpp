@@ -1342,7 +1342,7 @@ private:
         }
         if (type == "stop")
         {
-            if (recordingBusy) { engine.stopRecording(true,false,true); engine.continueAfterPunch=false; status = "Finalizing recorded WAV..."; }
+            if (recordingBusy) { if(engine.recorder.isActive()||engine.playback.recording.load())engine.stopRecording(true,false,true);else engine.playback.playing=false;engine.continueAfterPunch=false; status = "Finalizing recorded WAV..."; }
             else { engine.resetPluginGraph(); engine.playback.playing = false; engine.playback.seekSeconds = engine.dynamicTransport.load()?engine.playStart.load():0.0; }
             publish(); return;
         }

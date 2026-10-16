@@ -47,3 +47,6 @@ const paste=fixture({audio:{recording:false,seconds:2,clipboardKind:'midi'},edit
 const select=fixture();select.registry.shortcut(key('KeyA',{ctrlKey:true}));assert.ok(select.changes.some(c=>c[0]==='setAllTrack'&&c[1]===3));
 const wrongPaste=fixture({audio:{recording:false,seconds:2,clipboardKind:'audio'}});assert.equal(wrongPaste.registry.execute('edit.paste'),false);
 console.log('Clipboard shortcuts, edit-cursor paste, select all, clear and compatible-track guards PASS');
+
+const finishing=fixture({disabled:true,audio:{loading:true,recordingBusy:true,recording:false,playing:true}});assert.equal(finishing.registry.execute('transport.stop'),true);assert.deepEqual(finishing.sent,[{type:'stop'}]);
+console.log('Stop remains available during recording finalization PASS');

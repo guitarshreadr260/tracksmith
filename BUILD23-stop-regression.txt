@@ -1,0 +1,5 @@
+Before fix: FAIL — Stop closes recorder at zero/nonzero latency boundary.
+After fix: PASS — 0, 1 and 128-sample correction; recorder closed; transport stopped; WAV finalized; exact 997-frame capture after drain.
+Existing native integration: PASS — selected mono/stereo plugin-output recording, alignment, nonuniform callback blocks, physical input capture, offline routed mix, session round trip and deletion remapping.
+UI: PASS — Stop available while finalizing; Space sends Stop; normal Mix routing and aligned controls.
+Controlled test instrument; loaded GGD/real-device workflow not tested.
