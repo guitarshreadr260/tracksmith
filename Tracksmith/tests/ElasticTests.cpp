@@ -1,4 +1,4 @@
-#include "../source/ElasticRender.h"
+#include "../source/AttackDetection.h"
 #include <iostream>
 #include <cstdlib>
 static void require(bool condition,const char* message){if(!condition){std::cerr<<"FAIL: "<<message<<'\n';std::exit(1);}}
@@ -18,5 +18,9 @@ int main(){
  auto burst=input;for(auto& channel:burst)for(int n=0;n<96000;++n){const double t=n/rate;channel[n]=static_cast<float>(.5*std::exp(-std::pow((t-1)/.015,2))*std::sin(2*pi*440*t));}
  const auto warped=ElasticRender::render(burst,rate,map);size_t peak=0;for(size_t n=0;n<warped[0].size();++n)if(std::abs(warped[0][n])>std::abs(warped[0][peak]))peak=n;
  require(std::abs(peak/rate-1.2)<.065,"note envelope follows the moved anchor within analysis-window tolerance");
+ ElasticRender::Audio pulses;for(auto& channel:pulses){channel.assign(96000,0);for(double onset:{.43,.97,1.51})for(int n=0;n<2400;++n)channel[static_cast<size_t>(onset*rate)+n]=static_cast<float>(.8*std::exp(-n/400.0)*std::sin(2*pi*120*n/rate));}
+ const auto attacks=AttackDetection::detect(pulses,rate,.5f,[]{return false;});require(attacks.size()==5&&ElasticMap::valid(attacks,2),"detect three separated attacks with valid pinned map");for(double onset:{.43,.97,1.51})require(std::any_of(attacks.begin(),attacks.end(),[&](auto a){return std::abs(a.source-onset)<.025;}),"attack location within 25 ms");
+ auto silent=pulses;for(auto& channel:silent)std::fill(channel.begin(),channel.end(),0);require(AttackDetection::detect(silent,rate,1,[]{return false;}).size()==2,"silence produces no false attacks");
+ bool analysisCancelled=false;try{AttackDetection::detect(pulses,rate,.5f,[]{return true;});}catch(const std::exception&){analysisCancelled=true;}require(analysisCancelled,"attack analysis cancellation");require(std::abs(ElasticMap::targetAt(map,ElasticMap::sourceAt(map,.8))-.8)<1.e-9,"source-target inverse mapping");
  std::cout<<"PASS: Elastic identity, exact length, pitch preservation, stereo coherence, marker timing, ratio validation and cancellation.\n";
 }

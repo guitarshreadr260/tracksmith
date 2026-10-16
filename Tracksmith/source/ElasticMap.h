@@ -15,4 +15,7 @@ inline double sourceAt(const std::vector<ElasticAnchor>& map,double target){
  size_t i=1;while(i+1<map.size()&&target>map[i].target)++i;
  const auto a=map[i-1],b=map[i];return a.source+(target-a.target)*(b.source-a.source)/(b.target-a.target);
 }
+inline double targetAt(const std::vector<ElasticAnchor>& map,double source){
+ size_t i=1;while(i+1<map.size()&&source>map[i].source)++i;const auto a=map[i-1],b=map[i];return a.target+(source-a.source)*(b.target-a.target)/(b.source-a.source);
+}
 }

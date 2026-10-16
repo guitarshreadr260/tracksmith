@@ -1,10 +1,12 @@
 #pragma once
 #include "ElasticRender.h"
+#include "AttackDetection.h"
 #include "AudioEngine.h"
 class ElasticWorker final : private juce::Thread,private juce::AsyncUpdater {
 public:
- struct Request {ElasticRender::Audio audio;double rate=48000;std::vector<ElasticAnchor> map;juce::File folder;};
- std::function<void(LoadedWav)> onFinished;
+ struct Request {ElasticRender::Audio audio;double rate=48000;std::vector<ElasticAnchor> map;juce::File folder;bool analyseOnly=false;float sensitivity=.5f;};
+ struct Result {LoadedWav wav;bool analysis=false;std::vector<ElasticAnchor> suggestions;};
+ std::function<void(Result)> onFinished;
  ElasticWorker():Thread("Time Warp render"){}
  ~ElasticWorker()override{shutdown();}
  void shutdown(){onFinished={};signalThreadShouldExit();stopThread(-1);cancelPendingUpdate();}
@@ -34,7 +36,7 @@ public:
   }catch(const std::exception& e){result.error=e.what();}return result;
  }
 private:
- void run()override{auto result=std::make_unique<LoadedWav>(execute(job,[this]{return threadShouldExit();}));{const juce::ScopedLock lock(mutex);pending=std::move(result);}triggerAsyncUpdate();}
- void handleAsyncUpdate()override{std::unique_ptr<LoadedWav> result;{const juce::ScopedLock lock(mutex);result=std::move(pending);}if(result&&onFinished)onFinished(std::move(*result));}
- juce::CriticalSection mutex;std::unique_ptr<LoadedWav> pending;Request job;
+ void run()override{auto result=std::make_unique<Result>();result->analysis=job.analyseOnly;if(job.analyseOnly){try{result->suggestions=AttackDetection::detect(job.audio,job.rate,job.sensitivity,[this]{return threadShouldExit();});if(threadShouldExit())result->wav.error="Attack analysis cancelled.";}catch(const std::exception& e){result->wav.error=e.what();}}else result->wav=execute(job,[this]{return threadShouldExit();});{const juce::ScopedLock lock(mutex);pending=std::move(result);}triggerAsyncUpdate();}
+ void handleAsyncUpdate()override{std::unique_ptr<Result> result;{const juce::ScopedLock lock(mutex);result=std::move(pending);}if(result&&onFinished)onFinished(std::move(*result));}
+ juce::CriticalSection mutex;std::unique_ptr<Result> pending;Request job;
 };
