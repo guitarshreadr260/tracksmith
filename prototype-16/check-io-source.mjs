@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {inputPaths,outputPaths,inputAvailable} from './Tracksmith/ui/src/ioPaths.ts';
+const channel=(id,active=true)=>({id,name:`Channel ${id+1}`,hardwareName:`HW ${id+1}`,active});
+const audio={io:{matched:true,mainOutputPair:0,inputs:[channel(0),channel(1,false),channel(2),channel(3)],outputs:[channel(0),channel(1),channel(2,false),channel(3)]}};
+assert.equal(inputPaths(audio,1,2).find(p=>p.id===2).name,'3 · Channel 3');
+assert.equal(inputPaths(audio,1,1).find(p=>p.id===1).available,false);
+assert.equal(inputPaths(audio,2,0).find(p=>p.id===0).available,false);
+assert.equal(inputPaths(audio,2,2).find(p=>p.id===2).available,true);
+assert.equal(inputPaths(audio,2,3).find(p=>p.id===3).available,false);
+assert.equal(inputPaths(audio,1,27).find(p=>p.id===27).available,false);
+assert.equal(inputAvailable(audio,{inputSource:2,inputChannels:2}),true);
+assert.equal(inputAvailable({...audio,io:{...audio.io,matched:false}},{inputSource:2,inputChannels:2}),false);
+assert.equal(inputAvailable(audio,{inputSource:-1,inputChannels:1}),false);
+assert.equal(outputPaths(audio).find(p=>p.id===0).available,true);
+assert.equal(outputPaths(audio).find(p=>p.id===1).available,false);
+assert.equal(outputPaths({io:{...audio.io,mainOutputPair:7}}).find(p=>p.id===7).available,false);
+assert.equal(outputPaths({io:{...audio.io,outputs:[channel(0)]}})[0].available,true);
+console.log('I/O path checks passed: disabled holes, stereo availability, missing routes, device mismatch, mono output, and output pairs.');

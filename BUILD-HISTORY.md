@@ -1,3 +1,7 @@
+# October 15, 2026 — UI Prototype 16
+
+Modern UI/startup art; native EZ instruments; editing/monitoring and scanner improvements; 32-input/16-output I/O setup; session 10; musical grid and exact Dynamic punch. Release build, four native suites, UI checks and packaged editing regression passed. Elastic Audio and real-hardware validation remain pending. [Details and source restoration](prototype-16/BUILD.md).
+
 # Build history
 
 | Stage | Main change | Current status |
@@ -13,7 +17,7 @@
 Versioned archives remain saved on the development PC. This repository starts with the latest reference snapshots; it does not reconstruct every earlier source commit.
 
 
-## Updates after the initial reference upload â€” October 14, 2026
+## Updates after the initial reference upload — October 14, 2026
 
 | Build stage | Main additions | Status |
 | --- | --- | --- |
@@ -22,12 +26,12 @@ Versioned archives remain saved on the development PC. This repository starts wi
 | Playlist/group editing | Playlist management, alternate lanes, range promotion and explicit group operations | Delivered; automated checks passed |
 | Review build | Autosave/recovery, rotating snapshots and corrupt-snapshot fallback | User said so far so good; broad reliability/installer still pending |
 | Instrument piano roll | Instrument track type, inline draw/move/resize, velocity/channel and MIDI groove drops | Delivered; user then reported selection/deletion limitations |
-| Selection and Shortcuts â€” current | Box/Shift note selection, group delete/Undo, clipboard and more shortcuts; track-name context menu | Automated checks passed; latest manual review pending |
+| Selection and Shortcuts — current | Box/Shift note selection, group delete/Undo, clipboard and more shortcuts; track-name context menu | Automated checks passed; latest manual review pending |
 
 The latest source/build links are in README. Session format is now 9; older Automation archive documentation describes that older build's format 7. Earlier archives and Groove downloads remain preserved.
 
 
-## GGD fix and first reliability checkpoint â€” October 14, 2026
+## GGD fix and first reliability checkpoint — October 14, 2026
 
 | Stage | Result |
 | --- | --- |
@@ -38,7 +42,7 @@ The latest source/build links are in README. Session format is now 9; older Auto
 README now points to GGD MIDI Fix and a newer source checkpoint containing the test harness. The report distinguishes synthetic processing-budget results from device/xrun performance. Previous source/build archives and the optional Groove VST3 release remain preserved.
 
 
-## Windows installer and stock plugin suite â€” October 15, 2026
+## Windows installer and stock plugin suite — October 15, 2026
 
 The user reported that the first 0.1.0 Windows installer trial went well. That installer predates the current stock suite and remains an earlier milestone.
 
@@ -46,4 +50,4 @@ The new portable test build packages nine VST3 plugins: EQ 7, Gate, Bus Compress
 
 DSP, VST3 loading/state, native editor rendering, NAM preset compatibility and existing DAW regression suites passed. Package hashes and nine included bundles verified. The current stock suite has not yet received the user's listening pass. Earlier source/build snapshots and the separate Groove release are preserved.
 
-[Current Windows test build](Tracksmith-Windows-Stock-Plugins-Test.zip) Â· [Current source](Tracksmith-Source-Stock-Plugins.zip) Â· [Guide](Tracksmith-Stock-Plugins-Guide.md) Â· [Test results](Tracksmith-Stock-Plugin-Test-Results.json)
+[Current Windows test build](Tracksmith-Windows-Stock-Plugins-Test.zip) · [Current source](Tracksmith-Source-Stock-Plugins.zip) · [Guide](Tracksmith-Stock-Plugins-Guide.md) · [Test results](Tracksmith-Stock-Plugin-Test-Results.json)

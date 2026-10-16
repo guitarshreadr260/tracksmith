@@ -1,10 +1,22 @@
+# Current status — Prototype 16
+
+The October 15 work is preserved in [prototype-16](prototype-16/BUILD.md). See [changes](prototype-16/CHANGES.md), [native/UI validation](prototype-16/prototype16-test-results.json), [I/O details](prototype-16/IO-SETUP-NOTES.md), and [transport/grid/Elastic Audio status](prototype-16/TRANSPORT-GRID-ELASTIC-NOTES.md).
+
+Current: custom UI and VST3 startup scanner are implemented; native Groove and NAM are integrated; session format 10 opens 1–10. Grid and Dynamic selection punch are implemented. Elastic Audio remains a researched next step. Drum learning is paused, with the prior neural trial optional/off by default. Real hardware, sustained disk-load and listening validation remain pending.
+
+The code archive includes source/artwork/MIDI and excludes large runtime sample/model/executable payloads. Their exact inventory is preserved in external-assets.json. Full local source and portable ZIPs were built and verified; they have not been uploaded as GitHub release assets.
+
+Next: real-interface testing, resolve workflow findings, then design/prototype offline pitch-preserving stretch with user anchors. Preserve original media, old projects, separate Groove release and stock plugins.
+
+## Historical status (superseded where noted above)
+
 # Where we left off
 
 Updated October 15, 2026. Latest delivery: **combined stock-plugin test build**.
 
 ## Current delivery
 
-[Windows portable build](Tracksmith-Windows-Stock-Plugins-Test.zip) Â· [Source snapshot](Tracksmith-Source-Stock-Plugins.zip) Â· [Plugin-only bundle](Tracksmith-Stock-Plugins-VST3.zip) Â· [Guide](Tracksmith-Stock-Plugins-Guide.md)
+[Windows portable build](Tracksmith-Windows-Stock-Plugins-Test.zip) · [Source snapshot](Tracksmith-Source-Stock-Plugins.zip) · [Plugin-only bundle](Tracksmith-Stock-Plugins-VST3.zip) · [Guide](Tracksmith-Stock-Plugins-Guide.md)
 
 Nine bundled plugins: Tracksmith EQ 7, Gate, Bus Compressor, FET Compressor, Limiter, De-Esser, Plate, Digital Delay and NAM. All have native editors, host parameters, state saving and mono/stereo support. The delay has no modulation and uses milliseconds rather than tempo sync. For aux sends, set Plate/Delay Mix to 100%.
 
@@ -21,7 +33,7 @@ Tracksmith NAM replaces the displayed AVRX NAM name, adds bass/mid/treble, sweep
 - Existing VST3 hosting, NAM, wet monitoring, delay compensation, MIDI/session and WAV export checks passed, as did automation, routing and clip-edit suites.
 - Package integrity and payload hashes verified; nine bundles included, legacy AVRX Drums and AVRX NAM bundles excluded.
 
-[Raw stock test results](Tracksmith-Stock-Plugin-Test-Results.json) Â· [Dynamics notes and implementation limits](Tracksmith-Dynamics-Test-Update.md)
+[Raw stock test results](Tracksmith-Stock-Plugin-Test-Results.json) · [Dynamics notes and implementation limits](Tracksmith-Dynamics-Test-Update.md)
 
 User listening tests of this new combined stock-plugin build are still pending. Do not mark them complete. Bus/FET processors are original behavioral implementations, not verified circuit emulations. The limiter is sample-peak, not true-peak. The de-esser uses a manually selected band and adaptive threshold, not SPL's proprietary scanning system. Extreme delay feedback can outlast the export dialog's 30-second tail limit.
 
@@ -33,7 +45,7 @@ User listening tests of this new combined stock-plugin build are still pending. 
 
 ## Core workflow retained
 
-Recording and input monitoring with file playback, retake replacement, fades/crossfades, playlists, explicit group range editing, aux buses, pre/post sends, physical cue outputs, automation Read/Write/Touch/Latch, latency alignment, autosave/recovery, MIDI instrument tracks and inline piano roll, MIDI file drops, batch note selection/editing and shortcuts. Track deletion is not undoable and clears edit histories; source media remains. Session format 9 opens formats 1â€“9.
+Recording and input monitoring with file playback, retake replacement, fades/crossfades, playlists, explicit group range editing, aux buses, pre/post sends, physical cue outputs, automation Read/Write/Touch/Latch, latency alignment, autosave/recovery, MIDI instrument tracks and inline piano roll, MIDI file drops, batch note selection/editing and shortcuts. Track deletion is not undoable and clears edit histories; source media remains. Session format 9 opens formats 1–9.
 
 ## Next
 

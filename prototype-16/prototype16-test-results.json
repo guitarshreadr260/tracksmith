@@ -1,0 +1,55 @@
+{
+  "prototype": 16,
+  "passed": true,
+  "builtAt": "2026-10-16T01:54:13.390Z",
+  "native": [
+    {
+      "name": "session",
+      "code": 0,
+      "stdout": "All session format tests passed.\r\n",
+      "stderr": ""
+    },
+    {
+      "name": "recording",
+      "code": 0,
+      "stdout": "All recording buffer, input selection and WAV writer tests passed.\r\n",
+      "stderr": ""
+    },
+    {
+      "name": "mixer",
+      "code": 0,
+      "stdout": "Mixer routing, buses, post-fader sends and solo tests passed.\r\n",
+      "stderr": ""
+    },
+    {
+      "name": "instruments_io_punch",
+      "code": 0,
+      "stdout": "Full Groove visuals/navigation, analyzer-to-song notes, sample packs/layers, Sound Lab state, song alignment, dirty tracking, NAM and VST3 coexistence passed.\r\n",
+      "stderr": ""
+    }
+  ],
+  "applicationEditingReport": "PASS: Native command audio/MIDI delete undo/redo across track changes, scoped range deletion/undo, signed waveform extraction, timeline analysis to drum MIDI.",
+  "frontend": {
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "gridMath": "passed",
+    "ioPathChecks": "passed",
+    "editMixEZInteractions": "passed",
+    "monoStereoStripAlignment": "passed",
+    "interfaceReviewAnd32ChannelLayout": "passed"
+  },
+  "coverage": [
+    "32 independent physical-input WAV writers",
+    "physical channel holes and unavailable stereo pairs",
+    "main output remap/disconnect",
+    "interface mismatch hardware mute",
+    "version 10 I/O session roundtrip",
+    "automatic Dynamic punch inside an audio callback and exact captured frame count",
+    "old target silence inside punch with backing playback retained",
+    "Luke Holland all nine pads and velocity takes",
+    "saved kit overrides default",
+    "native NAM and VST3 coexistence"
+  ],
+  "elasticAudioImplemented": false,
+  "realHardwareValidated": false
+}

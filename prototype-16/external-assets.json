@@ -1,0 +1,1960 @@
+{
+  "note": "Required runtime content retained locally; not uploaded with code snapshot. Restore from the complete Prototype 16 package or provide licensed replacements.",
+  "files": [
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/kit.avrxpack",
+      "bytes": 7364,
+      "sha256": "cf8172af2aeaf92ce52d79f912dce32971d4d2deaa3f7156484e2357f0efc48b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Floor Tom Direct/Floor Tom Hard 1.wav",
+      "bytes": 627088,
+      "sha256": "0b99c8ee3ba1a261e17441380642c97475a2884151719872d32a4bf86d9ae779"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Floor Tom Direct/Floor Tom Hard 2.wav",
+      "bytes": 601624,
+      "sha256": "9b1f23741ad9d2572b2017a69ed5a22f470969cef838ae8be85dc40dbe420553"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Floor Tom Direct/Floor Tom Hard 3.wav",
+      "bytes": 516928,
+      "sha256": "68e60f90a82d77afb365f6d3a4820dc1b9c041df3da0f3b8c694d1e75c55e8a1"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Floor Tom Direct/Floor Tom Hard 4.wav",
+      "bytes": 667024,
+      "sha256": "46a30e3af1adac19a1edb2f4b10b3b442dadc420a2ec184fa5000a7831284e0c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Floor Tom Direct/Floor Tom Med 1.wav",
+      "bytes": 485176,
+      "sha256": "4e936c3986c89165edc7d04c7f4433bdb46cce6fcce337cf0ff1fab6ba2d00d7"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Floor Tom Direct/Floor Tom Med 2.wav",
+      "bytes": 489160,
+      "sha256": "334a174669a679fc363f6662f8a4abfa40cac5276e869e27458bc72fcca43d1e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Floor Tom Direct/Floor Tom Med 3.wav",
+      "bytes": 586000,
+      "sha256": "5c29a035c2e2346d32107d36d96c030b734778f1f7d0bd22f8c7362decf5a680"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Floor Tom Direct/Floor Tom Med 4.wav",
+      "bytes": 690688,
+      "sha256": "55fa6de21f42e7d0b8e3a9b5fabbc916433a64ba74e8d3eae26dc85debcae6ad"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Floor Tom Direct/Floor Tom Soft 1.wav",
+      "bytes": 560344,
+      "sha256": "e71bc9ae95fc24b400a22c5d7dac1c187464c483308af99caa33e29e0c78622e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Floor Tom Direct/Floor Tom Soft 2.wav",
+      "bytes": 523768,
+      "sha256": "104ec28cc86123ca1924f17e07d4bb5e5684f49342305fb4874e5ea865c8bed5"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Floor Tom Direct/Floor Tom Soft 3.wav",
+      "bytes": 491320,
+      "sha256": "ed3f92f58f78f5bd1c7296f2e539e3fb363d8d119ffc3deba04c18c70c471765"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Floor Tom Direct/Floor Tom Soft 4.wav",
+      "bytes": 543064,
+      "sha256": "de99dd8f0aadef81bb5c33748f0d96a238ef2ce9b93404c1fa40ece82571590a"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Kick Direct/Kick Hard  2.wav",
+      "bytes": 527824,
+      "sha256": "c9726ce0d90c6237d3d0c5735fe77366d18646892846cd82211ee9b88b17a03c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Kick Direct/Kick Hard  3.wav",
+      "bytes": 510544,
+      "sha256": "7ec4f67699351087f88b26aeca54df5899ac26d0cee4407f1f3f78aa2b9887a4"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Kick Direct/Kick Hard 1.wav",
+      "bytes": 477784,
+      "sha256": "44edf796805fff577809cff6da376d4632b8d99048da6bfd8fb1335772bee5e4"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Kick Direct/Kick Hard 4.wav",
+      "bytes": 573064,
+      "sha256": "c025db0d4b367f82429fa823cc2d8712090628e4cc2df8cc660a998c91429a8c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Kick Direct/Kick Med 1.wav",
+      "bytes": 492184,
+      "sha256": "5911ce10e167f4d1b17b1ee3c6fa332c00f75a701f281967691981b0dfdbe989"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Kick Direct/Kick Med 2.wav",
+      "bytes": 497968,
+      "sha256": "7bb376ebc0dc3276a8987b1c4053d64dc2690b98d1bcfd0efc843446e64aa8a6"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Kick Direct/Kick Med 3.wav",
+      "bytes": 472240,
+      "sha256": "deb9933fec7963d320ce23c99cbb735847fd838265cce475e4ae4ae247e8c80c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Kick Direct/Kick Med 4.wav",
+      "bytes": 473560,
+      "sha256": "7bcb9df26ef5743feec593cb200a92f7f2cabc83438d204f689e0bfa61f4d933"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Kick Direct/Kick Soft 1.wav",
+      "bytes": 474208,
+      "sha256": "0b959d6491ca5aa132935dc0c16d6c1c7ed4383cc3588718023a1ad81906ef2f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Kick Direct/Kick Soft 2.wav",
+      "bytes": 461824,
+      "sha256": "5361156b3e9ac5f31d68e4e8a3cde416feb16fce80aa6d5bd5b421d62593ecc2"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Kick Direct/Kick Soft 3.wav",
+      "bytes": 446200,
+      "sha256": "84cea17f0fe56997788e1deec083042fb17dc1b25eedc26c5117990915d2e28f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Kick Direct/Kick Soft 4.wav",
+      "bytes": 330928,
+      "sha256": "3796249caf886d1dba8e87d12e6e921fb6eef912d8bf06fca32743199f560a91"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Rack Tom Direct/Rack Tom Hard 1.wav",
+      "bytes": 600304,
+      "sha256": "e97422ba60360b850b5d9c10d06992d71afd2faff405b10c063c721f6ee7842d"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Rack Tom Direct/Rack Tom Hard 2.wav",
+      "bytes": 597928,
+      "sha256": "00bcb15ded7087c9df8cc415a171b0aed5e08100370b26c530e95d32fd93283e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Rack Tom Direct/Rack Tom Hard 3.wav",
+      "bytes": 570160,
+      "sha256": "cad875da78ac74acdf3fdf81e0bd48acc8d887dc7a74bd8962a13d38e57957a7"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Rack Tom Direct/Rack Tom Hard 4.wav",
+      "bytes": 724480,
+      "sha256": "9fb4529917e158feef26e5e3652062e24b5f895c05314891a77409ada1711325"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Rack Tom Direct/Rack Tom Med 1.wav",
+      "bytes": 526744,
+      "sha256": "bd3c624cff450fc2efe7e25335a2114c8b05eff87eb72b9456194a5bb6d7fabf"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Rack Tom Direct/Rack Tom Med 2.wav",
+      "bytes": 572680,
+      "sha256": "55ed2ff9da9698570bbb35f90449dbf6ba8d1e8813c2f7c72e74872a90d3d88e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Rack Tom Direct/Rack Tom Med 3.wav",
+      "bytes": 612256,
+      "sha256": "0daeba31d2932ac159b39ce1366dbe9b60765ac9c4b7578b118618418efb0a48"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Rack Tom Direct/Rack Tom Med 4.wav",
+      "bytes": 744376,
+      "sha256": "ae14b3b3a225f2505e24decd5687984ef9a58627f165bf58b354f51b6a04d7ac"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Rack Tom Direct/Rack Tom Soft 1.wav",
+      "bytes": 594520,
+      "sha256": "7289abba916f4e99f8f825d8623a50a667e95f4ee4801bf4ca6c21968c36f6f5"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Rack Tom Direct/Rack Tom Soft 2.wav",
+      "bytes": 623464,
+      "sha256": "28db8a8465b19a58f3085e810668572e473da9ca2ba4c25c960320bfff2644f6"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Rack Tom Direct/Rack Tom Soft 3.wav",
+      "bytes": 496792,
+      "sha256": "dc180d14ea183f235a7a469d791fce2b579547191b377a02749a2ac9cc4d1af9"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Rack Tom Direct/Rack Tom Soft 4.wav",
+      "bytes": 731560,
+      "sha256": "b5bf27d8933694ad7e52e00957ca82d69f3e317124d90ea694ea82e65aa112e1"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Flam 1.wav",
+      "bytes": 434560,
+      "sha256": "a29c9ced167d9beb0382b1e410f7b776ac58ceed69e3861f62587a975fed0086"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Flam 2.wav",
+      "bytes": 424168,
+      "sha256": "0bae85c80354d4ef846f5edea4faf11a0893c0db2baa05a4a9b8caa7a0f7d5ac"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Flam 3.wav",
+      "bytes": 398392,
+      "sha256": "790c56842984b46d45d5772783040a4a8f5c664f3f7b00fc0306a8b16fffec91"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Flam 4.wav",
+      "bytes": 467320,
+      "sha256": "f6a7c4dd9392ae628ad7df5a256106cad0dcbeefad3591a06915dbe995c002d8"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Hard 1.wav",
+      "bytes": 466624,
+      "sha256": "e7cc8307cd2964c685c07d233401a56b5b33618bd5f9714bd778aa6da06661ee"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Hard 2.wav",
+      "bytes": 470128,
+      "sha256": "1b41e9d3652ed96ee29e24654979bf4620b820fd5b432f54bf5822436ce44b2f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Hard 3.wav",
+      "bytes": 531928,
+      "sha256": "2ba408570e5880f27ec747364994f834272cbaaec34326e9ed1877e08bfd0981"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Hard 4.wav",
+      "bytes": 647584,
+      "sha256": "f8786145fc6d605c51246c76070dd9b173859e52ea0658fd527ab6cdbe96eb59"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Hardest 1.wav",
+      "bytes": 491344,
+      "sha256": "a3d49f09fb1ced4343879e9f527916e3f7cc1ac881351899934fa6a819ed9854"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Hardest 2.wav",
+      "bytes": 507808,
+      "sha256": "ecc71ab6bc055723d41b0c4fa517a9121a9a7febba063143ef70ff7499752813"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Hardest 3.wav",
+      "bytes": 531808,
+      "sha256": "892687ba192fb0e1f64723bd93b6d0edc67c40127d3cd3fc4c867fdc258f6636"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Hardest 4.wav",
+      "bytes": 500032,
+      "sha256": "ce9295ea85bd83f5ef73563a8aeee5b811be3128a27c6c8316dc08f2ea64c833"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Med 1.wav",
+      "bytes": 440944,
+      "sha256": "2732a351e18747097dc3c8603fd930a93988c92e7064a0f489025e6e34f1a32e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Med 2.wav",
+      "bytes": 505216,
+      "sha256": "2c6e9e3815a478045f16d400dd0b856366cb4d5f07c95f89328d11d65a7cee4b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Med 3.wav",
+      "bytes": 445072,
+      "sha256": "08c61b9ed5d771252f6570face7affc0ca60abfc8ed2c46c73f31e3f846c73ad"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Med 4.wav",
+      "bytes": 439816,
+      "sha256": "f2fcfb69d2451d8e29cf1932889fe6ce16f310e0fd4bd157cd0c8711da25076c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Rim 1 .wav",
+      "bytes": 360424,
+      "sha256": "1716f05cb9ca990ae03910215a974de8ba696fe3008bc1b7811aa2152f4824d6"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Rim 2.wav",
+      "bytes": 426136,
+      "sha256": "3767c8c3370b402a9d087a5826bc6ad689b6fe93de3c5a12e9c14607f08fcb13"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Rim 3.wav",
+      "bytes": 507976,
+      "sha256": "77cf4ea632f53a6e8e5e538f2e2b148b1f80f5cb51bd8d257badca52cac948b2"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Roll 1 .wav",
+      "bytes": 370720,
+      "sha256": "0d990e6d5b82f481fc2d287e2281ae1ebed55797cb34d0a6d34311f4d6e7b54d"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Roll 2.wav",
+      "bytes": 295504,
+      "sha256": "1b1bf3d67467a86a34d10e9520de76f7f9db5376b9718cda957c51ee1891e130"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Roll 3.wav",
+      "bytes": 357112,
+      "sha256": "86b1b67e6dc08fdfba15ac7563987790c6377254dac32c0f131ef72ed34f5828"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Roll 4.wav",
+      "bytes": 512272,
+      "sha256": "a736c82b5bcf80de2cf160b00a30f2341672c911c0e8219fa3a5ff1a7aed3448"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Soft 1.wav",
+      "bytes": 351376,
+      "sha256": "6e40b71183dd28517ab79f69a6c5b41ce2b12572bb993dceefa6a2e16ef82e6e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Soft 2.wav",
+      "bytes": 315904,
+      "sha256": "cad777558e705098054657f296938c1a187981f580da6befbc793dccfde66193"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Soft 3.wav",
+      "bytes": 378256,
+      "sha256": "b2dbb5a72752e9d9a808f3e718b5caba9e689b8e37a6abe4ce7237404a61a4ab"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Directs/Snare Direct/Snare Soft 4.wav",
+      "bytes": 434416,
+      "sha256": "649d44a5a4d65884ee434867573a177631e43e1cace2662dc2df4986efbb65a5"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/China/China 1.wav",
+      "bytes": 917440,
+      "sha256": "c316f0f08a8a8e0bcecd65b8e4365053bbbd14273ff4d372eb43c82d476fdb12"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/China/China 2.wav",
+      "bytes": 980848,
+      "sha256": "5027ea4c284f1ac79b7b02b93e85c397e43c29ae4c9d58dc098126754c1bde3d"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/China/China 3.wav",
+      "bytes": 845176,
+      "sha256": "b7bece4190366f13bc3c41cf432b48798a124a84863dda9374ae85739f017ad2"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/China/China 4.wav",
+      "bytes": 1007488,
+      "sha256": "d7908e86d4cab86a0b5e95d531cdfe7f63187ffd41da0cdc4e3df8a11034981b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/China/China Choke .wav",
+      "bytes": 582352,
+      "sha256": "043fdad8a23709efda2b5643d75e2d0bb3fa15836e6208870be062ea5ccfb230"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/China Stack/China Stack 1.wav",
+      "bytes": 740464,
+      "sha256": "c884d235c720310acb5e2ea933e2c6d82c61c50264ab02c6fb6f8e846beb61c1"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/China Stack/China Stack 2.wav",
+      "bytes": 683392,
+      "sha256": "d11ae871b3e29024d62794eaf3faadc32addabc3421b154fa63b48439971c7b8"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/China Stack/China Stack 3.wav",
+      "bytes": 612664,
+      "sha256": "6da5e7c5e602df59fc84dd21cc3f13df3ac3e5f95a6c41b091592d53e74bb461"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/China Stack/China Stack 4.wav",
+      "bytes": 893152,
+      "sha256": "6e53030caa8c0ad4e73a88ab36daebfc30c51e27d9d6a33ddd6a5d683f0cfae3"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Crash Alt/Crash  alt Choke 1.wav",
+      "bytes": 692224,
+      "sha256": "50d4c92c6357c974105037160b5ea50ec125d52b8e59a1e3b58dbe710a39e33e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Crash Alt/Crash alt 1.wav",
+      "bytes": 888952,
+      "sha256": "914959f9c6484829ab892619a38e7d35055149b2f7283148e76236eebd5ea8a3"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Crash Alt/Crash alt 2.wav",
+      "bytes": 1085632,
+      "sha256": "1406599ced0f6c6c7736a30d7658de556b57313f38d0a09c56475c91e1fb826f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Crash Alt/Crash alt 3.wav",
+      "bytes": 974968,
+      "sha256": "6c5b1ca5bdd399c07d624b692854f5abfaa26667225e804dff4258d76e93094c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Crash Alt/Crash alt 4.wav",
+      "bytes": 1239136,
+      "sha256": "953609d2066c2e6fcf552e1608719c89af796861fc0e5955f640983d3c444b6b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Floor Tom Overheads/Floor Toms Hard Overheads 1.wav",
+      "bytes": 627088,
+      "sha256": "a61ed1f6beebd5b9314c8fae2757a38ae1da7d44ed042fcf0aeab33f4ed631c0"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Floor Tom Overheads/Floor Toms Hard Overheads 2.wav",
+      "bytes": 601624,
+      "sha256": "53058f188eeec5b739ee794a5c296dd407b9b8e78e1d7fe2cbf3a33a27079fac"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Floor Tom Overheads/Floor Toms Hard Overheads 3.wav",
+      "bytes": 516928,
+      "sha256": "e59c08a19479bd0392a292f00a2325a2f0fd9e0e0b92dc2f263b890ce38fee60"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Floor Tom Overheads/Floor Toms Hard Overheads 4.wav",
+      "bytes": 667024,
+      "sha256": "ea1159a390ca22dbfaa0fe5058650e5104e95b19823b05efb1ba12ccba8c37eb"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Floor Tom Overheads/Floor Toms Med Overheads 1.wav",
+      "bytes": 485176,
+      "sha256": "e9427f1e5c085a9851ce51d7d13080943b7fbbe6abd1728d9d94bfb833d7cc59"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Floor Tom Overheads/Floor Toms Med Overheads 2.wav",
+      "bytes": 489160,
+      "sha256": "666cd3d0a40a32dc2ce7bec552318543a28098bd472bb8403a0b4bb69e5a80fb"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Floor Tom Overheads/Floor Toms Med Overheads 3.wav",
+      "bytes": 586000,
+      "sha256": "da0ebd15832accbfcd2f10e6ee1454ca2fa281a7b5333e08eb7c85445c3950a8"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Floor Tom Overheads/Floor Toms Med Overheads 4.wav",
+      "bytes": 690688,
+      "sha256": "1fa4701c0b8b3aad4469ce17cb4d1b05bcd6712ac7d8815cc0cd8bb8548aedf2"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Floor Tom Overheads/Floor Toms Soft Overheads 1.wav",
+      "bytes": 560344,
+      "sha256": "d4fcc6b084b4330d7812f86f66deadc92a01e5b47193ffc4ccc8f2554be31c34"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Floor Tom Overheads/Floor Toms Soft Overheads 2.wav",
+      "bytes": 523768,
+      "sha256": "2250e682ddb746cecd4b7a66960e48833c2cd3a12153fa2f72a956e1d7a3b0d7"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Floor Tom Overheads/Floor Toms Soft Overheads 3.wav",
+      "bytes": 491320,
+      "sha256": "dfda9d2d6bbb0df664437e336a7020be2e748df1ff978b50710904990905fa12"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Floor Tom Overheads/Floor Toms Soft Overheads 4.wav",
+      "bytes": 543064,
+      "sha256": "bb1a510c349fadf2a8de759ed94c45daae9fcb6d625e2af30e6ad246aefb4665"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Closed Hi hat 1.wav",
+      "bytes": 554320,
+      "sha256": "5366c8c74807cacdcdcfe20ad870eb717a462abc976ee99301e5c7c141fbe507"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Closed Hi hat 2.wav",
+      "bytes": 477280,
+      "sha256": "3c18a496f76f37f6dc71cf48be8b0317781336cb2d5096f8118d61156cbabe8c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Closed Hi hat 3.wav",
+      "bytes": 452944,
+      "sha256": "da4d5d87403465f2240fbc46e7f56462026aaa91fda3238505a65f67598c4d35"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Closed Hi hat 4.wav",
+      "bytes": 585784,
+      "sha256": "37b10c5bda06233f108b94eff068ae78273a779e0a72aab3008936437d39ba09"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Hi Hat Closed Tip 1.wav",
+      "bytes": 453520,
+      "sha256": "91616135f8137d5b7b0743ebccad6d91305c9e474df55a4635bb9a14213b529c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Hi Hat Closed Tip 2.wav",
+      "bytes": 363712,
+      "sha256": "68ea7ca0c1bc60f3102e860a12cb3c54331287e7c546574f5e5a5163bd4e020b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Hi Hat Closed Tip 3.wav",
+      "bytes": 369304,
+      "sha256": "b988993f1f08a91ee146d65bb8ea94123420d8bb4452d76f137009da13f3ae5a"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Hi Hat Closed Tip 4.wav",
+      "bytes": 407656,
+      "sha256": "3110c583ac454aab59aaaf6cd46e4da12ca9285719c6784b4ff017784dedd8df"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Open Hi Hat 1.wav",
+      "bytes": 944608,
+      "sha256": "30b37b619397fedc5833e9ef16f5b7b7e38ff0d2c1e815e306880b587b004790"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Open Hi Hat 2.wav",
+      "bytes": 839560,
+      "sha256": "9e94c7515233ead0716575d97a4537898307cc14d8b7b36388bd1ec9a0f4bfc8"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Open Hi Hat 3.wav",
+      "bytes": 964216,
+      "sha256": "a6f5a26641e6bdafe64a5642835eafe56f015faa65c0f40f80d71f3f9a8c2343"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Open Hi Hat 4.wav",
+      "bytes": 1128472,
+      "sha256": "34360309583dae067e4e025b7e894a9add88dadba199e6dd18e254dc53006dbd"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Pedal Hi Hat 1.wav",
+      "bytes": 259432,
+      "sha256": "a8441d6942a05551f9e24abb476dc73142e3582b828cf5fbd1ada6906ee0f7c5"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Pedal Hi Hat 2.wav",
+      "bytes": 266320,
+      "sha256": "6d6d65c8725bb042611647641dcb64f83133dd5366adb07ebc583a27c4b94fcd"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Pedal Hi Hat 3.wav",
+      "bytes": 351760,
+      "sha256": "15e3aeaf322ed2e78f97678d33530ba6f11a9e8a3099439cd0ebfa0da8b7a0ab"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Hi Hat/Pedal Hi Hat 4.wav",
+      "bytes": 385960,
+      "sha256": "8bd08bcf9177840242527df6ec7a54c817901551f0aff05ded26950a291a1fd0"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Kick Overheads/Kick Hard Overhead 1.wav",
+      "bytes": 477784,
+      "sha256": "7ee391809fa5be1581c6055ca85a16b7c1ab6109f8fb3278f5eb3c988a0e2ca5"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Kick Overheads/Kick Hard Overhead 2.wav",
+      "bytes": 527824,
+      "sha256": "91904c7e6c80c1e1f77d6cbcd055a8d2f3b4fcbc8b83affd52ab0737e79465ca"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Kick Overheads/Kick Hard Overhead 3.wav",
+      "bytes": 510544,
+      "sha256": "28ed85ce9de4ab0f03f18b5c31e0956971410757dc3130a5b4b78b0a204966db"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Kick Overheads/Kick Hard Overhead 4.wav",
+      "bytes": 573064,
+      "sha256": "239f204e28ecded1b1c66e9935cc02a7e09a59766b3c6d8b38661c0a9c8f055f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Kick Overheads/Kick Medium Overhead 1.wav",
+      "bytes": 492184,
+      "sha256": "4b7fbc76196105ffa21a89ab682aadfc054c056fbfd57ec043320a931b78eee0"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Kick Overheads/Kick Medium Overhead 2.wav",
+      "bytes": 497968,
+      "sha256": "09cefa44847e8a27c75179d54f7e89071b520e00bfead6ca5dd5c434f1ffa3ca"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Kick Overheads/Kick Medium Overhead 3.wav",
+      "bytes": 472240,
+      "sha256": "335fc066ef1ba8f71f8e91c56359ab0ce8ea9612bde81ae3ad074a1868b10050"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Kick Overheads/Kick Medium Overhead 4.wav",
+      "bytes": 473560,
+      "sha256": "46aabc584e6f4b9f22642f53ac69367ef1d87187d21127c86b0079802a3f103f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Kick Overheads/Kick Soft Overhead 1.wav",
+      "bytes": 474208,
+      "sha256": "bd4ef6d6a659ca9b7821f55d255e01d89b5c746ba8aa6f910c33e68d40106ca7"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Kick Overheads/Kick Soft Overhead 2.wav",
+      "bytes": 461824,
+      "sha256": "7735648785d3b2e12bd76654ce82f2c560699ed5326340461ddd373b0a132e17"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Kick Overheads/Kick Soft Overhead 3.wav",
+      "bytes": 446200,
+      "sha256": "2db02becc30b31082486189eaccac99d96ba992786bef53b751c106252a9a069"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Kick Overheads/Kick Soft Overhead 4.wav",
+      "bytes": 330928,
+      "sha256": "b7cbf66288f66a23f1afa0497a9301d7ebddb923c34a966c6aaeef99062df078"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Main Crash/Main Crash 1.wav",
+      "bytes": 1090984,
+      "sha256": "ae2f64ac225974c59670fd6bfdb244083073ea7a3a3249f8e36a5c82354404ab"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Main Crash/Main Crash 2.wav",
+      "bytes": 938728,
+      "sha256": "39319043a900de6d7b05b852c255db24d0ec4af843347e9090eb71b3635f842c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Main Crash/Main Crash 3.wav",
+      "bytes": 832168,
+      "sha256": "df6b38e45b88110565accaa9fc902428c0fe9d8e523f8d85f4d72e4ff85669ad"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Main Crash/Main Crash 4.wav",
+      "bytes": 861160,
+      "sha256": "a2264302f2f0530f6b302fee02f85476400412e831a020b92220144723ce716b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Main Crash/Main Crash Choke .wav",
+      "bytes": 620200,
+      "sha256": "43cbf6acec01015ff77fcb999fc586f0abdc6564a142cbaf49938aa22baef6c2"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Main Crash/Main Crash Soft 1.wav",
+      "bytes": 1035976,
+      "sha256": "17d500143425d5e2692565bf3e6925609b5a3e086d60a680b63d2c6997b3ee7d"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Main Crash/Main Crash Soft 2.wav",
+      "bytes": 1090960,
+      "sha256": "e8553d10ffb9f26e1d852aa2be7c8baa57735964721eefe6f42fcf5f237e7c50"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Main Crash/Main Crash Soft 3.wav",
+      "bytes": 1134064,
+      "sha256": "1b365cc1be56f1523eee94b1877b48ed003d68a305f194e03c2ae3bd25fe709d"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Main Crash/Main Crash Soft 4.wav",
+      "bytes": 964096,
+      "sha256": "d55dc137e842ab91f7aed3566598288c6403e4050726fb36c39fa098c9365be3"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Rack Tom Overheads/Rack Tom Hard Overheads 1.wav",
+      "bytes": 600304,
+      "sha256": "f9df3523585d9cc35a6aaa9f7841e621dcac4253733fc9f4598a9207896ef9cc"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Rack Tom Overheads/Rack Tom Hard Overheads 2.wav",
+      "bytes": 597928,
+      "sha256": "88a0d10fb210c0fc4b786f446af15476d7316e8afd80603fdf4faa263d82ce38"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Rack Tom Overheads/Rack Tom Hard Overheads 3.wav",
+      "bytes": 570160,
+      "sha256": "7da4d6ae92e8ee2316722284782d2bf90e5fdc9edbe2b0b5f63ad8d8885cc1f1"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Rack Tom Overheads/Rack Tom Hard Overheads 4.wav",
+      "bytes": 724480,
+      "sha256": "d32e7625c676be4670d503d083871a837267aaafabcedd2a29fff36523cf56db"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Rack Tom Overheads/Rack Tom Med Overheads 1.wav",
+      "bytes": 526744,
+      "sha256": "9847943116fe279b7d787a151598f712e023422618f9389600071c9860e4dd19"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Rack Tom Overheads/Rack Tom Med Overheads 2.wav",
+      "bytes": 572680,
+      "sha256": "cf0665845d2d2527cf9ad7e786a99ca2c908a3cc332a9f19f7a87d719811c722"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Rack Tom Overheads/Rack Tom Med Overheads 3.wav",
+      "bytes": 612256,
+      "sha256": "f5a125f7df2de02edd2573e40195ed494d27e7334a708134c13bb865f30d45db"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Rack Tom Overheads/Rack Tom Med Overheads 4.wav",
+      "bytes": 744376,
+      "sha256": "41ab2582b335df3b73cda78d3208ac2925e2c8ee151588c393046a18dc56d124"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Rack Tom Overheads/Rack Tom Soft Overheads 1.wav",
+      "bytes": 594520,
+      "sha256": "5137819e84c6996fb8f5f5e5cde625b312d8f003f241480d561fcb214627c514"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Rack Tom Overheads/Rack Tom Soft Overheads 2.wav",
+      "bytes": 623464,
+      "sha256": "cf0f57e032411b16051d3624941ed629b4e0def447fdd4efadd95ecb0b68ca1b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Rack Tom Overheads/Rack Tom Soft Overheads 3.wav",
+      "bytes": 496792,
+      "sha256": "a09787d9da31cc2b5a1e9a4432c5664636eaeac591816f93681b9f07283b8cdb"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Rack Tom Overheads/Rack Tom Soft Overheads 4.wav",
+      "bytes": 731560,
+      "sha256": "496a390f4026f2f07750451b4c0d79d61116c1db84c4d662b65c5da379af287a"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Ride/Ride 1.wav",
+      "bytes": 1080280,
+      "sha256": "e872572718e8dbcad3469de5b9a61868f0b8512ac88ee675c09db7cb3a10641b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Ride/Ride 2.wav",
+      "bytes": 1204984,
+      "sha256": "abadc9c4049e35cd40450aafe440ca9aebc89ac9d7ea6c9a5832a3b5f8992bdc"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Ride/Ride 3.wav",
+      "bytes": 1063120,
+      "sha256": "b5f4a144fba9923efa583b99a6f9305104949954b55f5d63b07838eaba5b90ca"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Ride/Ride 4.wav",
+      "bytes": 1110904,
+      "sha256": "a3cf4cb48fee21fa6252a3a987bcc22d1b7ecb13c58e0715395a2c18db8134d3"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Ride/Ride Bell 1.wav",
+      "bytes": 935488,
+      "sha256": "da1a2492812dac06a2d3a13186f26ac319cfae2e32a8c0da4cb0cddfa944e4ad"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Ride/Ride Bell 2.wav",
+      "bytes": 971872,
+      "sha256": "1f7361d40479bcb7fa11051de0380f7b147de7c26578765c6f63e0a452a485eb"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Ride/Ride Bell 3.wav",
+      "bytes": 904624,
+      "sha256": "873a57a91176ba2c59516fcc575bc31009b1074b98155191905eb8b9c6593db5"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Ride/Ride Bell 4.wav",
+      "bytes": 1126936,
+      "sha256": "f39006c4c810f7ff3d6f4a2e93b42184e0e7933a21993853e5645a05e4c51789"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Flam Overhead 1.wav",
+      "bytes": 434560,
+      "sha256": "f0d0e12d58043009ed2fe903f225396fca93475157b3871da4da9b0d7ecf1ffa"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Flam Overhead 2.wav",
+      "bytes": 424168,
+      "sha256": "c32a89f2826bef386d6893f8bf60e2a2b6fbfad0fc51843af6c44b2b9d6fd73c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Flam Overhead 3.wav",
+      "bytes": 398392,
+      "sha256": "426cdf3fdbf3f43f10a96d59add5464c6fe4875716be002f403f488c580595a9"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Flam Overhead 4.wav",
+      "bytes": 467320,
+      "sha256": "701332d3dbfe4c952e62d6c3eefa1d0db7ac78e5cc4e699d8948e8b27de70da2"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Hard Overhead 1.wav",
+      "bytes": 466624,
+      "sha256": "4e7c1a58a751487ecc5e3c87cd4bb3d79ddb121c98418841c753d629bfa37ddf"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Hard Overhead 2.wav",
+      "bytes": 470128,
+      "sha256": "4762ab7cd4278ec30a8a9482ccff4dc45d47a37f83b0da347bf5f91405e79e43"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Hard Overhead 3.wav",
+      "bytes": 531928,
+      "sha256": "1e2b7f0aa135eca659de6581e538e215bb36d0d862d6a134ea411932aa9655eb"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Hard Overhead 4.wav",
+      "bytes": 647584,
+      "sha256": "ec5c84ccf0ef37bd390dbc7ee90a348e7ea0e8a4919c05809ed22fea59ce01c8"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Hardest Overhead 1.wav",
+      "bytes": 491344,
+      "sha256": "2dd0e990b6641122ee5a73a746328603e54883aec1771f45b6d2eada76dbe7e1"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Hardest Overhead 2.wav",
+      "bytes": 507808,
+      "sha256": "3bf31dc0adc8356a87121fdaedbf60534a68e664c6dfe6a6ccbc2d7720ae70cd"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Hardest Overhead 3.wav",
+      "bytes": 531808,
+      "sha256": "d7275d97c0cf5a7d39ffbf62deab92bd11bd21c820c5057ca7f13450e7bb1857"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Hardest Overhead 4.wav",
+      "bytes": 500032,
+      "sha256": "4f5451d6bdc5fe49b950aed22f4fd793ae41aad5885ba52093184ba6287c2111"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Medium Overhead 1.wav",
+      "bytes": 440944,
+      "sha256": "c1d2c5b1eb192e17584bf97a651e7affeb055dd2045aac5e0fb91e72f5a83c87"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Medium Overhead 2.wav",
+      "bytes": 505216,
+      "sha256": "e88b93ee853371ccd9d7c1cdbd4a7170b7677489a65d130cc7a1bf1421d33d20"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Medium Overhead 3.wav",
+      "bytes": 445072,
+      "sha256": "22e7368d7a2985c062b935f3a1c3b6812d2362572eb38456bd6f755c49d4c1e4"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Medium Overhead 4.wav",
+      "bytes": 439816,
+      "sha256": "4fd99cab7008204282a2945d964a3f846575d8e5020dff6966d532154fba561a"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Rim Shot Overhead 1.wav",
+      "bytes": 360424,
+      "sha256": "305a6f8b3c042447cd7169fdee9443dc86a6784ed75f4ee9f33bb9f0b9378ca1"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Rim Shot Overhead 2.wav",
+      "bytes": 426136,
+      "sha256": "8bf7fc33ab7fcfaeed8c801609769138f869d2648f94f594c3141367c80baa61"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Rim Shot Overhead 3.wav",
+      "bytes": 507976,
+      "sha256": "dffb34a5a26a7f6c387abf79549e105bf51fe5866d77a65f29511b200c54fdc7"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Roll Overhead 1.wav",
+      "bytes": 370720,
+      "sha256": "b94e9274fdc67b8a0cead0bdf95a133d78133ff72556263a059a0c9551b038e9"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Roll Overhead 2.wav",
+      "bytes": 295504,
+      "sha256": "ee4257c90f7194b1ad95588c1559bd4ed1882f33fc2bb4122392fe5a602df515"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Roll Overhead 3.wav",
+      "bytes": 357112,
+      "sha256": "8dfd081e6912bb78641c0182d31fa84d025def8b78d0dfefa52c719c3103d751"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Roll Overhead 4.wav",
+      "bytes": 512272,
+      "sha256": "c8db4bdd69348afcbaa7e647da0997f0d65c00d119042bec46a996e2a1dfe56c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Soft Overhead 1.wav",
+      "bytes": 351376,
+      "sha256": "00eb82426b4f0f796b4958fea2b9d33d158b5adc9369b8532197907456b92791"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Soft Overhead 2.wav",
+      "bytes": 315904,
+      "sha256": "374ea1aeb74a575d6ea4cc825060dc7fae2f60c152ce9a014b1b39db5585447d"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Soft Overhead 3.wav",
+      "bytes": 378256,
+      "sha256": "6e35a71a0da4a6c06809a2808f9e69d5030ec4738f6ff980b9cc19cf01dfe3cf"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Overheads/Snare Overheads/Snare Soft Overhead 4.wav",
+      "bytes": 434416,
+      "sha256": "48271a2225818f1e3e5d441898dde644d2a4174a2153a72f1c37aa01e36fa716"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Alternate Crash Room/Alt Crash Room 1.wav",
+      "bytes": 888952,
+      "sha256": "fc816dfaa8d4254cf03f2a9a291403572334d818ee0d4da1be229ea9dcd981bc"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Alternate Crash Room/Alt Crash Room 2.wav",
+      "bytes": 1085632,
+      "sha256": "ed8887189774321f1ad0f78c40fc80e35e00d6b77f20b8195800a1a1f8cbacbf"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Alternate Crash Room/Alt Crash Room 3.wav",
+      "bytes": 974968,
+      "sha256": "cced270638c388f61af5a17cde4b2dde7cb9d8941ef846e1e3ddac34dc9cfe44"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Alternate Crash Room/Alt Crash Room 4.wav",
+      "bytes": 1239136,
+      "sha256": "c60fa1074a36d24dc194e3ca875e8619dea3a58d19b810a99b78e5c27b7c7f4a"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Alternate Crash Room/Alt Crash Room Choke.wav",
+      "bytes": 692224,
+      "sha256": "e6acae0802d1bfb02a4d411f0a38a5e2b2a985ca8d6e08604294c1e1ca5b0235"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/China Room/China Room 1.wav",
+      "bytes": 917440,
+      "sha256": "88b83925219f58d57271e6790fc3b53bafd4cd0525785aac45d78d56742d50cd"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/China Room/China Room 2.wav",
+      "bytes": 980848,
+      "sha256": "fe7463e55121ce93c566e3437972a350949ce7e5a7c9c39ca3bae52d33d5e343"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/China Room/China Room 3.wav",
+      "bytes": 845176,
+      "sha256": "943c51c4dbb2721d0a40b98d6e7d0dfd3624c6a279412d94194347e83ac08848"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/China Room/China Room 4.wav",
+      "bytes": 1007488,
+      "sha256": "013452aab706e61194bc9aee772303a9c85a386d5eaa5ca3269da06fff894319"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/China Room/China Room Choke.wav",
+      "bytes": 582352,
+      "sha256": "3af2cfbff36d23274c10a0cc808cdf6f84184ed641a91148371a210e811aa89e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/China Room/China Stack 1.wav",
+      "bytes": 740464,
+      "sha256": "26a5de3a3501221d918042ada7409f5de52af4a888be1376a46baf2970a11b5f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/China Room/China Stack 2.wav",
+      "bytes": 683392,
+      "sha256": "0ed6b86ecd03a301097287540043ef855f41cc572299957c672d7f076795e852"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/China Room/China Stack 3.wav",
+      "bytes": 612664,
+      "sha256": "19b18fad92fd5caf81561418e81cc7d67cd26b6a022df1680d700aa586df375f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/China Room/China Stack 4.wav",
+      "bytes": 893152,
+      "sha256": "7f5aec39936da174563fa9cfcf16234d19da6ec671c24570b0d6c0083d83e035"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Floor Tom Room/Floor Tom Room Hard 1.wav",
+      "bytes": 627088,
+      "sha256": "32c5b2c23e983be313ea9e7f592e66af39b2bb4a0872d3fba8ea7c0dfd2d8e2c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Floor Tom Room/Floor Tom Room Hard 2.wav",
+      "bytes": 601624,
+      "sha256": "cab554faab2967cdbe68845823a0b30ce30b27bcc6ba2fa03b171363ac570fe1"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Floor Tom Room/Floor Tom Room Hard 3.wav",
+      "bytes": 516928,
+      "sha256": "e62c28e17afe1d4e294a07fd118dfb6301b186110371b8326fdc435485cb944c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Floor Tom Room/Floor Tom Room Hard 4.wav",
+      "bytes": 667024,
+      "sha256": "ff15dd0ef8f99687ae24964d2202accac24291ff47025168640fa2a0c8e80df5"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Floor Tom Room/Floor Tom Room Med 1.wav",
+      "bytes": 485176,
+      "sha256": "8439004bc9566688e7cc59baeaae902651c062efb228c0dc017d9090a169a1f6"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Floor Tom Room/Floor Tom Room Med 2.wav",
+      "bytes": 489160,
+      "sha256": "0169553939bc23490a1feec128699120cc757d32d364db6d0243088f87caec4c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Floor Tom Room/Floor Tom Room Med 3.wav",
+      "bytes": 586000,
+      "sha256": "60e313ed4586c009fdd9bfbfcc09a6d3ce680c8ebee953699b41d0175fe2530a"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Floor Tom Room/Floor Tom Room Med 4.wav",
+      "bytes": 690688,
+      "sha256": "439015f2bd31c164d31923221c1ab37c5584fdd45689621577b8ad12b82f777f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Floor Tom Room/Floor Tom Room Soft 1.wav",
+      "bytes": 560344,
+      "sha256": "bc47c8267d75c3bf99547bdc71b0d42fef491de9b1c5d633e12efd1a91896207"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Floor Tom Room/Floor Tom Room Soft 2.wav",
+      "bytes": 523768,
+      "sha256": "6cddbca6ed7702396407a98563ee2b261f38fab36f15df2d96fb18b11fcc7f0e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Floor Tom Room/Floor Tom Room Soft 3.wav",
+      "bytes": 491320,
+      "sha256": "db7a25a9ecccc3e9faa6c0329f38b05d9a3340cd259fa0af3b4e250b0ec830a7"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Floor Tom Room/Floor Tom Room Soft 4.wav",
+      "bytes": 543064,
+      "sha256": "a4a2424a27848bc1266857228688a438cfa5399711a9a102ad568953a1195f70"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Closed Hi Hat Room 1.wav",
+      "bytes": 554320,
+      "sha256": "d6631bbd56b09b486e27f1f00473005ddf7b2034a9dec186e0d33fa0773d8587"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Closed Hi Hat Room 2.wav",
+      "bytes": 477280,
+      "sha256": "60a1bd2958f26c61e47715c5735c19a680fcb646c5fac200ba0cc018e91c2b0e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Closed Hi Hat Room 3.wav",
+      "bytes": 452944,
+      "sha256": "7ebc9191b10b6639b7d3a73e0e0ef858679a494c06d5675ef4b0e6509a9daf3f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Closed Hi Hat Room 4.wav",
+      "bytes": 585784,
+      "sha256": "b0216d9ac3e480a4a73464c86bd17e945fba7e42ea8a0f5a7a72f7f1c5efc55f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Closed Tip Hi Hat Room 1.wav",
+      "bytes": 453520,
+      "sha256": "4b9e5a761a27139560aef97ff08b5c930b55e9546caa828af7be455bb13328ee"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Closed Tip Hi Hat Room 2.wav",
+      "bytes": 363712,
+      "sha256": "e0d93d9415804b9df13005acbc0d6bcbd4c1fe28165ee06124580691a20e6e20"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Closed Tip Hi Hat Room 3.wav",
+      "bytes": 369304,
+      "sha256": "541b18d5ca7fb483744663c1d405792570d093026609bb44359a1e5843fb6ef9"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Closed Tip Hi Hat Room 4.wav",
+      "bytes": 407656,
+      "sha256": "6f37280d300956ac3305a13c209afb9ddaf2407ecb62804792422a0947a9e26b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Open Hi Hat Room 1.wav",
+      "bytes": 944608,
+      "sha256": "481cc6b209680ffee064e9e2b82af986f18f3a096c89b8851074dedf48b0d7f6"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Open Hi Hat Room 2.wav",
+      "bytes": 839560,
+      "sha256": "7a573344215e2ab8c0db9c5f43361cdd0cddd98a514ceaaa4cf1adfb0d772cec"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Open Hi Hat Room 3.wav",
+      "bytes": 964216,
+      "sha256": "5191bf0464493af9913927adab4368d47a721013940ae7f247bff456e0bc2eeb"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Open Hi Hat Room 4.wav",
+      "bytes": 1128472,
+      "sha256": "9f3bb892c13dfab6240608ce454fc2496024beff79b67c8eb719b138f0b58e9b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Pedal Hi Hat Room 1.wav",
+      "bytes": 259432,
+      "sha256": "b83ad4b8ed0ec1fd0fc5a3c71b35be26a9ba08324d7d200219a342ae07d6662e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Pedal Hi Hat Room 2.wav",
+      "bytes": 266320,
+      "sha256": "9a14f3e8643498f46c7f6a9ef37aa9d3425b0ce257c1f1f212f3e3471d328d3d"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Pedal Hi Hat Room 3.wav",
+      "bytes": 351760,
+      "sha256": "e030448f276933847c9ca8bdfdd9dca733bc321307378d7fd4d72b00d5eeab6a"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Hi Hat Room/Pedal Hi Hat Room 4.wav",
+      "bytes": 385960,
+      "sha256": "b2b59ee4bc1e6a91966f3d7069c598f8d09e107859835321ad2176f21683139f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Kick Room/Kick Hard Room 1.wav",
+      "bytes": 477784,
+      "sha256": "2b51fcb49bba8a16dca7dec68193fc2b73194821630aaee9417fe39875da768c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Kick Room/Kick Hard Room 2.wav",
+      "bytes": 527824,
+      "sha256": "5e1b724ca0f8699e8da125647b59e1ef4a841c0892e2cd0d7e5353968ae005a2"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Kick Room/Kick Hard Room 3.wav",
+      "bytes": 510544,
+      "sha256": "6b07fb0207bdacdd0e337dad15044d6fdc75d1f5c92f2daaa8f83d82764dda39"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Kick Room/Kick Hard Room 4.wav",
+      "bytes": 573064,
+      "sha256": "0155f7dd17a6739e909ae88c266b721a45dfaeaa743ba2747099f67139501b47"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Kick Room/Kick Med Room 1.wav",
+      "bytes": 492184,
+      "sha256": "54e4e066f5a725bca75b6584e1336a0dd21117ff6e8b354de7cca25d564656e9"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Kick Room/Kick Med Room 2.wav",
+      "bytes": 497968,
+      "sha256": "d4a52636110b5467ec5e5decca80ccac158f2a83262d670796e16bfacc6e9532"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Kick Room/Kick Med Room 3.wav",
+      "bytes": 472240,
+      "sha256": "d4472f733f1da6a13757093a9f68c356f689df9ea08358a774729b5a52d44c15"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Kick Room/Kick Med Room 4.wav",
+      "bytes": 473560,
+      "sha256": "984040da0456e7b4c7a7cc28d2bc4b10119298be6f9acf51807f9d92d6e7040b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Kick Room/Kick Soft Room 1.wav",
+      "bytes": 474208,
+      "sha256": "84cdae7c10dab54f5da46a94bd062986ed2d0a86deb03a76299ff791c921bb71"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Kick Room/Kick Soft Room 2.wav",
+      "bytes": 461824,
+      "sha256": "475bf1d985d16a2ab3abbebeaa4d1bd2702258586aa1cc8afbaa53fd6360fa8b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Kick Room/Kick Soft Room 3.wav",
+      "bytes": 446200,
+      "sha256": "b4c3b9067af4b75cdb7a1b191ac2588f394e90d8e0ff9de77e6209f35edc8066"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Kick Room/Kick Soft Room 4.wav",
+      "bytes": 330928,
+      "sha256": "b18085de33330319f701c0d99cc48e17f052279821e32809cbb4112161143082"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Main Crash Room/Main Crash Room 1.wav",
+      "bytes": 1090984,
+      "sha256": "0c278c46bc1b4bd474d17907ed5bfe90378a6ccbb8af7d010eb776cd0ec5b909"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Main Crash Room/Main Crash Room 2.wav",
+      "bytes": 938728,
+      "sha256": "bae255517dc9b3156ba67495d69f089c362b1e5a404c04dc0442835e79ed0c9d"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Main Crash Room/Main Crash Room 3.wav",
+      "bytes": 832168,
+      "sha256": "25f7e5eaf89a9ec0ed3b22cf5bd420e4940b17e43dd5190208f6adac90a1a23a"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Main Crash Room/Main Crash Room 4.wav",
+      "bytes": 861160,
+      "sha256": "237da3eee97d74dcbd576b2a7b1e9435c01f78cb135add79e8bc6ccfcf580105"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Main Crash Room/Main Crash Room Choke.wav",
+      "bytes": 620200,
+      "sha256": "0ca016e5e1ef9a018c050c7b38601d0fe5908db8cda9531eca76811f92419250"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Main Crash Room/Main Crash Soft Room 1.wav",
+      "bytes": 1035976,
+      "sha256": "7fc6c8cbc24e952ebbc0374be80734d2985d97674abd325525e90c0e52dd3e64"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Main Crash Room/Main Crash Soft Room 2.wav",
+      "bytes": 1090960,
+      "sha256": "6fffecd4fcefe4376df92bdde501e332d05669471097379c226db77a66153923"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Main Crash Room/Main Crash Soft Room 3.wav",
+      "bytes": 1134064,
+      "sha256": "76822f5903a0138579d365fa0910bf0fcce41a38ae803fca6b4e7386d482dd79"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Main Crash Room/Main Crash Soft Room 4.wav",
+      "bytes": 964096,
+      "sha256": "d63b393b5eaab759d77fd60d0770d443263156bca000eb62c3c9d0b5d451fcd5"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Rack Tom Room/Rack Tom Room Hard 1.wav",
+      "bytes": 600304,
+      "sha256": "f2a2f89ce1996261375a411b91a1dced1bc72eb3b32f075fed08b415a868a172"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Rack Tom Room/Rack Tom Room Hard 2.wav",
+      "bytes": 597928,
+      "sha256": "1a1f20b3caa752432de6693ae659445fdbf23cf1bf6ef66b9f0f8d7412675ad5"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Rack Tom Room/Rack Tom Room Hard 3.wav",
+      "bytes": 570160,
+      "sha256": "f63f10a47e65a9a3861038840f7bec04610059c75e28ceed905f46c8b6c0e955"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Rack Tom Room/Rack Tom Room Hard 4.wav",
+      "bytes": 724480,
+      "sha256": "58bd3254d5398a710a5d7bc5c254cfa4c0cce7354fee8528eeefeb886705e6f3"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Rack Tom Room/Rack Tom Room Med 1.wav",
+      "bytes": 526744,
+      "sha256": "87d308764f759ea72891b5db9a8557deab7ae3cfd93292952b6f41cb61fbfaa0"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Rack Tom Room/Rack Tom Room Med 2.wav",
+      "bytes": 572680,
+      "sha256": "9041914c104cce177627ed50ceba8b5e01bc87188018181a55591871791b415e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Rack Tom Room/Rack Tom Room Med 3.wav",
+      "bytes": 612256,
+      "sha256": "576536135e2c393faed711f22bfdac448263b08a9fd7192b8110da98f18be492"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Rack Tom Room/Rack Tom Room Med 4.wav",
+      "bytes": 744376,
+      "sha256": "d200c17f041d837bb3c3dba031b88e9c7bb8bb58fa5e90ae2e5fa0fcc80b0b01"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Rack Tom Room/Rack Tom Room Soft 1.wav",
+      "bytes": 594520,
+      "sha256": "c86df45ba32e23e4b3c2524b33660fcbac9d0a52bebe74a9f0a2048bcd18c758"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Rack Tom Room/Rack Tom Room Soft 2.wav",
+      "bytes": 623464,
+      "sha256": "d269a4686ace13e53e5c9b9b70d450439b359f107aea20494d2fc46e965cfcbd"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Rack Tom Room/Rack Tom Room Soft 3.wav",
+      "bytes": 496792,
+      "sha256": "27ae4a21a23cc1cefba37d8f3f6d8d12bb8ad329c1fc279eec759f18fa656c7d"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Rack Tom Room/Rack Tom Room Soft 4.wav",
+      "bytes": 731560,
+      "sha256": "1fb469c360351a74fdb68fbc96bedef9be9e6dd74ff1d7248668d30fe40aefb1"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Ride Room/Ride Bell Room 1.wav",
+      "bytes": 935488,
+      "sha256": "0a383a0e532ba381095b62531c68b468587978e81b31a5140b2ba7eb180d9c24"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Ride Room/Ride Bell Room 2.wav",
+      "bytes": 971872,
+      "sha256": "e71e4a893fdca4a5832a9ed3ec564ed63d2c97bf7c42369221affa869b0e473f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Ride Room/Ride Bell Room 3.wav",
+      "bytes": 904624,
+      "sha256": "7c5c5ebdd31ca17a6402e0e62811fd2b7b450e0c5107a3c2d4d2f7cd798c4d56"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Ride Room/Ride Bell Room 4.wav",
+      "bytes": 1126936,
+      "sha256": "54899cc1016e9c25d36b6c2e377832f8394abf6ad7e9004262c1521c3e9bfabf"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Ride Room/Ride Room 1.wav",
+      "bytes": 1081156,
+      "sha256": "982c1e8594d43b5db1676c2c922531e15fe4b9a0b9fa2fa3fa71e558ca5e2280"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Ride Room/Ride Room 2.wav",
+      "bytes": 1204984,
+      "sha256": "ada5c0a85b26f145e6f657ea58fed427d088cd05967c0e2d1d6e825c3c4faa20"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Ride Room/Ride Room 3.wav",
+      "bytes": 1063120,
+      "sha256": "28a5fbb9712f14b67a12b5461ad76b48e8e578e1f1cf552ab3269ae21542cd37"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Ride Room/Ride Room 4.wav",
+      "bytes": 1110904,
+      "sha256": "09cca6f67a16170aceee59845a5e00e9bb502b4ee6af16ccff7998fd623226e3"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Flam Room 1.wav",
+      "bytes": 434560,
+      "sha256": "54d4dadf2826d0c31f5af5e998a42efb64fc1c9ac2b15426be2145a529f22cfb"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Flam Room 2.wav",
+      "bytes": 424168,
+      "sha256": "9fa944c23e70958f2c18adc2d9770fa9947563a3c426c8c157163e050021e8bb"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Flam Room 3.wav",
+      "bytes": 398392,
+      "sha256": "924f2085846e3accc6c4de4335a5952dd887f6aea375340753d3b250443c159f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Flam Room 4.wav",
+      "bytes": 467320,
+      "sha256": "ff49ccb9be0ddc5e568c541e1c7a9bcbe62b9303a8f9cf1e1634352510530db0"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Hard Room 1.wav",
+      "bytes": 466624,
+      "sha256": "6e5218c96182e5531b6bee6fc9d6d941092e1bfffb758c4c742ade21ea775a11"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Hard Room 2.wav",
+      "bytes": 470128,
+      "sha256": "bb3de5fd819714f5b5301f8542c4656379575ba43a94aaba18d2ab515cf4b15e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Hard Room 3.wav",
+      "bytes": 531928,
+      "sha256": "0f3c4d50519a38331e0b0a5cedc261a056156ab0b47635a0108d27e15df4375c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Hard Room 4.wav",
+      "bytes": 647584,
+      "sha256": "e203147fcc3a9476b09550f4eaef63e41ac712de1ec4eccc27b16351a0219826"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Hardest Room 1.wav",
+      "bytes": 491344,
+      "sha256": "12127f3d499de4a621495271c828e81f8cf5778665ca6cdd69735f8ec7a141f1"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Hardest Room 2.wav",
+      "bytes": 507808,
+      "sha256": "40d7567ce85a19d194f0f22401c3020be4618d9988afb1966e5eeba2272e37b0"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Hardest Room 3.wav",
+      "bytes": 531808,
+      "sha256": "2e3bf49901f064c00195171260c4e423b688972ca028c300b58f43accf2c0bd3"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Hardest Room 4.wav",
+      "bytes": 500032,
+      "sha256": "543259432f19b0680cd9872ff9b1684865b6764ef19cd1ca15846c445add81dd"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Med Room 1.wav",
+      "bytes": 440944,
+      "sha256": "558107e9ff4661fb8fa841c7ee5e2b997d6ecc489d5dc2a5701bf4bf236b8f28"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Med Room 2.wav",
+      "bytes": 505216,
+      "sha256": "954e06e95338a3693dfde898b69b2586682e24a6fa52e6918767c758ef615d83"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Med Room 3.wav",
+      "bytes": 445072,
+      "sha256": "8b6e87e9a74bc0e6f498c4a8d22ef631bf3073844a1b8800404eb5befc1eae53"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Med Room 4.wav",
+      "bytes": 439816,
+      "sha256": "7c27746b961eefc3247595a628ccb807d4523ad41910692049ea8ed01028801a"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Rim Shot Room 1.wav",
+      "bytes": 360424,
+      "sha256": "296abcfc601ede1ead2fc852aa4e1cb4178f6e4635a341905269a93c6be0d976"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Rim Shot Room 2.wav",
+      "bytes": 426136,
+      "sha256": "14280154c0606e37f34fca66bbe62e128b9a4eea2af3e4803312d70425e64e06"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Rim Shot Room 3.wav",
+      "bytes": 507976,
+      "sha256": "c3632c22651e71883ff3744217adac270d99498a2dfebafb58bb8a9292a036c8"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Roll Room 1.wav",
+      "bytes": 370720,
+      "sha256": "df09dfc9554d24d76f1b74905ba734c3863b2b426e9e9d8091f3b122fbe2f0cf"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Roll Room 2.wav",
+      "bytes": 295504,
+      "sha256": "5ef34fdf286dd50a0002cd6bf1e0201fcc512e1ca10c0bf6fef18c546bb8cee7"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Roll Room 3.wav",
+      "bytes": 357112,
+      "sha256": "303bd9f9704405a7c422b08ff8641087a1e6242dc1c18d67f4bc4b4dec823edb"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Roll Room 4.wav",
+      "bytes": 512272,
+      "sha256": "73c4e17adc56dc094ef4d62a1e392efb113fd9aa03133cfbb3e6a40bfdb1960d"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Soft Room 1.wav",
+      "bytes": 351376,
+      "sha256": "5ffc47d8caaa2f522b99c6238d9cb07242283a1eaa32946417eb4f5a84a69ee0"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Soft Room 2.wav",
+      "bytes": 315904,
+      "sha256": "952c10c132845ad80f92d7dc1485811bc7fc139b736b71da6bf14f3a825da635"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Soft Room 3.wav",
+      "bytes": 378256,
+      "sha256": "50222187e6fc92083e16ffa90a20106021fecb7b656ebae6bee2df11481bf764"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Chango Luke Holland/Samples/Room/Snare Room/Snare Soft Room 4.wav",
+      "bytes": 434416,
+      "sha256": "baed622b73b21812380671f6a4e9ca98b6fbef3f2b5300070234bbc2b019ef3d"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/kit.avrxpack",
+      "bytes": 7722,
+      "sha256": "27bbf08582289cd40ef1b24ccc53c08b1c445860d79ef6baf55ba026af04c98b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Alternate Crash/Alternate Crash Hard 1.wav",
+      "bytes": 1169824,
+      "sha256": "18d7f0ccc636102791076c80f09317eaf355547dde0b79010c55c2b48e1ce21b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Alternate Crash/Alternate Crash Hard 2.wav",
+      "bytes": 1101904,
+      "sha256": "1194699fc31730fc266b7b1ded7652386c63c6f35f4cfda4e374c8bb62509d6e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Alternate Crash/Alternate Crash Hard 3.wav",
+      "bytes": 1178296,
+      "sha256": "c15a16e372ba2fda2ff7e80d36347b2292532a60ec37a3148259584d4e049bbc"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Alternate Crash/Alternate Crash Hard 4.wav",
+      "bytes": 1182376,
+      "sha256": "66a541b78b4af089e54de987903c880bd33663d44c804a6299362b7bee592c3e"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Hardest 1.wav",
+      "bytes": 369664,
+      "sha256": "c564ca311fdf3571ff5cdbcdc852114f92fef10396e049f3655e6da4e0a3eb60"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Hardest 2.wav",
+      "bytes": 323056,
+      "sha256": "93d8ef940d16b5e53ffea0dd4172090f5e8328910bdabdca62f14de97831e93f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Hardest 3.wav",
+      "bytes": 348472,
+      "sha256": "1a24b62bfed52c0e324affd3f4a17777b2885359c213fad846f589447265d6c1"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Hardest 4.wav",
+      "bytes": 373888,
+      "sha256": "77b02642a4283974c1928fbba775cb0cd3e0a23123238bc0fd9338ee92d16574"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Med 1.wav",
+      "bytes": 331528,
+      "sha256": "d89a9bb737e637d0b742c3e9cbf44ba06d56368ca8fd996514a9d89161669ec1"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Med 2.wav",
+      "bytes": 378112,
+      "sha256": "f5eac1f69281c0d72fb2994195f9993fc1ad45c3b154fb4e39c83c265739605b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Med 3.wav",
+      "bytes": 352696,
+      "sha256": "23ba45f8518db1c95bd9204ce9f0923e429e52f8cdd5f900df8b77c488523984"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Med 4.wav",
+      "bytes": 327280,
+      "sha256": "bcfc7420f19538b6da355525a5f0826d180e6a8f0fbfd11d290b38a78f6a5e27"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Soft 1.wav",
+      "bytes": 356920,
+      "sha256": "6508a17e428699b79ca95c02b23ecb6728a6023908709238ffd6a5f298b33731"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Soft 2.wav",
+      "bytes": 382336,
+      "sha256": "0f1cdc2161699f121eaf061088248c317fba6787f66a35f48f3f62361ed72157"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Soft 3.wav",
+      "bytes": 335752,
+      "sha256": "65aa1becceaf4dc831f5d88486683dce1dcb9a4e48468fd35f2b94a0b578ae27"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Soft 4.wav",
+      "bytes": 361168,
+      "sha256": "5a85f08217bc120b1f2a41dd18ed785635a2629ddfc7fb906c74b920bd187c7a"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Super Soft 1.wav",
+      "bytes": 386560,
+      "sha256": "d4a8a24be9fc671a996df261eb34dbd8a3a20ec580fd9895d3f5958f302d5d11"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Super Soft 2.wav",
+      "bytes": 339976,
+      "sha256": "da881ccabe0347249ea5c9302328a269bff1226509a2701fbd37a58ee8647afa"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Super Soft 3.wav",
+      "bytes": 365392,
+      "sha256": "72f75f0c38296791351c1f64001db6c8a8fd63b94fbc0354b8dfd5675446f752"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Floor Tom/Floor Tom Super Soft 4.wav",
+      "bytes": 390808,
+      "sha256": "f24a24a413afed26b29be46084d935bd9be58ac78ce72c450103d513003861b8"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Hi Hat/Hi Hat Closed 1.wav",
+      "bytes": 339736,
+      "sha256": "60466aa314739001d387574ae08af433b2beda960f3fad8b1a18ef1c1695fadd"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Hi Hat/Hi Hat Closed 2.wav",
+      "bytes": 365152,
+      "sha256": "e767273b3fd7cca5ebae3be30dfabeff964631a19bb1e6105ebaed89369194fd"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Hi Hat/Hi Hat Closed 3.wav",
+      "bytes": 318520,
+      "sha256": "96bfbb7029a3ee300655c23970504667a61559d1da2a120aa0fc06998ec4985f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Hi Hat/Hi Hat Closed 4.wav",
+      "bytes": 343984,
+      "sha256": "23729a3e18a234f432b40e492c710b0ee5a27df0629d4e7c000e1aa7f86b3e5b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Hi Hat/Hi Hat Closed Soft 1.wav",
+      "bytes": 297448,
+      "sha256": "be012220411540309f15a7e635a33801bf4adf9482bc565ac73e1da42eb21b1a"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Hi Hat/Hi Hat Closed Soft 2.wav",
+      "bytes": 250864,
+      "sha256": "958de09a673763383572faeb994b0f40500941a9e0b9fbea8e28d6a219ab3150"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Hi Hat/Hi Hat Closed Soft 3.wav",
+      "bytes": 348304,
+      "sha256": "6018f442a676382d0e8c2f952e723749be75abfac6632f46e354136f64cad07f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Hi Hat/Hi Hat Closed Soft 4.wav",
+      "bytes": 373672,
+      "sha256": "548444e36d2c6d8032d1c9f2cdfac02afd9aa400a85ad81bdd4bbb1f47aa7e5b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Hi Hat/Hi Hat Open 1.wav",
+      "bytes": 1186816,
+      "sha256": "a3f740a804237ebfedeee6e0d12003ba411b4a6deadf4b3e6543bc3432cb8196"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Hi Hat/Hi Hat Open 2.wav",
+      "bytes": 1191040,
+      "sha256": "a384f4399e318238d64f6f2defc35e737c4955ff07f857d0b72a8667df24e771"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Hi Hat/Hi Hat Open 3.wav",
+      "bytes": 1195288,
+      "sha256": "b0fb8421410e0562ec8e1644a509d5b154efc73595f6bda06c6b1b341c3fb3b9"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Hi Hat/Hi Hat Open 4.wav",
+      "bytes": 1055536,
+      "sha256": "6f6a9c40c7c189c4765eeccef45763729da4b921ce50c010b042d24be17a6201"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Hard 1.wav",
+      "bytes": 286024,
+      "sha256": "e889644b689ef4e9c75907164df252705584374c7c7abc3f53569a2c7d1a8f09"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Hard 2.wav",
+      "bytes": 286024,
+      "sha256": "98b0cb8488ca8941b158bad0bb9d32932306a9d3427c99143e125907dc9d8702"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Hard 3.wav",
+      "bytes": 286048,
+      "sha256": "1c2ffe5e58409b9e6721f723e8c5ad30e69cef14a252842a4c2096ddfdd71345"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Hard 4.wav",
+      "bytes": 286024,
+      "sha256": "537b427c92028ef4512e3a60ecbb2b7f2dcad595cd3464674b3df5773973326b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Hardest 1.wav",
+      "bytes": 289156,
+      "sha256": "00e2d7e2b87baa694fce97ee3ba95a7a5682deea2b60289e5585dc22e4b363e8"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Hardest 2.wav",
+      "bytes": 286096,
+      "sha256": "6c08818e0840a9ab0287a7c1a118941fb124a13b03754607e3ee19c390c68af3"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Hardest 3.wav",
+      "bytes": 286048,
+      "sha256": "082c21c839c639ab6e6e0c2e85578adbfe3ba00a38d8686a2ba0ba60ea1b75b0"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Hardest 4.wav",
+      "bytes": 286096,
+      "sha256": "afdf1f70880286e73118967d7746fcc95df11aced5d4b211ccfcfdac86622846"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Med 1.wav",
+      "bytes": 286072,
+      "sha256": "385c4f2b15196ca3353d83900838d07b7f4eb75e4b4313bd945798e2fbaf55e7"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Med 2.wav",
+      "bytes": 286096,
+      "sha256": "e2920a9eb50de0e0573297218d664fcb189d10c901e5fb925608b78d8c637d09"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Med 3.wav",
+      "bytes": 286072,
+      "sha256": "01bf359d033c35191bf24e3400b98a0d9bcc41a7a9d55f053560d468069e7cd1"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Med 4.wav",
+      "bytes": 286048,
+      "sha256": "ef399309b58e77c7cb78b60882391282b677b99c8aff843352f400ab2c41af29"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Soft 1.wav",
+      "bytes": 286000,
+      "sha256": "1a42ad601ec8d7584f9ace62b6e67e6a957ecf4b5654cfda01b9eb91cf29ce1b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Soft 2.wav",
+      "bytes": 286000,
+      "sha256": "dfca8c0bd758ad6949458bedec3244903200c8f61418fdee3feb431117868b84"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Soft 3.wav",
+      "bytes": 285928,
+      "sha256": "de9de3f3ca09403f9fbf0c0c47f166a8b8f7c237e3699c19c0e126b606a9867a"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Kick/Kick Soft 4.wav",
+      "bytes": 286000,
+      "sha256": "b0e3734745e64cfd5be28fe04b3e79a87b953a89d30edaae8c3ba14f525b9eb2"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Main Crash/Main Crash Hard 1.wav",
+      "bytes": 1207000,
+      "sha256": "2496b05ca6e356185245c39192400d356d5436f0101810d13bf0d9a0b6ce0cf6"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Main Crash/Main Crash Hard 2.wav",
+      "bytes": 1139560,
+      "sha256": "920032fb84b391606e92e93566eb280408dfbc436e3db3000ca5e400e0e606b0"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Main Crash/Main Crash Hard 3.wav",
+      "bytes": 1143472,
+      "sha256": "0bea5a056bc362bfa131ef83f1c3954c3cd662945f9723420765b92c8175b7d0"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Main Crash/Main Crash Hard 4.wav",
+      "bytes": 1148032,
+      "sha256": "6906378edc624f9b29f4240c5ad6f459a57b959df8b6b2e8947f95ad9050abba"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Main Crash/Main Crash Soft 1.wav",
+      "bytes": 1152064,
+      "sha256": "bf6a9fe78d5e070e5e91687b076c8918ee98cff0b2dfcb10b598398e26cc462f"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Main Crash/Main Crash Soft 2.wav",
+      "bytes": 1155040,
+      "sha256": "58ed7f3b7469de76672af4bbc98fe1a48efc8d8c0b2401aed2d7492a79e6da22"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Main Crash/Main Crash Soft 3.wav",
+      "bytes": 1160440,
+      "sha256": "66f65fa17260f69d361a268d4a7a4fd02a636d6eef117a217c9e58de3ca2e92c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Main Crash/Main Crash Soft 4.wav",
+      "bytes": 1164784,
+      "sha256": "15230e1196436804d0446aae2ba664e95e15e0139306ff759066f5f9b0145414"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Hard 1.wav",
+      "bytes": 323056,
+      "sha256": "815e2cbf2cea2b26ace71e92b2d31d3c04ae64fb3af3ace7d5018d333b229315"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Hard 2.wav",
+      "bytes": 348520,
+      "sha256": "623f6d19a3862e7efba3895849a9decddaa8345bbea30567ca48e680683e5400"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Hard 3.wav",
+      "bytes": 373984,
+      "sha256": "44c2591d7ede34132ed3c100da4561bf9f643f827abaccbc85fdcc132f0b755b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Hard 4.wav",
+      "bytes": 327304,
+      "sha256": "c163c6dc0ff06267da5b1e1d6859ed6c2a711ff0e755a0e1cbdf2ed6c40dc4f0"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Med 1.wav",
+      "bytes": 352720,
+      "sha256": "d35743009a4870847bae7aed6e8204b64f15b388b1d72a3590036d38e025dc94"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Med 2.wav",
+      "bytes": 378136,
+      "sha256": "a017a4343e47cba37e6f62c10b0c637d44e85246ffa4899ecd9d911619a52c82"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Med 3.wav",
+      "bytes": 331552,
+      "sha256": "33b1f82ac1b8c13bf95911f8b144134b968863eef7229f58c1be6a1281d5a31b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Med 4.wav",
+      "bytes": 356944,
+      "sha256": "0792c33f4d0c2bb2e81d4d3c9cdb9692a9fa5f9141082516b60ea78a55172dce"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Soft 1.wav",
+      "bytes": 310360,
+      "sha256": "efd06ef1a69905aad26e5e91d0c5e5d69cd5d5b0c8dcd38d46135a6607798336"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Soft 2.wav",
+      "bytes": 335776,
+      "sha256": "0186a13318b0ab8a3f6897085a5de81eda302c86ffe1467137ac989420089987"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Soft 3.wav",
+      "bytes": 361168,
+      "sha256": "58d063b638c57cfbaa6716bb6cf48f386dd25a7514ff15776a57d2788da674c1"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Soft 4.wav",
+      "bytes": 314584,
+      "sha256": "d6308f033f2160d2430528e560d08bb6367c0e1ebbbe24c71ceb8966db1dfbec"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Super Soft 1.wav",
+      "bytes": 340000,
+      "sha256": "835d1c543da7fd6185ad6f4e1fcd86488623a56d92847d8c0f0e92b3686a4ebd"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Super Soft 2.wav",
+      "bytes": 365392,
+      "sha256": "c6662603125cd61c0ce2d3e2b90f726a2791c9ad533556cf42f58f33ad4d1783"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Super Soft 3.wav",
+      "bytes": 390832,
+      "sha256": "c0507b26afc5c58d8e30e18519243db608c9862221e911a2f7186e90740a3165"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Rack Tom/Rack Tom Super Soft 4.wav",
+      "bytes": 344224,
+      "sha256": "17139fd02c7a87ba7b5a6829bb7019cdff339bb9aebe68e2ad229f39cdb95163"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Ride/Ride .wav",
+      "bytes": 670480,
+      "sha256": "1d067741f95d6ba88d19b05349dcf416bcdcde5011865d09f1b9cae3f644e2b9"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Ride/Ride 1.wav",
+      "bytes": 712816,
+      "sha256": "be47963e766b531019c181ca1e0b99d87dd1ba66c39d2232b41327c38bfb8fa9"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Ride/Ride 2.wav",
+      "bytes": 691624,
+      "sha256": "74af2b1b762d0801e90e9e2dbf4dd87e1047d5e05a9dcadd358b54b23d508322"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Ride/Ride 4.wav",
+      "bytes": 793816,
+      "sha256": "4194102c6dfa4cf1c33b940de5a9d737a087201421734b930f67194e96be9523"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Flam 1.wav",
+      "bytes": 335752,
+      "sha256": "5f3b7828b3029b63cb6972961f4f5e2ae9a4566ddfb978fe600e5b7388ac8f09"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Flam 2.wav",
+      "bytes": 361168,
+      "sha256": "9336e46de10772f59d397b1a9a4d47595d05ade9aaac9a6c7a3699e357999596"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Flam 3.wav",
+      "bytes": 314632,
+      "sha256": "055e2aed926f28677a4f21766e15f8a861ca55dcaa217fabb12fc997e74c1fd5"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Flam 4.wav",
+      "bytes": 340000,
+      "sha256": "0243b0dc728d0198efe9d0b0154597362b875cc10bbda725b37efd345e60e06d"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Hard 1.wav",
+      "bytes": 318832,
+      "sha256": "3e28f5bf6451e2c7ab270e305426584e5f924421477fd8d11ac0fbf98b6664a8"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Hard 2.wav",
+      "bytes": 344224,
+      "sha256": "ac333b1a06fe1ab0bfece4aae8d1626cc2ac56192655bf527bf3ed8c34059b68"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Hard 3.wav",
+      "bytes": 297640,
+      "sha256": "72078fb50913cae28e0cdf01c1b2fbf07c46b9b11ed2aebe9ccc0b54ad159af0"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Hard 4.wav",
+      "bytes": 323128,
+      "sha256": "734dc1af5a859cafd929b6767b93a41d46939faf2814f0d3ec6bc4822389db50"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Hardest 1.wav",
+      "bytes": 361156,
+      "sha256": "f41084ad1eb8fb94a44ad1dc7376b8864f5813bd321abddee20b8afbdf5db0d6"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Hardest 2.wav",
+      "bytes": 386920,
+      "sha256": "ddf58f7dc745a7f583b5c202b53a88791d64d1d89184ebae93b1c9c03aab93f9"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Hardest 3.wav",
+      "bytes": 340000,
+      "sha256": "808f85974c19bd8730d89435cdc7586dd312355b1209ec2314a9c761e4a85802"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Hardest 4.wav",
+      "bytes": 365416,
+      "sha256": "af07f16774e613b5435985c3c10212ac5fcfa5ff90e09bd1141d1967e92cb608"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Med 1.wav",
+      "bytes": 348448,
+      "sha256": "1b7f5ee2551598d317b3d2d34040d634332392ab141ed9a94b65c2835aa383d6"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Med 2.wav",
+      "bytes": 301864,
+      "sha256": "b9b30925ffddce197735fc190d7888679c1e52f5310d36aa35dfce571b18216c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Med 3.wav",
+      "bytes": 327256,
+      "sha256": "4713027616104a31cb960f1f7b14fa233bb3deaa7fdcc65618c67ab057f00f80"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Med 4.wav",
+      "bytes": 352696,
+      "sha256": "a82785d07ddb74a203f14b0cfbd3614de4ea854fa68f35bcde93dca6e5a1a691"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Roll 1.wav",
+      "bytes": 293392,
+      "sha256": "d2d9cea241327f9011e0d0f82c9bad5ff6baba9d03282df7a6203aed618f1705"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Roll 2.wav",
+      "bytes": 318808,
+      "sha256": "97b9ff3df886b1ccf6e22e790fd5c01c098d15284b6897258ce0c03db001806b"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Roll 3.wav",
+      "bytes": 344200,
+      "sha256": "78a50efd738084eddee35c33c9e3f8087643b40f25e3c1ee33ca69472122fe78"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Roll 4.wav",
+      "bytes": 369568,
+      "sha256": "a0f0e254e8041156f16fd939c3af814040c10eaf5c57e88795c540103180743c"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Soft 1.wav",
+      "bytes": 306088,
+      "sha256": "865181fd10802721bd0e4a3f574c32ab99bd3d4c34b71c8632883f3072bb73ac"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Soft 2.wav",
+      "bytes": 331480,
+      "sha256": "1f18f4f9893c7dba15e64bcc0e8d9da833719d1b20aff8c3089234ebeef63847"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Soft 3.wav",
+      "bytes": 212848,
+      "sha256": "da5414d93cc986f9812678409e1685f88656912d8d4140d08f5e9a8ed03945a7"
+    },
+    {
+      "path": "Native Instruments/Groove/Drum Packs/Time Traveller/Samples/Snare/Snare Soft 4.wav",
+      "bytes": 238264,
+      "sha256": "8a2762951fbfc75dfcb897f26046dd926d73ead50f2ab75d0f880977828ec8c9"
+    },
+    {
+      "path": "Native Instruments/Guitar/Default Guitar.nam",
+      "bytes": 309788,
+      "sha256": "81724f66c7db8348029a3fb09ed3f81a24ae0a35c882a0dc7c4c271811d67715"
+    },
+    {
+      "path": "Native Instruments/Neural/GrooVAE/group1-shard1of4",
+      "bytes": 4194304,
+      "sha256": "a63569b8eb3fce7d87aafd05ff58bc0d727e15918df071eea2ed68b56cf331ce"
+    },
+    {
+      "path": "Native Instruments/Neural/GrooVAE/group1-shard2of4",
+      "bytes": 4194304,
+      "sha256": "9fe133f601c7bdb7f74493e00d74eb02f32e35f1f0f9dca632f76a1746386a95"
+    },
+    {
+      "path": "Native Instruments/Neural/GrooVAE/group1-shard3of4",
+      "bytes": 4194304,
+      "sha256": "4a9ea3a75d0683f79ad44065b663692bc7018a52b806223651faf33cf2935899"
+    },
+    {
+      "path": "Native Instruments/Neural/GrooVAE/group1-shard4of4",
+      "bytes": 3757164,
+      "sha256": "92d29f984be6f2ad921d0eeae8a599c01adb929df8b88bac871ba3c7a8f4f560"
+    },
+    {
+      "path": "Native Instruments/Neural/node.exe",
+      "bytes": 93580104,
+      "sha256": "ba4e6d110e8c1592a1ecd390f6b05f3da124b13871a5be62b341a07a853c6c32"
+    }
+  ]
+}

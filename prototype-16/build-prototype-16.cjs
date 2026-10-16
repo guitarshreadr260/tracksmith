@@ -1,0 +1,9 @@
+const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
+const root=path.resolve(__dirname,'../..'),log=path.join(__dirname,'prototype16-native-build.log'),status=path.join(__dirname,'prototype16-build-status.json');
+const started=new Date().toISOString();fs.writeFileSync(status,JSON.stringify({started,state:'running'}));
+const fd=fs.openSync(log,'w');
+const env={...process.env,CMAKE_BUILD_PARALLEL_LEVEL:'1',MSBUILDDISABLENODEREUSE:'1',SystemRoot:'C:/Windows',WINDIR:'C:/Windows',ProgramData:'C:/ProgramData',ALLUSERSPROFILE:'C:/ProgramData',ProgramFiles:'C:/Program Files','ProgramFiles(x86)':'C:/Program Files (x86)',ProgramW6432:'C:/Program Files',CommonProgramFiles:'C:/Program Files/Common Files','CommonProgramFiles(x86)':'C:/Program Files (x86)/Common Files',CommonProgramW6432:'C:/Program Files/Common Files',USERPROFILE:'C:/Users/tiaii',APPDATA:'C:/Users/tiaii/AppData/Roaming',LOCALAPPDATA:'C:/Users/tiaii/AppData/Local',TEMP:'C:/Users/tiaii/AppData/Local/Temp',TMP:'C:/Users/tiaii/AppData/Local/Temp'};
+const child=cp.spawn('C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe',['--build','work/native-build','--config','Release','--target','Tracksmith','StudioInstrumentTests','StudioRecordingTests','StudioMixerTests','StudioSessionTests','--parallel','1','--','/nodeReuse:false'],{cwd:root,windowsHide:true,env,stdio:['ignore',fd,fd]});
+fs.writeFileSync(status,JSON.stringify({started,state:'running',pid:child.pid}));
+child.on('error',error=>fs.writeFileSync(status,JSON.stringify({started,state:'failed',error:error.message})));
+child.on('exit',code=>{fs.closeSync(fd);fs.writeFileSync(status,JSON.stringify({started,finished:new Date().toISOString(),state:code===0?'passed':'failed',code}));});
