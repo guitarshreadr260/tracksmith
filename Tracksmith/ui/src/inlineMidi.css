@@ -19,3 +19,5 @@
 .studio-lane{cursor:crosshair}
 
 .inline-midi-resize{position:absolute;right:0;top:0;bottom:0;width:25%;max-width:4px;cursor:ew-resize;background:#ffffff25}
+
+.timeline-edit-cursor{position:absolute;inset-block:0;border-left:2px solid #c7edff;pointer-events:none;z-index:5}.timeline-edit-cursor span{position:absolute;top:30px;left:4px;white-space:nowrap;font-size:9px;color:#d8efff;background:#142835;padding:2px 4px}

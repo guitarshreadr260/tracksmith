@@ -38,3 +38,13 @@ Core: source/AttackDetection.h, ElasticMap.h, ElasticWorker.h and Main.cpp. UI: 
 ## Notes view reference
 
 The revised in-track layout follows the Notes view concept described in [Avid’s instrument-track documentation](https://apps.avid.com/protoolsfirsthelp/version12.3/enu/Pro%20Tools%20First%20Help/ed1.basics.23.16.html). Notes are edited inside each instrument lane, with its keyboard aligned beside the timeline. The implementation is Tracksmith code and retains its existing MIDI engine and limits. The in-track editor currently handles individual notes; use the optional larger editor for marquee and group editing.
+
+## Clipboard and Windows editing shortcuts
+
+Added a shared native audio/MIDI clipboard, Edit menu entries and Ctrl+X Cut, Ctrl+C Copy, Ctrl+V Paste, Ctrl+A Select all on track, Ctrl+B Clear, and Ctrl+D Duplicate. A persistent edit insertion line shows the paste destination after clicking the timeline or in-track note area. Text fields retain their normal text-editing shortcuts. The optional larger piano roll shares the native MIDI clipboard.
+
+Audio clips or a selected time range can be copied/cut and pasted onto compatible audio tracks; source audio, offsets, fades and Time Warp provenance are retained. MIDI notes preserve pitch, velocity, channel, duration and relative timing. Paste replaces material within its span and Undo restores it. Clipboard contents are session-local; track deletion invalidates the audio source reference. Cross-track audio paste respects resident-media limits. Ctrl+A selects material on the current track, not the entire session.
+
+Validation: production UI and all eight UI suites passed, browser keyboard checks passed for copy/cut/paste at the edit cursor, select-all/clear and text-field focus, and native clipboard diagnostics passed for cross-track audio, range edits, MIDI properties, overwrite/undo, cut/undo and incompatible paste safety. See BUILD20-clipboard-regression.txt. Native Release rebuild passed.
+
+Reference: [Avid Windows editing shortcuts](https://resources.avid.com/SupportFiles/attach/Pro_Tools/12.6/Pro_Tools_Shortcuts.pdf).

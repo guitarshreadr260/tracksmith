@@ -12,8 +12,8 @@ const block=source.slice(source.indexOf(' const available='),source.indexOf(' re
 const js=ts.transpileModule(block+';return registry;', {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
 function fixture(overrides={}){
  const sent=[],changes=[];
- const context={disabled:false,audio:{recording:false,seconds:2,canMidiUndo:true},chosen:{id:3,kind:'MIDI'},selection:{id:8,track:3,midi:true},selected:3,tracks:[{}],rangeStart:0,rangeEnd:4,rangeTrack:null,view:'edit',clips:[{id:5,track:3,start:1,length:2,offset:0,sourceDuration:8}],elasticOpen:false,setElasticOpen:()=>{},gridStep:.25,native:true,bpm:120,play:()=>sent.push({type:'play'}),record:()=>sent.push({type:'record'}),editor:false,playlist:false,zoom:1,snap:true,command:c=>sent.push(c),addInstrument:()=>changes.push('add'),createCommandRegistry,...overrides};
- for(const key of ['setLauncher','setNewSetup','setSelection','setRangeTrack','setView','setLibraryOpen','setEditor','setZoom','setPlaylist','setSnap','setIOOpen','setDetails','setNotice'])context[key]=v=>changes.push([key,v]);
+ const context={allTrack:null,editCursor:null,editFocus:'timeline',pianoContext:undefined,disabled:false,audio:{recording:false,seconds:2,canMidiUndo:true},chosen:{id:3,kind:'MIDI'},selection:{id:8,track:3,midi:true},selected:3,tracks:[{}],rangeStart:0,rangeEnd:4,rangeTrack:null,view:'edit',clips:[{id:5,track:3,start:1,length:2,offset:0,sourceDuration:8}],elasticOpen:false,setElasticOpen:()=>{},gridStep:.25,native:true,bpm:120,play:()=>sent.push({type:'play'}),record:()=>sent.push({type:'record'}),editor:false,playlist:false,zoom:1,snap:true,command:c=>sent.push(c),addInstrument:()=>changes.push('add'),createCommandRegistry,...overrides};
+ for(const key of ['setAllTrack','setEditFocus','setLauncher','setNewSetup','setSelection','setRangeTrack','setView','setLibraryOpen','setEditor','setZoom','setPlaylist','setSnap','setIOOpen','setDetails','setNotice'])context[key]=v=>changes.push([key,v]);
  return {registry:new Function(...Object.keys(context),js)(...Object.values(context)),sent,changes};
 }
 const midi=fixture();assert.deepEqual([...new Set(midi.registry.commands.map(c=>c.menu))],menuNames);
@@ -23,7 +23,7 @@ assert.deepEqual(midi.sent,[{type:'undo',track:3},{type:'midiImport',track:3}]);
 const clip=fixture({chosen:{id:3,kind:'AUDIO'},selection:{id:5,track:3}});clip.registry.execute('clip.split');clip.registry.execute('audio.import');
 assert.deepEqual(clip.sent,[{type:'clipEdit',id:5,track:3,action:'split',position:2},{type:'import',id:3}]);
 const busy=fixture({disabled:true});for(const id of ['file.new','file.open','file.save','track.add','midi.import','edit.delete'])assert.equal(busy.registry.execute(id),false);
-const range=fixture({selection:null,rangeTrack:3});assert.equal(range.registry.execute('edit.delete'),true);assert.deepEqual(range.sent,[{type:'groupEdit',action:'delete',tracks:[3]}]);
+const range=fixture({selection:null,rangeTrack:3});assert.equal(range.registry.execute('edit.delete'),true);assert.deepEqual(range.sent,[{type:'clipboard',action:'clear',track:3,ids:[],start:0,end:4}]);
 console.log('Command registry: menu coverage, availability, dispatch, MIDI undo, clip split, range deletion and duplicate IDs PASS');
 
 const key=(code,extra={})=>({code,ctrlKey:false,metaKey:false,altKey:false,shiftKey:false,repeat:false,...extra});
@@ -38,6 +38,12 @@ const file=fixture();assert.equal(file.registry.shortcut(key('KeyS')),false);fil
 file.registry.shortcut(key('KeyS',{ctrlKey:true,repeat:true}));assert.equal(file.sent.length,1);
 console.log('R/T zoom direction, repeat, bounds, mixer guard, modifiers, Ctrl-only save and repeat suppression PASS');
 
-const duplicate=fixture({selection:{id:5,track:3}});duplicate.registry.shortcut(key('KeyD',{ctrlKey:true}));assert.deepEqual(duplicate.sent,[{type:'clipEdit',track:3,id:5,action:'duplicate',position:3}]);
+const duplicate=fixture({selection:{id:5,track:3}});duplicate.registry.shortcut(key('KeyD',{ctrlKey:true}));assert.deepEqual(duplicate.sent,[{type:'clipboard',track:3,ids:[5],action:'duplicate'}]);
 const mixer=fixture();assert.equal(mixer.registry.shortcut(key('Equal',{ctrlKey:true})),false);assert.equal(mixer.registry.shortcut(key('KeyM',{ctrlKey:true,shiftKey:true})),true);
 console.log('Build 18 duplicate and non-conflicting mixer shortcuts PASS');
+
+for(const [code,action] of [['KeyX','cut'],['KeyC','copy'],['KeyB','clear']]){const test=fixture();test.registry.shortcut(key(code,{ctrlKey:true}));assert.deepEqual(test.sent,[{type:'clipboard',track:3,ids:[8],action}]);}
+const paste=fixture({audio:{recording:false,seconds:2,clipboardKind:'midi'},editCursor:{track:3,seconds:4}});paste.registry.shortcut(key('KeyV',{ctrlKey:true}));assert.deepEqual(paste.sent,[{type:'clipboard',action:'paste',track:3,position:4}]);
+const select=fixture();select.registry.shortcut(key('KeyA',{ctrlKey:true}));assert.ok(select.changes.some(c=>c[0]==='setAllTrack'&&c[1]===3));
+const wrongPaste=fixture({audio:{recording:false,seconds:2,clipboardKind:'audio'}});assert.equal(wrongPaste.registry.execute('edit.paste'),false);
+console.log('Clipboard shortcuts, edit-cursor paste, select all, clear and compatible-track guards PASS');

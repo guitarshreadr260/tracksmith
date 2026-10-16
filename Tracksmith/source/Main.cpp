@@ -269,6 +269,18 @@ public:
             send(R"({"type":"elastic","track":0,"id":1,"preview":true,"anchors":[{"source":0,"target":0},{"source":1,"target":1.1},{"source":2,"target":2}]})");wait();send(R"({"type":"elasticPreview","action":"original"})");send(R"({"type":"elasticPreview","action":"apply"})");check(!elasticPreview&&!loading&&lane.clips[0].elasticAnchors[1].target==1.1&&undoClips.size()==historyBefore+1,"apply correction while listening to original commits once");send(R"({"type":"undo"})");check(lane.clips[0].source==sourceBefore,"audition apply undo restores previous correction");
         }catch(const std::exception& e){failure=e.what();}report.replaceWithText(failure.isEmpty()?"PASS: attack suggestions without mutation, audition A/B/discard/apply/undo/loop safety; asynchronous Time Warp render, original PCM preservation, new media/provenance, WAV/session reopening, undo/redo, cache reuse, cancel safety and undoable original restoration.":"FAIL: "+failure);return failure.isEmpty();
     }
+    bool clipboardRegression(const juce::File& reference,const juce::File& report){
+        juce::String failure;auto check=[](bool ok,const char* text){if(!ok)throw std::runtime_error(text);};auto send=[&](const char* json){command(juce::JSON::parse(json));};try{
+            auto wav=decodeWav(reference,16*1024*1024,[]{return false;});check(wav.error.isEmpty(),"fixture WAV");trackCount=3;auto& a=engine.playback.tracks[0];auto& b=engine.playback.tracks[1];a.left=wav.left;a.right=wav.right;a.sourceRate=wav.rate;a.timelineEnabled=true;a.clips={{1,0,0,.25,1},{2,0,2,1,1}};a.clips[0].fadeIn=.01;trackInfo[0].file=reference;trackInfo[0].fileName=reference.getFileName();trackInfo[0].waveform=wav.waveform;syncPlaylist(0);syncPlaylist(1);
+            const auto revision=editRevision;send(R"({"type":"clipboard","track":0,"action":"copy","ids":[1]})");check(a.clips.size()==2&&editRevision==revision,"copy leaves source and history unchanged");send(R"({"type":"clipboard","track":1,"action":"paste","position":4})");check(b.timelineEnabled&&b.clips.size()==1&&b.clips[0].start==4&&b.clips[0].offset==.25&&b.clips[0].fadeIn==.01&&b.extra.size()==1&&b.extra[0].left==a.left,"cross-track paste retains audio, offset and fade");
+            send(R"({"type":"undo"})");check(b.clips.empty(),"audio paste undo");send(R"({"type":"redo"})");check(b.clips.size()==1,"audio paste redo");send(R"({"type":"clipboard","track":0,"action":"cut","ids":[1]})");check(a.clips.size()==1,"audio cut");send(R"({"type":"undo"})");check(a.clips.size()==2,"audio cut undo");
+            send(R"({"type":"clipboard","track":0,"action":"copy","start":0.5,"end":0.75})");send(R"({"type":"clipboard","track":0,"action":"paste","position":2.25})");check(std::any_of(a.clips.begin(),a.clips.end(),[](auto c){return c.start==2.25&&c.length==.25&&c.offset==.75;}),"range copy/paste trims source and overwrites destination");send(R"({"type":"undo"})");check(a.clips.size()==2,"overwritten audio restored by undo");
+            auto& notes=engine.plugins.midiLanes[2].notes;engine.playback.tracks[2].midiTrack=true;engine.plugins.midiLanes[2].enabled=true;notes={{1,60,1,0,1,.7f},{2,64,1,1,1,.8f}};syncPlaylist(2);
+            send(R"({"type":"clipboard","track":2,"action":"copy","ids":[1,2]})");send(R"({"type":"clipboard","track":2,"action":"paste","position":2})");check(notes.size()==4&&std::any_of(notes.begin(),notes.end(),[](auto n){return n.start==4&&n.pitch==60&&n.velocity==.7f;}),"MIDI paste at beat four retains velocity/pitch/channel");send(R"({"type":"undo"})");check(notes.size()==2,"MIDI paste undo");send(R"({"type":"clipboard","track":2,"action":"cut","ids":[1]})");check(notes.size()==1,"MIDI cut");send(R"({"type":"undo"})");check(notes.size()==2,"MIDI cut undo");
+            send(R"({"type":"clipboard","track":2,"action":"copy","ids":[1]})");send(R"({"type":"clipboard","track":2,"action":"paste","position":0})");check(notes.size()==2,"MIDI paste replaces overlapping destination");send(R"({"type":"clipboard","track":2,"action":"clear","ids":[1,2,3,4,5,6,7,8,9,10]})");check(notes.empty(),"select-all clear");send(R"({"type":"undo"})");check(notes.size()==2,"clear undo");
+            const auto count=a.clips.size();send(R"({"type":"clipboard","track":0,"action":"paste","position":5})");check(a.clips.size()==count,"incompatible paste leaves audio unchanged");
+        }catch(const std::exception& e){failure=e.what();}report.replaceWithText(failure.isEmpty()?"PASS: audio copy/cut/range paste, cross-track source and fade preservation, audio and MIDI overwrite undo, MIDI clipboard properties, clear/undo and incompatible paste safety.":"FAIL: "+failure);return failure.isEmpty();
+    }
     bool midiDropRegression(const juce::File& midi,const juce::File& report){
         juce::String failure;try{trackCount=2;trackNames[1]="GGD instrument";engine.playback.tracks[1].midiTrack=true;engine.plugins.midiLanes[1].enabled=true;juce::MemoryBlock bytes;if(!midi.loadFileAsData(bytes))throw std::runtime_error("MIDI fixture unreadable");auto* message=new juce::DynamicObject();message->setProperty("type","midiDrop");message->setProperty("request","ggd-regression");message->setProperty("track",1);message->setProperty("beat",3.25);message->setProperty("data",juce::Base64::toBase64(bytes.getData(),bytes.getSize()));command(juce::var(message));auto& notes=engine.plugins.midiLanes[1].notes;if(!static_cast<bool>(midiDropResult.getProperty("success",false))||notes.empty())throw std::runtime_error("GGD MIDI import failed");if(std::any_of(notes.begin(),notes.end(),[](const auto& n){return n.start<3.25||n.length<=0;}))throw std::runtime_error("invalid imported timing");const auto count=notes.size();command(juce::JSON::parse(R"({"type":"undo"})"));if(!notes.empty())throw std::runtime_error("MIDI import undo failed");command(juce::JSON::parse(R"({"type":"redo"})"));if(notes.size()!=count)throw std::runtime_error("MIDI import redo failed");}catch(const std::exception& e){failure=e.what();}report.replaceWithText(failure.isEmpty()?"PASS: real GGD MIDI file through drop command, instrument-lane note creation at drop beat, positive note lengths, undo and redo.":"FAIL: "+failure);return failure.isEmpty();
     }
@@ -544,6 +556,45 @@ private:
         else {const auto t=message.getProperty("time",{}),v=message.getProperty("value",{});if((t.isInt()||t.isInt64()||t.isDouble())&&std::isfinite(static_cast<double>(t))){const double time=static_cast<double>(t);if(action=="put"&&(v.isInt()||v.isDouble())){ok=Automation::put(found->points,{time,static_cast<float>(v)},0,1);found->read=true;found->mode=1;}else if(action=="delete"){auto point=std::find_if(found->points.begin(),found->points.end(),[time](const auto& p){return std::abs(p.time-time)<1.e-8;});if(point!=found->points.end()){found->points.erase(point);ok=true;}}}}
         if(ok){engine.detach();slot->rememberAutomation();slot->automation=std::move(lanes);slot->bindAutomation();engine.attach();markDirty();status="Plugin automation saved. Read follows the curve; Off leaves the current control value.";}else status="Choose a valid plugin automation point.";
         publish(true);
+    }
+    void timelineClipboard(const juce::var& message){
+        if(loading||recordingBusy||sessionBusy||pluginBusy||exportBusy||chooser||recoveryWorker.isBusy()||automationPassActive)return;
+        const auto targetValue=message.getProperty("track",{});if(!targetValue.isInt())return;const int track=targetValue;if(track<0||track>=trackCount||engine.playback.tracks[track].routing.aux)return;
+        const auto action=message.getProperty("action",{}).toString();const bool midi=engine.playback.tracks[track].midiTrack;auto& lane=engine.playback.tracks[track];
+        auto fail=[&](const juce::String& text){status=text;publish();};
+        if(action=="paste"){
+            const double position=static_cast<double>(message.getProperty("position",-1));if(!std::isfinite(position)||position<0)return;
+            if(clipboardTrack<0||clipboardTrack>=trackCount||clipboardSession!=sessionRevision||clipboardMidi!=midi){fail("Copy compatible audio clips or MIDI notes in this session first.");return;}
+            if(midi){
+                const double start=position*controls.bpm/60,end=start+clipboardSpan;int next=1;for(const auto& n:engine.plugins.midiLanes[track].notes)next=std::max(next,n.id+1);std::vector<MidiNote> result;
+                for(const auto& n:engine.plugins.midiLanes[track].notes){const double stop=n.start+n.length;if(stop<=start||n.start>=end)result.push_back(n);else{if(n.start<start){auto left=n;left.length=start-n.start;if(validMidiNote(left))result.push_back(left);}if(stop>end){auto right=n;right.id=next++;right.start=end;right.length=stop-end;if(validMidiNote(right))result.push_back(right);}}}
+                for(auto n:clipboardNotes){n.id=next++;n.start+=start;if(!validMidiNote(n)){fail("Not enough timeline room to paste these notes.");return;}result.push_back(n);}if(result.size()>MidiLane::maximumNotes){fail("Paste would exceed the 2048-note limit.");return;}applyMidiNotes(track,std::move(result));status="MIDI pasted at the edit cursor. Undo restores overwritten notes.";publish(true);return;
+            }
+            auto& source=engine.playback.tracks[clipboardTrack];if(clipboardFiles.size()>trackInfo[clipboardTrack].extra.size()+1){fail("Clipboard source changed. Copy the clips again.");return;}for(size_t i=0;i<clipboardFiles.size();++i)if(clipboardFiles[i]!=(i?trackInfo[clipboardTrack].extra[i-1].file:trackInfo[clipboardTrack].file)){fail("Clipboard source changed. Copy the clips again.");return;}
+            std::vector<std::pair<int,int>> mapping;std::vector<int> append;int64_t frames=0;
+            auto mapSource=[&](int id){for(auto item:mapping)if(item.first==id)return item.second;if(id<0||id>static_cast<int>(source.extra.size()))return -1;int mapped=-1;
+                if(track==clipboardTrack)mapped=id;else{const auto file=clipboardFiles[id];if(file!=juce::File()){if(trackInfo[track].file==file)mapped=0;for(size_t i=0;i<trackInfo[track].extra.size()&&mapped<0;++i)if(trackInfo[track].extra[i].file==file)mapped=static_cast<int>(i)+1;}if(mapped<0){mapped=static_cast<int>(lane.extra.size()+append.size())+1;append.push_back(id);frames+=static_cast<int64_t>(id?source.extra[id-1].left.size():source.left.size());}}
+                mapping.push_back({id,mapped});return mapped;};
+            auto incoming=clipboardClips;for(auto& c:incoming){c.start+=position;c.source=mapSource(c.source);if(c.elasticSource>=0)c.elasticSource=mapSource(c.elasticSource);if(!ClipLayout::valid(c)){fail("Clip cannot be pasted at this position.");return;}}
+            if(lane.extra.size()+append.size()+1>ClipLayout::maximumSources||frames>engine.importBudget(track,true)){fail("Paste would exceed the source-media or resident-audio limit.");return;}
+            auto before=lane.clips,after=before;if(!ClipLayout::replaceRange(after,position,position+clipboardSpan,incoming)){fail("Paste would exceed the clip limit or timeline bounds.");return;}
+            engine.detach();for(int id:append){if(id){lane.extra.push_back(source.extra[id-1]);trackInfo[track].extra.push_back(trackInfo[clipboardTrack].extra[id-1]);}else{lane.extra.push_back({source.left,source.right,source.sourceRate});trackInfo[track].extra.push_back({trackInfo[clipboardTrack].fileName,trackInfo[clipboardTrack].file,trackInfo[clipboardTrack].waveform});}}
+            clearBatchHistory();undoClips.push_back({track,std::move(before),after,activePlaylists[track]});if(undoClips.size()>64)undoClips.erase(undoClips.begin());redoClips.clear();midiRedo.clear();lane.clips=std::move(after);lane.timelineEnabled=true;syncPlaylist(track);finishClipEdit();markDirty();status="Audio pasted at the edit cursor. Undo restores overwritten clips.";publish(true);return;
+        }
+        if(action!="copy"&&action!="cut"&&action!="clear"&&action!="duplicate")return;
+        std::vector<int> ids;if(const auto idsValue=message.getProperty("ids",{});const auto* values=idsValue.getArray())for(const auto& id:*values){if(!id.isInt())return;ids.push_back(static_cast<int>(id));}
+        const double start=static_cast<double>(message.getProperty("start",-1)),end=static_cast<double>(message.getProperty("end",-1));const bool range=std::isfinite(start)&&std::isfinite(end)&&start>=0&&end>start;
+        const auto picked=[&](int id){return std::find(ids.begin(),ids.end(),id)!=ids.end();};double base=1.e10,stop=0;
+        std::vector<MidiNote> notes;std::vector<TimelineClip> clips;
+        if(midi){const double a=start*controls.bpm/60,b=end*controls.bpm/60;for(auto n:engine.plugins.midiLanes[track].notes)if(range?(n.start<b&&n.start+n.length>a):picked(n.id)){if(range){const auto finish=std::min(n.start+n.length,b);n.start=std::max(n.start,a);n.length=finish-n.start;}if(validMidiNote(n)){base=std::min(base,n.start);stop=std::max(stop,n.start+n.length);notes.push_back(n);}}if(notes.empty())return;if(range){base=a;stop=b;}for(auto& n:notes)n.start-=base;
+        }else{for(auto c:lane.clips)if(range?(c.start<end&&c.start+c.length>start):picked(c.id)){if(range)c=ClipLayout::slice(c,std::max(start,c.start),std::min(end,c.start+c.length),c.id);base=std::min(base,c.start);stop=std::max(stop,c.start+c.length);clips.push_back(c);}if(clips.empty())return;if(range){base=start;stop=end;}for(auto& c:clips)c.start-=base;}
+        if(action!="clear"){clipboardTrack=track;clipboardSession=sessionRevision;clipboardMidi=midi;clipboardSpan=stop-base;clipboardNotes=std::move(notes);clipboardClips=std::move(clips);clipboardFiles={trackInfo[track].file};for(const auto& info:trackInfo[track].extra)clipboardFiles.push_back(info.file);}
+        if(action=="cut"||action=="clear"){
+            if(midi){auto after=engine.plugins.midiLanes[track].notes;if(range){const double a=start*controls.bpm/60,b=end*controls.bpm/60;int next=1;for(auto n:after)next=std::max(next,n.id+1);std::vector<MidiNote> kept;for(auto n:after){const double finish=n.start+n.length;if(finish<=a||n.start>=b)kept.push_back(n);else{if(n.start<a){auto left=n;left.length=a-n.start;if(validMidiNote(left))kept.push_back(left);}if(finish>b){n.id=next++;n.start=b;n.length=finish-b;if(validMidiNote(n))kept.push_back(n);}}}if(kept.size()>MidiLane::maximumNotes)return;after=std::move(kept);}else after.erase(std::remove_if(after.begin(),after.end(),[&](auto n){return picked(n.id);}),after.end());applyMidiNotes(track,std::move(after));}
+            else{auto before=lane.clips,after=before;if(range){if(!ClipLayout::replaceRange(after,start,end,{}))return;}else after.erase(std::remove_if(after.begin(),after.end(),[&](auto c){return picked(c.id);}),after.end());clearBatchHistory();undoClips.push_back({track,std::move(before),after,activePlaylists[track]});if(undoClips.size()>64)undoClips.erase(undoClips.begin());redoClips.clear();midiRedo.clear();engine.detach();lane.clips=std::move(after);syncPlaylist(track);finishClipEdit();markDirty();}
+        }
+        if(action=="duplicate"){auto* paste=new juce::DynamicObject();paste->setProperty("action","paste");paste->setProperty("track",track);paste->setProperty("position",midi?stop*60/controls.bpm:stop);timelineClipboard(juce::var(paste));return;}
+        status=action=="copy"?"Selection copied. Click a destination and paste.":action=="cut"?"Selection cut. Undo restores it; paste at the edit cursor.":"Selection cleared.";publish(true);
     }
     void finishAttackAnalysis(ElasticWorker::Result result){
         loading=elasticBusy=false;if(elasticCancelled||result.wav.error.isNotEmpty()){status=elasticCancelled?"Attack analysis cancelled. Clip unchanged.":result.wav.error;publish();return;}
@@ -1058,7 +1109,7 @@ private:
         if(includeWaveform)object->setProperty("pluginAutomation",engine.plugins.automationSnapshot(pluginAutomationChannel,pluginAutomationSlot,pluginAutomationParameter));
         object->setProperty("inserts", engine.plugins.snapshot(trackCount));
         object->setProperty("pluginBusy", pluginBusy);
-        object->setProperty("midiDropResult",midiDropResult);
+        object->setProperty("clipboardKind",clipboardTrack>=0&&clipboardSession==sessionRevision?(clipboardMidi?"midi":"audio"):"");object->setProperty("midiDropResult",midiDropResult);
         object->setProperty("playbackLatency", engine.playback.playbackLatencyFrames);
         if (groove.valid)
         {
@@ -1215,6 +1266,7 @@ private:
         if(elasticPreview){if(type=="stop")timeWarpPreviewAction("stop");else if(type=="ready")publish(true);else{status="Apply or discard the Time Warp preview first.";publish();}return;}
         if(type=="cancelElastic"){if(elasticBusy){elasticCancelled=true;elasticWorker.cancel();status="Cancelling Time Warp…";publish();}return;}
         if(elasticBusy&&type!="ready"){status="Wait for Time Warp or cancel the render first.";publish();return;}
+        if(type=="clipboard"){timelineClipboard(message);return;}
         if(type=="midiDrop"){importDroppedMidi(message);return;}
         if(type=="autosave"){const auto enabled=message.getProperty("enabled",{});if(enabled.isBool())autosaveEnabled=static_cast<bool>(enabled);if(static_cast<bool>(message.getProperty("now",false)))autosaveTick(true);publish();return;}
         if(type=="recoveryFolder"){recoveryRoot.createDirectory();recoveryRoot.revealToUser();return;}
@@ -1685,7 +1737,7 @@ private:
         const double position=engine.playback.seconds.load();engine.playback.playing=false;finishAutomation();engine.detach();
         const auto& removedSlot=engine.plugins.channels[id][0];const bool removedClick=removedSlot&&removedSlot->description.fileOrIdentifier=="tracksmith-native-click";
         if(!TrackEditing::remove(engine,id,trackCount)){engine.attach();return;}
-        stopRemovedClick(removedClick);
+        clipboardTrack=-1;stopRemovedClick(removedClick);
         const auto name=trackNames[id];for(int i=id;i<trackCount-1;++i){controls.channels[i]=controls.channels[i+1];trackInfo[i]=std::move(trackInfo[i+1]);trackNames[i]=trackNames[i+1];trackPlaylists[i]=std::move(trackPlaylists[i+1]);activePlaylists[i]=activePlaylists[i+1];automationPreviousMode[i]=automationPreviousMode[i+1];}
         --trackCount;controls.channels[trackCount]={};trackInfo[trackCount]={};trackNames[trackCount]="Audio "+juce::String(trackCount+1);trackPlaylists[trackCount].clear();activePlaylists[trackCount]=1;automationPreviousMode[trackCount]=0;
         clearBatchHistory();clearClipHistory();automationUndo.clear();automationRedo.clear();for(auto& pass:automationPasses)pass={};automationCurvesChanged=true;pluginAutomationChannel=-1;groove={};grooveTrack=-1;
@@ -1783,6 +1835,7 @@ private:
     std::unique_ptr<juce::FileChooser> chooser;
     std::unique_ptr<AudioSettingsWindow> settings;
     juce::File elasticMediaFolder;
+    int clipboardTrack=-1,clipboardSession=-1;bool clipboardMidi=false;double clipboardSpan=0;std::vector<MidiNote> clipboardNotes;std::vector<TimelineClip> clipboardClips;std::vector<juce::File> clipboardFiles;
     juce::var attackResult;int attackRevision=0;bool attackRunning=false,elasticPreviewRequest=false;
     bool elasticPreview=false,previewPlaying=false,previewOriginal=false,previewOldLoop=false;int previewTrack=-1;size_t previewSourceCount=0,previewMediaCount=0;TimelineClip previewCorrected;std::vector<TimelineClip> previewBefore;
     ElasticWorker elasticWorker;bool elasticBusy=false,elasticCancelled=false;int elasticTrack=-1;TimelineClip elasticClip;
@@ -1819,6 +1872,7 @@ public:
     void initialise(const juce::String& args) override {
         juce::StringArray tokens;tokens.addTokens(args,true);tokens.removeEmptyStrings();
         if(tokens.size()==3&&tokens[0]=="--scan-vst3"){PluginDiscovery::scan(tokens[1].unquoted(),tokens[2].unquoted());quit();return;}
+        if(tokens.size()==3&&tokens[0]=="--clipboard-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->clipboardRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==3&&tokens[0]=="--midi-drop-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->midiDropRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==3&&tokens[0]=="--elastic-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->elasticRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==2&&tokens[0]=="--insert-transfer-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->insertTransferRegression(juce::File(tokens[1].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
@@ -1826,7 +1880,7 @@ public:
         PluginDiscovery::recover();
         mainWindow=std::make_unique<MainWindow>();
     }
-    bool moreThanOneInstanceAllowed() override { return getCommandLineParameters().contains("--midi-drop-regression")||getCommandLineParameters().contains("--scan-vst3")||getCommandLineParameters().contains("--editing-regression")||getCommandLineParameters().contains("--insert-transfer-regression")||getCommandLineParameters().contains("--elastic-regression"); }
+    bool moreThanOneInstanceAllowed() override { return getCommandLineParameters().contains("--clipboard-regression")||getCommandLineParameters().contains("--midi-drop-regression")||getCommandLineParameters().contains("--scan-vst3")||getCommandLineParameters().contains("--editing-regression")||getCommandLineParameters().contains("--insert-transfer-regression")||getCommandLineParameters().contains("--elastic-regression"); }
     void shutdown() override { mainWindow.reset(); }
     void systemRequestedQuit() override { if (mainWindow) mainWindow->requestClose(); else quit(); }
 private:
