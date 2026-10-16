@@ -82,6 +82,9 @@ int main()
         require(SessionFile::decode(doc,file,result).wasOk()&&result.tracks[0].stereoLeft==-1&&result.tracks[0].stereoRight==1,"old sessions retain original stereo image");
         track->setProperty("stereoLeft",2);require(SessionFile::decode(doc,file,result).failed(),"invalid stereo pan rejects");
     }
+    SavedSession elasticSession;SessionTrack elasticTrack;elasticTrack.name="Elastic";elasticTrack.timelineEnabled=true;elasticTrack.audioFile=wav;elasticTrack.sources={wav,folder.getChildFile("Rendered.wav")};TimelineClip elasticClip{1,1,0,0,2};elasticClip.elasticSource=0;elasticClip.elasticLength=2;elasticClip.elasticAnchors={{0,0},{1,1.2},{2,2}};elasticTrack.clips={elasticClip};elasticSession.tracks.push_back(elasticTrack);
+    const auto elasticDocument=SessionFile::encode(elasticSession,file);SavedSession elasticRestored;require(SessionFile::decode(elasticDocument,file,elasticRestored).wasOk()&&elasticRestored.tracks[0].clips[0].elasticSource==0&&elasticRestored.tracks[0].clips[0].elasticAnchors[1].target==1.2,"version 11 Elastic metadata round trips");
+    auto badElastic=elasticDocument.clone();badElastic.getProperty("tracks",{}).getArray()->getReference(0).getProperty("clips",{}).getArray()->getReference(0).getProperty("elasticAnchors",{}).getArray()->getReference(1).getDynamicObject()->setProperty("target",1.9);require(SessionFile::decode(badElastic,file,elasticRestored).failed(),"invalid Elastic map rejects atomically");
     std::cout<<"All session format tests passed.\n";
 }
 

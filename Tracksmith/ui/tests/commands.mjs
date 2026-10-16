@@ -12,7 +12,7 @@ const block=source.slice(source.indexOf(' const available='),source.indexOf(' re
 const js=ts.transpileModule(block+';return registry;', {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
 function fixture(overrides={}){
  const sent=[],changes=[];
- const context={disabled:false,audio:{recording:false,seconds:2,canMidiUndo:true},chosen:{id:3,kind:'MIDI'},selection:{id:8,track:3,midi:true},selected:3,tracks:[{}],rangeStart:0,rangeEnd:4,rangeTrack:null,view:'edit',clips:[{id:5,track:3,start:1,length:2,offset:0,sourceDuration:8}],gridStep:.25,native:true,bpm:120,play:()=>sent.push({type:'play'}),record:()=>sent.push({type:'record'}),editor:false,playlist:false,zoom:1,snap:true,command:c=>sent.push(c),addInstrument:()=>changes.push('add'),createCommandRegistry,...overrides};
+ const context={disabled:false,audio:{recording:false,seconds:2,canMidiUndo:true},chosen:{id:3,kind:'MIDI'},selection:{id:8,track:3,midi:true},selected:3,tracks:[{}],rangeStart:0,rangeEnd:4,rangeTrack:null,view:'edit',clips:[{id:5,track:3,start:1,length:2,offset:0,sourceDuration:8}],elasticOpen:false,setElasticOpen:()=>{},gridStep:.25,native:true,bpm:120,play:()=>sent.push({type:'play'}),record:()=>sent.push({type:'record'}),editor:false,playlist:false,zoom:1,snap:true,command:c=>sent.push(c),addInstrument:()=>changes.push('add'),createCommandRegistry,...overrides};
  for(const key of ['setLauncher','setNewSetup','setSelection','setRangeTrack','setView','setLibraryOpen','setEditor','setZoom','setPlaylist','setSnap','setIOOpen','setDetails','setNotice'])context[key]=v=>changes.push([key,v]);
  return {registry:new Function(...Object.keys(context),js)(...Object.values(context)),sent,changes};
 }

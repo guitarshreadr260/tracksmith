@@ -1,0 +1,1 @@
+PASS: asynchronous Time Warp render, original PCM preservation, new media/provenance, WAV/session reopening, undo/redo, cache reuse, cancel safety and undoable original restoration.

@@ -17,6 +17,7 @@
 #include "StartupScan.h"
 #include "PluginCatalog.h"
 #include "NativeInstruments.h"
+#include "ElasticWorker.h"
 
 static uint64_t nextTimelineEdit() { static uint64_t serial=0; return ++serial; }
 
@@ -85,6 +86,7 @@ public:
     MainComponent(bool diagnostic=false) : browser(makeOptions())
     {
         setSize(1280, 820);
+        elasticWorker.onFinished=[this](LoadedWav wav){finishElastic(std::move(wav));};
         if(diagnostic)return;
         if (! juce::WebBrowserComponent::areOptionsSupported(makeOptions()))
         {
@@ -228,10 +230,11 @@ public:
         startupScan.onProgress=[safe=juce::Component::SafePointer<MainComponent>(this)](StartupScan::Progress p){if(!safe)return;safe->startupProgress=p;safe->pluginBusy=p.active;if(!p.active)safe->status=p.failed?"Studio ready. "+juce::String(p.failed)+" plugin(s) skipped after failed discovery; manual rescan is available in the insert menu.":"Studio ready. VST3 library checked.";safe->publish();};
         pluginBusy=true;startupScan.begin();
     }
-    ~MainComponent() override { startupScan.shutdown();stopTimer();recoveryWorker.onFinished={};recoveryWorker.shutdown(); }
+    ~MainComponent() override { elasticWorker.shutdown();startupScan.shutdown();stopTimer();recoveryWorker.onFinished={};recoveryWorker.shutdown(); }
     void resized() override { browser.setBounds(getLocalBounds()); error.setBounds(getLocalBounds().reduced(30)); }
     void requestClose()
     {
+        if(elasticBusy){status="Cancel Time Warp or wait for the render before closing.";publish();return;}
         if(recoveryWorker.isBusy()){status="Wait for the recovery snapshot to finish before closing.";publish();return;}
         if (exportBusy) { status = "Cancel export or wait for it to finish before closing."; publish(); return; }
         if (recordingBusy) { status = "Stop recording and wait for the take to finish before closing."; publish(); return; }
@@ -239,6 +242,23 @@ public:
         if (pluginBusy) { status = "Wait for the plugin operation to finish before closing."; publish(); return; }
         if(automationPassActive){automationTick();engine.playback.playing=false;finishAutomation();}
         confirmDiscard("Close Tracksmith?", [safe=juce::Component::SafePointer<MainComponent>(this)] {if(safe){safe->cleanRecovery();juce::JUCEApplication::getInstance()->quit();}});
+    }
+    bool elasticRegression(const juce::File& reference,const juce::File& report){
+        juce::String failure;auto check=[](bool ok,const char* text){if(!ok)throw std::runtime_error(text);};auto send=[&](const char* json){command(juce::JSON::parse(json));};
+        auto wait=[&]{const auto deadline=juce::Time::getMillisecondCounterHiRes()+30000;while(elasticBusy&&juce::Time::getMillisecondCounterHiRes()<deadline){elasticWorker.pollCompletion();juce::Thread::sleep(2);}check(!elasticBusy,"render timeout");juce::Thread::sleep(2);};
+        try{
+            auto wav=decodeWav(reference,16*1024*1024,[]{return false;});check(wav.error.isEmpty()&&wav.left.size()>=static_cast<size_t>(wav.rate*2),"reference WAV");trackCount=1;trackNames[0]="Time Warp reference";auto& lane=engine.playback.tracks[0];lane.left=wav.left;lane.right=wav.right;lane.sourceRate=wav.rate;lane.timelineEnabled=true;lane.clips={{1,0,0,0,2}};trackInfo[0].file=reference;trackInfo[0].fileName=reference.getFileName();trackInfo[0].waveform=wav.waveform;syncPlaylist(0);
+            elasticMediaFolder=report.getSiblingFile("Time Warp validation media");
+            send(R"({"type":"elastic","track":0,"id":1,"anchors":[{"source":0,"target":0},{"source":1,"target":1.2},{"source":2,"target":2}]})");check(elasticBusy&&lane.clips[0].source==0,"async render leaves current audio unchanged");wait();
+            check(lane.clips[0].source==1&&lane.clips[0].elasticSource==0&&lane.clips[0].elasticAnchors.size()==3,"render installs new media with original provenance");check(lane.left==wav.left&&lane.right==wav.right,"original PCM is untouched");
+            const auto renderFile=trackInfo[0].extra[0].file;check(renderFile.existsAsFile(),"rendered WAV persists");
+            auto saved=currentSession();const auto session=report.getSiblingFile("Time-Warp-regression.tracksmith");const auto document=SessionFile::encode(saved,session);check(session.replaceWithText(juce::JSON::toString(document)),"save session");SavedSession reopened;check(SessionFile::decode(juce::JSON::parse(session),session,reopened).wasOk()&&reopened.tracks[0].clips[0].elasticAnchors[1].target==1.2,"saved timing metadata reopens");
+            const auto reopenedAudio=decodeWav(reopened.tracks[0].sources[1],16*1024*1024,[]{return false;});check(reopenedAudio.error.isEmpty()&&reopenedAudio.left==lane.extra[0].left,"reopened render reproduces the exact audio");
+            send(R"({"type":"undo"})");check(lane.clips[0].source==0,"Elastic undo restores original");send(R"({"type":"redo"})");check(lane.clips[0].source==1,"Elastic redo restores render");
+            send(R"({"type":"elastic","track":0,"id":1,"anchors":[{"source":0,"target":0},{"source":1,"target":1.2},{"source":2,"target":2}]})");wait();check(lane.extra.size()==1&&lane.clips[0].elasticSource==0,"identical render reuses cache and original source");
+            const auto before=lane.clips[0].source;send(R"({"type":"elastic","track":0,"id":1,"anchors":[{"source":0,"target":0},{"source":1,"target":1.1},{"source":2,"target":2}]})");check(elasticBusy,"second render starts");send(R"({"type":"cancelElastic"})");wait();check(lane.clips[0].source==before,"cancel preserves last applied audio");
+            send(R"({"type":"elastic","track":0,"id":1,"reset":true})");check(lane.clips[0].source==0&&lane.clips[0].elasticSource==-1&&lane.clips[0].length==2,"restore original timing");send(R"({"type":"undo"})");check(lane.clips[0].elasticSource==0,"restore original is undoable");
+        }catch(const std::exception& e){failure=e.what();}report.replaceWithText(failure.isEmpty()?"PASS: asynchronous Time Warp render, original PCM preservation, new media/provenance, WAV/session reopening, undo/redo, cache reuse, cancel safety and undoable original restoration.":"FAIL: "+failure);return failure.isEmpty();
     }
     bool insertTransferRegression(const juce::File& report)
     {
@@ -512,6 +532,43 @@ private:
         else {const auto t=message.getProperty("time",{}),v=message.getProperty("value",{});if((t.isInt()||t.isInt64()||t.isDouble())&&std::isfinite(static_cast<double>(t))){const double time=static_cast<double>(t);if(action=="put"&&(v.isInt()||v.isDouble())){ok=Automation::put(found->points,{time,static_cast<float>(v)},0,1);found->read=true;found->mode=1;}else if(action=="delete"){auto point=std::find_if(found->points.begin(),found->points.end(),[time](const auto& p){return std::abs(p.time-time)<1.e-8;});if(point!=found->points.end()){found->points.erase(point);ok=true;}}}}
         if(ok){engine.detach();slot->rememberAutomation();slot->automation=std::move(lanes);slot->bindAutomation();engine.attach();markDirty();status="Plugin automation saved. Read follows the curve; Off leaves the current control value.";}else status="Choose a valid plugin automation point.";
         publish(true);
+    }
+    void elasticCommand(const juce::var& message)
+    {
+        if(loading||recordingBusy||sessionBusy||pluginBusy||exportBusy||chooser||recoveryWorker.isBusy()||automationPassActive)return;
+        const auto trackValue=message.getProperty("track",{}),idValue=message.getProperty("id",{});if(!trackValue.isInt()||!idValue.isInt())return;
+        const int track=trackValue,id=idValue;if(track<0||track>=trackCount||engine.playback.tracks[track].midiTrack||engine.playback.tracks[track].routing.aux)return;
+        auto& lane=engine.playback.tracks[track];const auto found=std::find_if(lane.clips.begin(),lane.clips.end(),[&](const auto& c){return c.id==id;});if(found==lane.clips.end())return;
+        if(message.getProperty("reset",false)==juce::var(true)){
+            if(found->elasticSource<0)return;const auto old=*found;auto restored=old;restored.source=old.elasticSource;restored.offset=old.elasticOffset+ElasticMap::sourceAt(old.elasticAnchors,old.offset);restored.length=ElasticMap::sourceAt(old.elasticAnchors,old.offset+old.length)-ElasticMap::sourceAt(old.elasticAnchors,old.offset);
+            restored.elasticSource=-1;restored.elasticOffset=restored.elasticLength=0;restored.elasticAnchors.clear();restored.fadeSpan=restored.fadeOffset=0;restored.fadeIn=std::min(restored.fadeIn,restored.length);restored.fadeOut=std::min(restored.fadeOut,restored.length-restored.fadeIn);restored.blend=false;
+            if(!ClipLayout::valid(restored))return;auto before=lane.clips;engine.detach();*found=restored;rememberElastic(track,std::move(before));return;
+        }
+        const int original=found->elasticSource<0?found->source:found->elasticSource;const double offset=found->elasticSource<0?found->offset:found->elasticOffset,length=found->elasticSource<0?found->length:found->elasticLength;
+        const auto value=message.getProperty("anchors",{});const auto* points=value.getArray();if(!points||points->size()>16)return;std::vector<ElasticAnchor> anchors;
+        for(const auto& p:*points){const auto a=p.getProperty("source",{}),b=p.getProperty("target",{});if(!(a.isInt()||a.isDouble())||!(b.isInt()||b.isDouble()))return;anchors.push_back({static_cast<double>(a),static_cast<double>(b)});}
+        if(!ElasticMap::valid(anchors,length)){status="Time Warp needs ordered anchors, pinned edges, 0.5–30 second source regions and segment ratios between 0.75 and 1.5.";publish();return;}
+        if(original<0||original>static_cast<int>(lane.extra.size())||offset+length>lane.sourceDuration(original)+1.e-5)return;
+        if(lane.extra.size()+1>=ClipLayout::maximumSources){status="This track has reached its source-media limit. Use a fresh track for further Elastic edits.";publish();return;}
+        const auto& left=original?lane.extra[original-1].left:lane.left;const auto& right=original?lane.extra[original-1].right:lane.right;const double rate=original?lane.extra[original-1].rate:lane.sourceRate;
+        const int first=static_cast<int>(std::floor(offset*rate)),frames=static_cast<int>(std::ceil(length*rate-1.e-9));if(first<0||frames<1||first+frames>static_cast<int>(left.size())||right.size()!=left.size()||frames>engine.importBudget(track,true))return;
+        ElasticWorker::Request request;request.rate=rate;request.map=anchors;request.folder=elasticMediaFolder==juce::File()?juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile("Tracksmith/Time Warp Media"):elasticMediaFolder;
+        request.audio[0].assign(left.begin()+first,left.begin()+first+frames);request.audio[1].assign(right.begin()+first,right.begin()+first+frames);
+        elasticTrack=track;elasticClip=*found;elasticClip.elasticSource=original;elasticClip.elasticOffset=offset;elasticClip.elasticLength=length;elasticClip.elasticAnchors=anchors;
+        engine.playback.playing=false;loading=elasticBusy=true;elasticCancelled=false;status="Rendering Time Warp from the original source…";
+        if(!elasticWorker.start(std::move(request))){loading=elasticBusy=false;status="Time Warp worker is busy.";}publish();
+    }
+    void rememberElastic(int track,std::vector<TimelineClip> before){
+        clearBatchHistory();undoClips.push_back({track,std::move(before),engine.playback.tracks[track].clips,activePlaylists[track]});if(undoClips.size()>64)undoClips.erase(undoClips.begin());redoClips.clear();midiRedo.clear();syncPlaylist(track);finishClipEdit();markDirty();status="Time Warp edit applied. Original audio preserved; Undo restores the previous timing.";publish(true);
+    }
+    void finishElastic(LoadedWav wav){
+        loading=elasticBusy=false;if(elasticCancelled||wav.error.isNotEmpty()){status=elasticCancelled?"Time Warp cancelled. Previous clip kept.":wav.error;publish();return;}
+        if(elasticTrack<0||elasticTrack>=trackCount)return;auto& lane=engine.playback.tracks[elasticTrack];auto found=std::find_if(lane.clips.begin(),lane.clips.end(),[&](const auto& c){return c.id==elasticClip.id;});if(found==lane.clips.end())return;
+        const auto& originalInfo=trackInfo[elasticTrack];wav.name=(elasticClip.elasticSource>0?originalInfo.extra[elasticClip.elasticSource-1].fileName:originalInfo.fileName)+" · Time Warp";
+        auto before=lane.clips;int source=0;for(size_t i=0;i<trackInfo[elasticTrack].extra.size();++i)if(trackInfo[elasticTrack].extra[i].file==wav.file)source=static_cast<int>(i)+1;
+        engine.detach();if(source==0){source=static_cast<int>(lane.extra.size())+1;lane.extra.push_back({std::move(wav.left),std::move(wav.right),wav.rate});trackInfo[elasticTrack].extra.push_back({wav.name,wav.file,std::move(wav.waveform)});}
+        if(source>0&&lane.extra[source-1].left.empty()){lane.extra[source-1]={std::move(wav.left),std::move(wav.right),wav.rate};trackInfo[elasticTrack].extra[source-1].waveform=std::move(wav.waveform);}
+        auto next=elasticClip;if(found->elasticSource<0)next.offset=0;next.source=source;*found=std::move(next);rememberElastic(elasticTrack,std::move(before));
     }
     void transferInsert(const juce::var& message)
     {
@@ -999,12 +1056,13 @@ private:
             item->setProperty("start",clip.start);item->setProperty("offset",clip.offset);item->setProperty("length",clip.length);
             item->setProperty("sourceDuration",engine.playback.tracks[id].sourceDuration(clip.source));item->setProperty("name",media?media->fileName:info.fileName);
             if(includeWaveform)item->setProperty("waveform",media?media->waveform:info.waveform);
+            if(clip.elasticSource>=0){if(includeWaveform){const auto& originalInfo=trackInfo[id];const auto* original=clip.elasticSource>0?&originalInfo.extra[clip.elasticSource-1]:nullptr;item->setProperty("elasticSourceWaveform",original?original->waveform:originalInfo.waveform);}item->setProperty("elasticSourceDuration",engine.playback.tracks[id].sourceDuration(clip.elasticSource));const auto saved=SessionFile::encodeClip(clip);for(const auto* key:{"elasticSource","elasticOffset","elasticLength","elasticAnchors"})item->setProperty(key,saved.getProperty(key,{}));}
             clips.add(juce::var(item));
         }
         juce::Array<juce::var> midiNotes;
         for(int track=0;track<trackCount;++track)if(engine.plugins.midiLanes[track].enabled)for(const auto& n:engine.plugins.midiLanes[track].notes){auto* item=new juce::DynamicObject();item->setProperty("track",track);item->setProperty("id",n.id);item->setProperty("pitch",n.pitch);item->setProperty("channel",n.channel);item->setProperty("start",n.start);item->setProperty("length",n.length);item->setProperty("velocity",n.velocity);midiNotes.add(juce::var(item));}object->setProperty("midiNotes",midiNotes);
         object->setProperty("canBatchUndo",!groupUndo.empty()||!playlistUndo.empty());object->setProperty("canBatchRedo",!groupRedo.empty()||!playlistRedo.empty());
-        object->setProperty("clipEditResult",clipEditResult);object->setProperty("clips",clips);object->setProperty("canUndo",!undoClips.empty());object->setProperty("canRedo",!redoClips.empty());object->setProperty("canMidiUndo",!midiUndo.empty());object->setProperty("canMidiRedo",!midiRedo.empty());
+        object->setProperty("elasticBusy",elasticBusy);object->setProperty("clipEditResult",clipEditResult);object->setProperty("clips",clips);object->setProperty("canUndo",!undoClips.empty());object->setProperty("canRedo",!redoClips.empty());object->setProperty("canMidiUndo",!midiUndo.empty());object->setProperty("canMidiRedo",!midiRedo.empty());
         object->setProperty("loading", loading || sessionBusy || pluginBusy || (recordingBusy && !engine.recorder.isActive()));
         object->setProperty("sessionRevision",sessionRevision);
         object->setProperty("sessionName", sessionFile == juce::File() ? (recoveredName.isEmpty()?(newSessionName.isEmpty()?juce::String("Untitled session"):newSessionName):recoveredName) : sessionFile.getFileNameWithoutExtension());
@@ -1116,6 +1174,8 @@ private:
     {
         if (! message.isObject()) return;
         const auto type = message.getProperty("type", {}).toString();
+        if(type=="cancelElastic"){if(elasticBusy){elasticCancelled=true;elasticWorker.cancel();status="Cancelling Time Warp…";publish();}return;}
+        if(elasticBusy&&type!="ready"){status="Wait for Time Warp or cancel the render first.";publish();return;}
         if(type=="midiDrop"){importDroppedMidi(message);return;}
         if(type=="autosave"){const auto enabled=message.getProperty("enabled",{});if(enabled.isBool())autosaveEnabled=static_cast<bool>(enabled);if(static_cast<bool>(message.getProperty("now",false)))autosaveTick(true);publish();return;}
         if(type=="recoveryFolder"){recoveryRoot.createDirectory();recoveryRoot.revealToUser();return;}
@@ -1167,6 +1227,7 @@ private:
             else { engine.resetPluginGraph(); engine.playback.playing = false; engine.playback.seekSeconds = engine.dynamicTransport.load()?engine.playStart.load():0.0; }
             publish(); return;
         }
+        if(type=="elastic"){elasticCommand(message);return;}
         if (loading || sessionBusy || pluginBusy) return;
         if (recordingBusy && type != "track" && type != "master" && type != "sendLevel") return;
         if(type.startsWith("io")){ioCommand(message);return;}
@@ -1682,6 +1743,8 @@ private:
     juce::WebBrowserComponent browser;
     std::unique_ptr<juce::FileChooser> chooser;
     std::unique_ptr<AudioSettingsWindow> settings;
+    juce::File elasticMediaFolder;
+    ElasticWorker elasticWorker;bool elasticBusy=false,elasticCancelled=false;int elasticTrack=-1;TimelineClip elasticClip;
     WavLoader loader;
     SessionWorker sessionWorker;
     GrooveWorker grooveWorker;
@@ -1715,19 +1778,16 @@ public:
     void initialise(const juce::String& args) override {
         juce::StringArray tokens;tokens.addTokens(args,true);tokens.removeEmptyStrings();
         if(tokens.size()==3&&tokens[0]=="--scan-vst3"){PluginDiscovery::scan(tokens[1].unquoted(),tokens[2].unquoted());quit();return;}
+        if(tokens.size()==3&&tokens[0]=="--elastic-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->elasticRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==2&&tokens[0]=="--insert-transfer-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->insertTransferRegression(juce::File(tokens[1].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==3&&tokens[0]=="--editing-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->editingRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         PluginDiscovery::recover();
         mainWindow=std::make_unique<MainWindow>();
     }
-    bool moreThanOneInstanceAllowed() override { return getCommandLineParameters().contains("--scan-vst3")||getCommandLineParameters().contains("--editing-regression")||getCommandLineParameters().contains("--insert-transfer-regression"); }
+    bool moreThanOneInstanceAllowed() override { return getCommandLineParameters().contains("--scan-vst3")||getCommandLineParameters().contains("--editing-regression")||getCommandLineParameters().contains("--insert-transfer-regression")||getCommandLineParameters().contains("--elastic-regression"); }
     void shutdown() override { mainWindow.reset(); }
     void systemRequestedQuit() override { if (mainWindow) mainWindow->requestClose(); else quit(); }
 private:
     std::unique_ptr<MainWindow> mainWindow;
 };
 START_JUCE_APPLICATION(TracksmithApplication)
-
-
-
-

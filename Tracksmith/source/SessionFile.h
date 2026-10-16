@@ -43,7 +43,8 @@ inline bool decodeAutomation(const juce::var& input,Automation::Lane& lane,float
 inline juce::var encodeClip(const TimelineClip& clip)
 {
     auto* c=new juce::DynamicObject();c->setProperty("id",clip.id);c->setProperty("source",clip.source);c->setProperty("start",clip.start);c->setProperty("offset",clip.offset);c->setProperty("length",clip.length);
-    c->setProperty("fadeIn",clip.fadeIn);c->setProperty("fadeOut",clip.fadeOut);c->setProperty("fadeOffset",clip.fadeOffset);c->setProperty("fadeSpan",clip.fadeSpan);c->setProperty("blend",clip.blend);return juce::var(c);
+    c->setProperty("fadeIn",clip.fadeIn);c->setProperty("fadeOut",clip.fadeOut);c->setProperty("fadeOffset",clip.fadeOffset);c->setProperty("fadeSpan",clip.fadeSpan);c->setProperty("blend",clip.blend);
+    if(clip.elasticSource>=0){c->setProperty("elasticSource",clip.elasticSource);c->setProperty("elasticOffset",clip.elasticOffset);c->setProperty("elasticLength",clip.elasticLength);juce::Array<juce::var> anchors;for(const auto p:clip.elasticAnchors){auto* a=new juce::DynamicObject();a->setProperty("source",p.source);a->setProperty("target",p.target);anchors.add(juce::var(a));}c->setProperty("elasticAnchors",anchors);}return juce::var(c);
 }
 inline bool decodeClip(const juce::var& entry,TimelineClip& c,int sources,bool fades)
 {
@@ -51,6 +52,7 @@ inline bool decodeClip(const juce::var& entry,TimelineClip& c,int sources,bool f
     const auto number=[&](const char* key,double& target){const auto v=entry.getProperty(key,{});if(!(v.isInt()||v.isInt64()||v.isDouble()))return false;target=static_cast<double>(v);return std::isfinite(target);};
     if(!number("start",c.start)||!number("offset",c.offset)||!number("length",c.length))return false;
     if(fades){const auto blend=entry.getProperty("blend",{});if(!blend.isBool()||!number("fadeIn",c.fadeIn)||!number("fadeOut",c.fadeOut)||!number("fadeOffset",c.fadeOffset)||!number("fadeSpan",c.fadeSpan))return false;c.blend=static_cast<bool>(blend);}
+    if(entry.hasProperty("elasticSource")){const auto source=entry.getProperty("elasticSource",{});if(!source.isInt()||!number("elasticOffset",c.elasticOffset)||!number("elasticLength",c.elasticLength))return false;c.elasticSource=static_cast<int>(source);if(c.elasticSource<0||c.elasticSource>=sources)return false;const auto anchors=entry.getProperty("elasticAnchors",{});const auto* list=anchors.getArray();if(!list||list->size()>16)return false;for(const auto& point:*list){const auto a=point.getProperty("source",{}),b=point.getProperty("target",{});if(!(a.isInt()||a.isInt64()||a.isDouble())||!(b.isInt()||b.isInt64()||b.isDouble()))return false;c.elasticAnchors.push_back({static_cast<double>(a),static_cast<double>(b)});}}
     return ClipLayout::valid(c)&&c.source<sources;
 }
 inline juce::var encodeNote(const MidiNote& note)
@@ -67,7 +69,7 @@ inline bool decodeNote(const juce::var& entry,MidiNote& n)
 inline juce::var encode(const SavedSession& session, const juce::File& destination)
 {
     auto* root = new juce::DynamicObject();
-    root->setProperty("format", "TracksmithSession"); root->setProperty("version", 10);
+    root->setProperty("format", "TracksmithSession"); root->setProperty("version", 11);
     root->setProperty("mainOutputPair",session.mainOutputPair);root->setProperty("ioDeviceKey",session.ioDeviceKey);
     juce::Array<juce::var> inserts;for(const auto& original:session.inserts){auto item=original.clone();if(!item.hasProperty("automation"))item.getDynamicObject()->setProperty("automation",juce::Array<juce::var>());inserts.add(item);}root->setProperty("inserts", inserts);
     root->setProperty("preRollBars", session.preRollBars); root->setProperty("metronomeGain", session.metronomeGain);
@@ -103,7 +105,7 @@ inline juce::Result decode(const juce::var& root, const juce::File& source, Save
     auto fail = [] { return juce::Result::fail("Invalid or unsupported Tracksmith session."); };
     if (!root.isObject() || root.getProperty("format", {}).toString() != "TracksmithSession") return fail();
     const auto version = root.getProperty("version", {});
-    if (!version.isInt() || (static_cast<int>(version) != 1 && static_cast<int>(version) != 2 && static_cast<int>(version) != 3 && static_cast<int>(version) != 4 && static_cast<int>(version) != 5 && static_cast<int>(version) != 6 && static_cast<int>(version) != 7 && static_cast<int>(version) != 8 && static_cast<int>(version) != 9 && static_cast<int>(version) != 10)) return fail();
+    if (!version.isInt() || (static_cast<int>(version) != 1 && static_cast<int>(version) != 2 && static_cast<int>(version) != 3 && static_cast<int>(version) != 4 && static_cast<int>(version) != 5 && static_cast<int>(version) != 6 && static_cast<int>(version) != 7 && static_cast<int>(version) != 8 && static_cast<int>(version) != 9 && static_cast<int>(version) != 10 && static_cast<int>(version) != 11)) return fail();
     const auto number = [](const juce::var& object, const char* key, double low, double high, double& result)
     {
         const auto value = object.getProperty(key, {});

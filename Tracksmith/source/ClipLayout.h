@@ -1,4 +1,5 @@
 #pragma once
+#include "ElasticMap.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -9,13 +10,16 @@ struct TimelineClip
     int id = 0, source = 0;
     double start = 0, offset = 0, length = 0;
     double fadeIn=0,fadeOut=0,fadeOffset=0,fadeSpan=0;bool blend=false;
+    int elasticSource=-1;double elasticOffset=0,elasticLength=0;std::vector<ElasticAnchor> elasticAnchors;
 };
 namespace ClipLayout
 {
+inline bool validElastic(const TimelineClip& c){return c.elasticSource==-1?c.elasticAnchors.empty()&&c.elasticOffset==0&&c.elasticLength==0:c.elasticSource>=0&&c.elasticSource<32&&c.elasticSource!=c.source&&std::isfinite(c.elasticOffset)&&c.elasticOffset>=0&&c.elasticOffset+c.elasticLength<=86400&&ElasticMap::valid(c.elasticAnchors,c.elasticLength)&&c.offset+c.length<=c.elasticLength+1.e-5;}
+
 constexpr size_t maximumClips = 128, maximumSources = 32;
 constexpr double maximumSeconds = 86400;
 inline bool valid(const TimelineClip& c)
-{ return c.id>0 && c.id<=1000000000 && c.source>=0 && c.source<static_cast<int>(maximumSources) && std::isfinite(c.start) && std::isfinite(c.offset) && std::isfinite(c.length) && c.start>=0 && c.offset>=0 && c.length>0 && c.start+c.length<=maximumSeconds && c.offset+c.length<=maximumSeconds && std::isfinite(c.fadeIn)&&std::isfinite(c.fadeOut)&&std::isfinite(c.fadeOffset)&&std::isfinite(c.fadeSpan)&&c.fadeIn>=0&&c.fadeOut>=0&&c.fadeOffset>=0&&c.fadeSpan>=0&&c.fadeSpan<=maximumSeconds&&c.fadeIn+c.fadeOut<=(c.fadeSpan>0?c.fadeSpan:c.length)+1.e-8&&(c.fadeSpan>0?c.fadeOffset+c.length<=c.fadeSpan+1.e-8:c.fadeOffset==0); }
+{ return validElastic(c) && c.id>0 && c.id<=1000000000 && c.source>=0 && c.source<static_cast<int>(maximumSources) && std::isfinite(c.start) && std::isfinite(c.offset) && std::isfinite(c.length) && c.start>=0 && c.offset>=0 && c.length>0 && c.start+c.length<=maximumSeconds && c.offset+c.length<=maximumSeconds && std::isfinite(c.fadeIn)&&std::isfinite(c.fadeOut)&&std::isfinite(c.fadeOffset)&&std::isfinite(c.fadeSpan)&&c.fadeIn>=0&&c.fadeOut>=0&&c.fadeOffset>=0&&c.fadeSpan>=0&&c.fadeSpan<=maximumSeconds&&c.fadeIn+c.fadeOut<=(c.fadeSpan>0?c.fadeSpan:c.length)+1.e-8&&(c.fadeSpan>0?c.fadeOffset+c.length<=c.fadeSpan+1.e-8:c.fadeOffset==0); }
 inline TimelineClip slice(const TimelineClip& original,double start,double end,int id)
 {
     auto c=original;const double delta=start-original.start;c.id=id;c.start=start;c.offset+=delta;c.length=end-start;
