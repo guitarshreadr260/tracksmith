@@ -2,6 +2,8 @@
 
 Created on the separate local `build-18-editing` branch/worktree from Build 17 commit `b042425`. Builds 16 and 17 were left unchanged. This build has not been pushed or merged.
 
+User review, October 16, 2026: user reports "everything seems to work ok" and accepts moving on. This records acceptance of the reviewed build; it does not expand the automated or hardware test coverage listed below.
+
 ## Controls
 
 | Action | Windows control |
