@@ -1,3 +1,9 @@
+# Current GitHub source checkpoint: Build 33
+
+See [checkpoint details](BUILD33-GITHUB-CHECKPOINT.md) and [audio-reference usage](BUILD33-AUDIO-REFERENCE.md). Historical checkpoint statements below describe earlier builds.
+
+---
+
 # Build 33 - timeline audio references - October 17, 2026
 
 Local Windows build: audio clip drag/drop analysis and reference-conditioned variations. See [usage and limits](BUILD33-AUDIO-REFERENCE.md). Earlier builds preserved; no GitHub push.
