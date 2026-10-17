@@ -1,6 +1,6 @@
 # Build 30 - native TONE3000 preview
 
-Based on Build 29 (0981976). Earlier builds are unchanged. Local development preview only; no GitHub push or public release.
+Based on Build 29 (0981976). Earlier builds are unchanged. Development preview. Source and validation notes are uploaded to GitHub main and build-30-tone3000; no executable release is published. The publishable integration key remains in the local ignored configuration.
 
 ## What changed
 

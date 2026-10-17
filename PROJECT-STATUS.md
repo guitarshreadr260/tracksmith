@@ -1,6 +1,6 @@
 # Build 30 - October 17, 2026
 
-Local native TONE3000 preview replaces NAM for new inserts and guitar tracks. Legacy NAM sessions retain their original engine. Includes native chains/editor and OAuth configuration, isolated host device management/settings and session dirty tracking. Online sign-in/download and listening require user confirmation; distribution is subject to API access terms. [Notes](BUILD30-TONE3000.md). Published main remains Build 24.
+Local native TONE3000 preview replaces NAM for new inserts and guitar tracks. Legacy NAM sessions retain their original engine. Includes native chains/editor and OAuth configuration, isolated host device management/settings and session dirty tracking. Online sign-in/download and listening require user confirmation; distribution is subject to API access terms. [Notes](BUILD30-TONE3000.md). GitHub main advances to this Build 30 source checkpoint. Portable binaries and the integration key remain local.
 
 ---
 

@@ -1,6 +1,6 @@
 # Tracksmith - Build 30
 
-Build 30 is the current local development preview: native TONE3000 replaces NAM for new inserts and guitar tracks, with legacy NAM session compatibility preserved. Published GitHub main remains Build 24. Current editable application source is in `Tracksmith/`; Prototype 16 and older downloads below are historical snapshots.
+Build 30 is the current local development preview: native TONE3000 replaces NAM for new inserts and guitar tracks, with legacy NAM session compatibility preserved. GitHub main now contains the Build 30 source checkpoint. The portable executable remains local. Current editable application source is in `Tracksmith/`; Prototype 16 and older downloads below are historical snapshots.
 
 Includes traditional DAW menus, R/T zoom, clip editing and fades, Time Warp, instrument-track piano rolls, MIDI groove file drops, audio/MIDI clipboard shortcuts, aligned mixer controls, GGD/Kontakt output inputs and the recording Stop fix. No Library sidebar.
 
