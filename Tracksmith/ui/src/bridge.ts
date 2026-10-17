@@ -6,6 +6,7 @@ export type IOState={deviceKey:string;sessionDeviceKey:string;matched:boolean;ma
 export type ElasticAnchor={source:number;target:number};
 export type StemPlan={stage:'preparing'|'cancelling'|'choosing'|'ready'|'rendering'|'failed';track:number;instrument:string;error?:string;seconds:number;outputs:{id:number;name:string;channels:number}[]};
 export type Command =
+ | {type:'trackHeight';id:number;height:number}
  | {type:'selectionPlay';preBars:number;postBars:number}
  | {type:'editCursor';position:number}
  | {type:'trackColor';id:number;color:string}
@@ -77,7 +78,7 @@ export type Command =
  | { type: 'master'; gain: number }
  | { type: 'track'; id: number; gain: number; pan: number; muted: boolean; solo: boolean; armed: boolean };
 export type AudioTrackState = { peakLeft?:number;peakRight?:number; id: number; fileName: string; duration: number; peak: number; waveform?: number[] };
-export type ProjectTrack = { color?:string;displayOrder?:number; clickTrack?:boolean;drumNoteMap?:number[];ezInstrument?:'guitar'|'drums'; stereoLeft?:number;stereoRight?:number; output?:number;hardwarePair?:number;sends?:{target:number;gain:number;pre?:boolean;muted?:boolean}[]; inputSource?:number;inputChannels?:1|2; kind?:string; id: number; name: string; gain: number; pan: number; muted: boolean; solo: boolean; armed: boolean };
+export type ProjectTrack = { height?:number; color?:string;displayOrder?:number; clickTrack?:boolean;drumNoteMap?:number[];ezInstrument?:'guitar'|'drums'; stereoLeft?:number;stereoRight?:number; output?:number;hardwarePair?:number;sends?:{target:number;gain:number;pre?:boolean;muted?:boolean}[]; inputSource?:number;inputChannels?:1|2; kind?:string; id: number; name: string; gain: number; pan: number; muted: boolean; solo: boolean; armed: boolean };
 export type InsertState = { token?:number; channel: number; slot: number; name: string; bypass: boolean; missing: boolean; latency: number; compensation: number };
 export type TimelineClip = { elasticSourceWaveform?:number[];elasticSourceDuration?:number; elasticSource?:number;elasticOffset?:number;elasticLength?:number;elasticAnchors?:ElasticAnchor[]; fadeIn?:number;fadeOut?:number;fadeOffset?:number;fadeSpan?:number;blend?:boolean; id:number; track:number; source:number; start:number; offset:number; length:number; sourceDuration:number; name:string; waveform?:number[] };
 export type MidiNote = { track:number;id:number;pitch:number;channel:number;start:number;length:number;velocity:number };

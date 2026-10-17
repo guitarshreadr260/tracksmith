@@ -1,3 +1,9 @@
+# Build 29 - October 17, 2026
+
+Local build: drag the bottom edge of Edit tracks to resize, choose height presets, and double-click to reset. Audio waveforms grow; instrument piano rolls show more pitches with aligned keys. Heights save in sessions as optional version-13 metadata. [Notes and validation](BUILD29-TRACK-HEIGHTS.md). Published main remains Build 24.
+
+---
+
 # Build 28 - October 17, 2026
 
 Local build: opaque track-colored clips, mini-keyboard/note-grid pitch scrolling, expanded editable transport counters and selection fields, independent nudge, selection playback pre/post-roll and Big Counter/display presets. Session format remains 13. [Notes and validation](BUILD28-TRANSPORT-PIANO.md). Published main remains Build 24.

@@ -24,7 +24,7 @@ struct SessionTrack
     int inputSource=0,inputChannels=1;
     float stereoLeft=-1,stereoRight=1;
     bool midiTrack=false;std::vector<MidiNote> notes;
-    int displayOrder=-1;juce::String color;
+    int displayOrder=-1;juce::String color;int height=0;
 };
 struct SavedSession
 {
@@ -80,7 +80,7 @@ inline juce::var encode(const SavedSession& session, const juce::File& destinati
     juce::Array<juce::var> tracks;
     for (const auto& track : session.tracks)
     {
-        auto* item = new juce::DynamicObject(); item->setProperty("name", track.name);item->setProperty("displayOrder",track.displayOrder<0?tracks.size():track.displayOrder);item->setProperty("color",track.color);
+        auto* item = new juce::DynamicObject(); item->setProperty("name", track.name);item->setProperty("displayOrder",track.displayOrder<0?tracks.size():track.displayOrder);item->setProperty("color",track.color);item->setProperty("height",track.height);
         item->setProperty("aux",track.routing.aux);item->setProperty("output",track.routing.output);item->setProperty("hardwarePair",track.routing.hardwarePair);
         juce::Array<juce::var> sends;for(const auto& send:track.routing.sends){auto* entry=new juce::DynamicObject();entry->setProperty("target",send.target);entry->setProperty("gain",send.gain);entry->setProperty("pre",send.pre);entry->setProperty("muted",send.muted);sends.add(juce::var(entry));}item->setProperty("sends",sends);
         item->setProperty("audio", track.audioFile == juce::File() ? juce::String() : track.audioFile.getRelativePathFrom(destination.getParentDirectory()));
@@ -146,6 +146,7 @@ inline juce::Result decode(const juce::var& root, const juce::File& source, Save
             || !boolean(item,"muted",track.muted) || !boolean(item,"solo",track.solo) || !boolean(item,"armed",track.armed)) return fail();
         track.displayOrder=static_cast<int>(parsed.tracks.size());
         if(static_cast<int>(version)>=13){const auto order=item.getProperty("displayOrder",{}),color=item.getProperty("color",{});if(!order.isInt()||static_cast<int>(order)<0||static_cast<int>(order)>=array->size()||!color.isString())return fail();track.displayOrder=static_cast<int>(order);track.color=color.toString();if(track.color.isNotEmpty()&&(track.color.length()!=7||track.color[0]!='#'||!track.color.substring(1).containsOnly("0123456789abcdefABCDEF")))return fail();for(const auto& previous:parsed.tracks)if(previous.displayOrder==track.displayOrder)return fail();}
+        if(static_cast<int>(version)>=13&&item.hasProperty("height")){const auto h=item.getProperty("height",{});if(!h.isInt()||(static_cast<int>(h)!=0&&(static_cast<int>(h)<126||static_cast<int>(h)>900)))return fail();track.height=static_cast<int>(h);}
         track.gain = static_cast<float>(gain); track.pan = static_cast<float>(pan);
         double pl=-1,pr=1;if(item.hasProperty("stereoLeft")&&!number(item,"stereoLeft",-1,1,pl))return fail();if(item.hasProperty("stereoRight")&&!number(item,"stereoRight",-1,1,pr))return fail();track.stereoLeft=static_cast<float>(pl);track.stereoRight=static_cast<float>(pr);
         if(item.hasProperty("inputSource")){const auto value=item.getProperty("inputSource",{});if(!value.isInt()||static_cast<int>(value)<(parsed.legacyInputRouting?0:-1)||(static_cast<int>(value)>(parsed.legacyInputRouting?3:31)&&!(static_cast<int>(version)>=12&&PluginInput::encoded(static_cast<int>(value)))))return fail();track.inputSource=static_cast<int>(value);}

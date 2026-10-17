@@ -181,9 +181,9 @@ public:
                 {
                     trackPlaylists[id].clear();activePlaylists[id]=1;
                     engine.trackInputs[id]=0;engine.trackInputChannels[id]=1;
-                    trackColors[id]={};trackRanks[id]=static_cast<int>(id);trackInfo[id] = {}; trackNames[id] = "Audio " + juce::String(static_cast<int>(id) + 1);
+                    trackHeights[id]=0;trackColors[id]={};trackRanks[id]=static_cast<int>(id);trackInfo[id] = {}; trackNames[id] = "Audio " + juce::String(static_cast<int>(id) + 1);
                     if (id >= result.session.tracks.size()) continue;
-                    const auto& track = result.session.tracks[id];trackPlaylists[id]=track.playlists;activePlaylists[id]=track.activePlaylist;syncPlaylist(static_cast<int>(id)); trackNames[id] = track.name;trackColors[id]=track.color;trackRanks[id]=track.displayOrder<0?static_cast<int>(id):track.displayOrder;
+                    const auto& track = result.session.tracks[id];trackPlaylists[id]=track.playlists;activePlaylists[id]=track.activePlaylist;syncPlaylist(static_cast<int>(id)); trackNames[id] = track.name;trackHeights[id]=track.height;trackColors[id]=track.color;trackRanks[id]=track.displayOrder<0?static_cast<int>(id):track.displayOrder;
                     auto& channel = controls.channels[id]; channel.gain = track.gain; channel.pan = track.pan;
                     channel.muted = track.muted; channel.solo = track.solo; channel.armed = track.armed;
                     engine.trackInputs[id]=track.inputSource;engine.trackInputChannels[id]=track.inputChannels;
@@ -276,15 +276,15 @@ public:
         juce::String failure;const auto check=[](bool ok,const char* why){if(!ok)throw std::runtime_error(why);};
         try{trackCount=4;for(int i=0;i<4;++i)trackNames[i]="Track "+juce::String(i);engine.playback.tracks[0].left={.123f};engine.playback.tracks[0].right={.123f};engine.playback.tracks[2].midiTrack=true;engine.plugins.midiLanes[2].enabled=true;engine.plugins.midiLanes[2].notes={{1,36,10,0,1,.8f}};engine.playback.tracks[3].routing.aux=true;engine.trackInputs[0]=PluginInput::encode(2,0);auto route=engine.playback.routingSnapshot(0);route.sends[0]={3,.4f,true};engine.playback.setRouting(0,route);
         auto send=[&](const char* json){command(juce::JSON::parse(json));};
-        send(R"({"type":"trackOrder","id":2,"before":0})");send(R"({"type":"trackColor","id":0,"color":"#39b6df"})");
+        send(R"({"type":"trackHeight","id":0,"height":400})");send(R"({"type":"trackOrder","id":2,"before":0})");send(R"({"type":"trackColor","id":0,"color":"#39b6df"})");
         check(trackRanks[2]==0&&trackRanks[0]==1&&trackRanks[1]==2&&trackRanks[3]==3,"display order permutation");
         check(engine.trackInputs[0]==PluginInput::encode(2,0)&&engine.plugins.midiLanes[2].notes[0].pitch==36&&engine.playback.tracks[0].left[0]==.123f&&engine.playback.routingSnapshot(0).sends[0].target==3,"reorder changed audio, MIDI or routing identity");
         send(R"({"type":"routing","id":0,"send":0,"muted":true})");send(R"({"type":"sendLevel","id":0,"send":0,"gain":0.7})");
         const auto saved=currentSession();SavedSession reopened;const auto file=report.getSiblingFile("Workflow.tracksmith");check(SessionFile::decode(SessionFile::encode(saved,file),file,reopened).wasOk(),"workflow session decodes");
-        check(reopened.tracks[0].color=="#39b6df"&&reopened.tracks[0].displayOrder==1&&reopened.tracks[2].displayOrder==0&&reopened.tracks[0].inputSource==PluginInput::encode(2,0),"organization/input recall");
+        check(reopened.tracks[0].height==400&&reopened.tracks[0].color=="#39b6df"&&reopened.tracks[0].displayOrder==1&&reopened.tracks[2].displayOrder==0&&reopened.tracks[0].inputSource==PluginInput::encode(2,0),"organization/input recall");
         check(reopened.tracks[0].routing.sends[0].muted&&reopened.tracks[0].routing.sends[0].pre&&std::abs(reopened.tracks[0].routing.sends[0].gain-.7f)<1.e-5,"send level/pre/mute recall");
         send(R"({"type":"trackOrder","id":2,"before":3,"after":true})");check(trackRanks[2]==3,"move after last track");send(R"({"type":"trackColor","id":0,"color":"bogus"})");check(trackColors[0]=="#39b6df","bad color accepted");
-        deleteTrack(1);check(trackRanks[0]==0&&trackRanks[1]==2&&trackRanks[2]==1&&trackColors[0]=="#39b6df"&&engine.trackInputs[0]==PluginInput::encode(1,0)&&engine.playback.routingSnapshot(0).sends[0].target==2,"delete remaps routes and keeps organization");
+        deleteTrack(1);check(trackRanks[0]==0&&trackRanks[1]==2&&trackRanks[2]==1&&trackHeights[0]==400&&trackColors[0]=="#39b6df"&&engine.trackInputs[0]==PluginInput::encode(1,0)&&engine.playback.routingSnapshot(0).sends[0].target==2,"delete remaps routes and keeps organization");
         }catch(const std::exception& ex){failure=ex.what();}report.replaceWithText(failure.isEmpty()?"PASS: track reorder before/after, stable audio/MIDI/plugin-input/aux identities, colors, send level/pre/mute session recall, invalid color rejection and deletion remapping.":"FAIL: "+failure);return failure.isEmpty();
     }
     bool mixerRegression(const juce::File& report){
@@ -925,7 +925,7 @@ private:
         {
             const auto index = static_cast<size_t>(id); const auto& c = controls.channels[index];
             SessionTrack track {trackNames[index],trackInfo[index].file,c.gain,c.pan,c.muted,c.solo,c.armed};
-            track.displayOrder=trackRanks[index];track.color=trackColors[index];syncPlaylist(id);track.playlists=trackPlaylists[index];track.activePlaylist=activePlaylists[index];
+            track.height=trackHeights[index];track.displayOrder=trackRanks[index];track.color=trackColors[index];syncPlaylist(id);track.playlists=trackPlaylists[index];track.activePlaylist=activePlaylists[index];
             track.volumeAutomation=engine.playback.tracks[index].volumeAutomation;track.panAutomation=engine.playback.tracks[index].panAutomation;track.automationMode=engine.playback.tracks[index].automationMode.load()==0?0:1;
             track.routing=engine.playback.routingSnapshot(index);
             track.stereoLeft=engine.playback.tracks[index].stereoLeft.load();track.stereoRight=engine.playback.tracks[index].stereoRight.load();
@@ -1233,7 +1233,7 @@ private:
                 lane->setProperty("kind",engine.playback.tracks[id].routing.aux?"AUX":engine.playback.tracks[id].midiTrack?"MIDI":"AUDIO");
                 const auto route=engine.playback.routingSnapshot(id);lane->setProperty("output",route.output);lane->setProperty("hardwarePair",route.hardwarePair);juce::Array<juce::var> sends;for(const auto& send:route.sends){auto* item=new juce::DynamicObject();item->setProperty("target",send.target);item->setProperty("gain",send.gain);item->setProperty("pre",send.pre);item->setProperty("muted",send.muted);sends.add(juce::var(item));}lane->setProperty("sends",sends);lane->setProperty("id", id); lane->setProperty("name", trackNames[static_cast<size_t>(id)]);
                 lane->setProperty("stereoLeft",engine.playback.tracks[id].stereoLeft.load());lane->setProperty("stereoRight",engine.playback.tracks[id].stereoRight.load());
-                lane->setProperty("color",trackColors[id]);lane->setProperty("displayOrder",trackRanks[id]);lane->setProperty("gain", c.gain); lane->setProperty("pan", c.pan); lane->setProperty("muted", c.muted);
+                lane->setProperty("height",trackHeights[id]);lane->setProperty("color",trackColors[id]);lane->setProperty("displayOrder",trackRanks[id]);lane->setProperty("gain", c.gain); lane->setProperty("pan", c.pan); lane->setProperty("muted", c.muted);
                 const auto& nativeSlot=engine.plugins.channels[id][0];if(nativeSlot&&nativeSlot->description.pluginFormatName=="Tracksmith Native"){if(nativeSlot->description.fileOrIdentifier=="tracksmith-native-click")lane->setProperty("clickTrack",true);else lane->setProperty("ezInstrument",nativeSlot->description.isInstrument?"drums":"guitar");if(nativeSlot->description.isInstrument)lane->setProperty("drumNoteMap",NativeInstruments::grooveNoteMap(nativeSlot->instance.get()));}
                 lane->setProperty("inputSource",engine.trackInputs[id].load());lane->setProperty("inputChannels",engine.trackInputChannels[id].load());lane->setProperty("solo", c.solo); lane->setProperty("armed", c.armed); lanes.add(juce::var(lane));
             }
@@ -1396,6 +1396,7 @@ private:
             engine.playback.playing=false;engine.resetPluginGraph();engine.playback.selectionPlaybackEnd=plan.end;engine.playback.seekSeconds=plan.origin;controls.playing=true;engine.playback.playing=true;status="Playing selected range with pre/post-roll.";publish();return;
         }
         if(type=="editCursor"){const auto v=message.getProperty("position",{});if(!(v.isDouble()||v.isInt()))return;const double seconds=static_cast<double>(v);if(!std::isfinite(seconds)||seconds<0||seconds>86400)return;if(!engine.playback.playing.load()){engine.playback.seekSeconds=seconds;if(engine.dynamicTransport.load())engine.playStart=seconds;}publish();return;}
+        if(type=="trackHeight"){const auto id=message.getProperty("id",{}),h=message.getProperty("height",{});if(!id.isInt()||!h.isInt()||static_cast<int>(id)<0||static_cast<int>(id)>=trackCount||static_cast<int>(h)<126||static_cast<int>(h)>900)return;trackHeights[static_cast<int>(id)]=static_cast<int>(h);markDirty();projectControlsPending=true;return;}
         if(type=="trackColor"||type=="trackOrder"){
             const auto idValue=message.getProperty("id",{});if(!idValue.isInt())return;const int id=static_cast<int>(idValue);if(id<0||id>=trackCount)return;
             if(type=="trackColor"){const auto value=message.getProperty("color",{});if(!value.isString())return;const auto color=value.toString();if(color.isNotEmpty()&&(color.length()!=7||color[0]!='#'||!color.substring(1).containsOnly("0123456789abcdefABCDEF")))return;trackColors[id]=color;}
@@ -1646,7 +1647,7 @@ private:
             engine.detach();engine.playback.tracks[track].midiTrack=midi;engine.playback.tracks[track].routing.aux=aux;engine.plugins.midiLanes[track].enabled=midi;
             if(midi){engine.playback.tracks[track].midiSeconds=engine.plugins.midiLanes[track].endBeat()*60/controls.bpm+1;trackNames[track]="Instrument "+juce::String(track+1);}
             if(aux){trackNames[track]="Aux "+juce::String(auxCount+1);engine.playback.tracks[track].gain=1;controls.channels[track].gain=1;}
-            trackRanks[track]=track;trackColors[track]={};
+            trackHeights[track]=0;trackRanks[track]=track;trackColors[track]={};
             const auto customName=message.getProperty("name",{}).toString().trim().substring(0,80);if(customName.isNotEmpty())trackNames[track]=customName;
             engine.playback.refreshDuration();engine.attach();markDirty();publish(true,track);return;
         }
@@ -1824,8 +1825,8 @@ private:
         if(!TrackEditing::remove(engine,id,trackCount)){engine.attach();return;}
         clipboardTrack=-1;stopRemovedClick(removedClick);
         const int removedRank=trackRanks[id];for(int i=0;i<trackCount;++i)if(trackRanks[i]>removedRank)--trackRanks[i];
-        const auto name=trackNames[id];for(int i=id;i<trackCount-1;++i){controls.channels[i]=controls.channels[i+1];trackInfo[i]=std::move(trackInfo[i+1]);trackNames[i]=trackNames[i+1];trackColors[i]=trackColors[i+1];trackRanks[i]=trackRanks[i+1];trackPlaylists[i]=std::move(trackPlaylists[i+1]);activePlaylists[i]=activePlaylists[i+1];automationPreviousMode[i]=automationPreviousMode[i+1];}
-        --trackCount;trackColors[trackCount]={};trackRanks[trackCount]=trackCount;controls.channels[trackCount]={};trackInfo[trackCount]={};trackNames[trackCount]="Audio "+juce::String(trackCount+1);trackPlaylists[trackCount].clear();activePlaylists[trackCount]=1;automationPreviousMode[trackCount]=0;
+        const auto name=trackNames[id];for(int i=id;i<trackCount-1;++i){controls.channels[i]=controls.channels[i+1];trackInfo[i]=std::move(trackInfo[i+1]);trackNames[i]=trackNames[i+1];trackHeights[i]=trackHeights[i+1];trackColors[i]=trackColors[i+1];trackRanks[i]=trackRanks[i+1];trackPlaylists[i]=std::move(trackPlaylists[i+1]);activePlaylists[i]=activePlaylists[i+1];automationPreviousMode[i]=automationPreviousMode[i+1];}
+        --trackCount;trackHeights[trackCount]=0;trackColors[trackCount]={};trackRanks[trackCount]=trackCount;controls.channels[trackCount]={};trackInfo[trackCount]={};trackNames[trackCount]="Audio "+juce::String(trackCount+1);trackPlaylists[trackCount].clear();activePlaylists[trackCount]=1;automationPreviousMode[trackCount]=0;
         clearBatchHistory();clearClipHistory();automationUndo.clear();automationRedo.clear();for(auto& pass:automationPasses)pass={};automationCurvesChanged=true;pluginAutomationChannel=-1;groove={};grooveTrack=-1;
         applyChannels();engine.plugins.resetGraph();engine.playback.seekSeconds=std::min(position,engine.playback.duration());engine.attach();markDirty();status="Deleted "+name+". Source audio files are retained. Track deletion cannot be undone.";publish(true,std::min(id,trackCount-1));
     }
@@ -1890,6 +1891,7 @@ private:
     std::array<TrackInfo, 128> trackInfo;
     std::array<std::vector<TrackPlaylist>,128> trackPlaylists;
     std::array<int,128> activePlaylists=[] {std::array<int,128> a;a.fill(1);return a;}();
+    std::array<int,128> trackHeights{};
     std::array<juce::String,128> trackColors;
     std::array<int,128> trackRanks=[] {std::array<int,128> result{};for(int i=0;i<128;++i)result[i]=i;return result;}();
     std::array<juce::String, 128> trackNames;
