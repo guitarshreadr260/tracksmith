@@ -162,7 +162,7 @@ function Studio(){
  register('Window','window.start','Session start screen',()=>{setLauncher(true);setNewSetup(false)},!audio.recording);
  register('Window','window.ez','EZ workspace',()=>setView(view==='ez'?'edit':'ez'),true,undefined,view==='ez');
  register('Help','help.shortcuts','Keyboard shortcuts',()=>setNotice('Ctrl+X Cut · Ctrl+C Copy · Ctrl+V Paste at edit cursor · Ctrl+A select all on track · Ctrl+B Clear · Ctrl+D Duplicate · Alt-drag clip/insert to copy · Ctrl+D duplicate clip · Ctrl+T trim · Alt+Left/Right nudge · Ctrl+Shift+M mixer · R zoom out · T zoom in · Ctrl+N new · Ctrl+O open · Ctrl+S save · Ctrl+Z undo · Ctrl+Shift+Z redo · Ctrl+E split · Delete selected clip/note · Space play/stop · F12 record · Numpad 1/2 shuttle · F2/F4 snap off/on'));
- register('Help','help.about','About Tracksmith Build 23',()=>setNotice('Tracksmith Build 23 · Reliable recording Stop with normal GGD output routing.'));
+ register('Help','help.about','About Tracksmith Build 24',()=>setNotice('Tracksmith Build 24 · Current main release with MIDI editing, Time Warp and normal GGD output recording.'));
  register('Audio','transport.play','Play / stop',play,native&&(!disabled||audio.recordingBusy||audio.recording||audio.playing),'Space');
  register('Audio','transport.stop','Stop',()=>command({type:'stop'}),native);
  register('Audio','transport.start','Return to start',()=>command({type:'seek',beat:0}),available);
