@@ -13,6 +13,7 @@ inline juce::PluginDescription description(bool drums)
 }
 std::unique_ptr<juce::AudioProcessor> create(const juce::PluginDescription&);
 inline juce::PluginDescription clickDescription(){auto d=description(true);d.name=d.descriptiveName="Tracksmith Click";d.fileOrIdentifier="tracksmith-native-click";d.uniqueId=0x5473434b;d.numOutputChannels=1;return d;}
+inline juce::PluginDescription tone3000Description(){auto d=description(false);d.name=d.descriptiveName="TONE3000";d.fileOrIdentifier="tracksmith-native-tone3000";d.uniqueId=0x54735433;d.manufacturerName="TONE3000";return d;}
 void setNeuralOptions(juce::AudioProcessor*,bool enabled,float influence);
 void setGrooveLibrary(juce::AudioProcessor*,const juce::File&);
 void audition(juce::AudioProcessor*,int drum);
@@ -26,3 +27,7 @@ void useSongMidi(juce::AudioProcessor*);
 bool consumeGrooveChanges(juce::AudioProcessor*);
 }
 std::unique_ptr<juce::AudioProcessor> createTracksmithNativeNam();
+
+std::unique_ptr<juce::AudioProcessor> createTracksmithTone3000();
+
+bool consumeTracksmithTone3000Changes(juce::AudioProcessor*);

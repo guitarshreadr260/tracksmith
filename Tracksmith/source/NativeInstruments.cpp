@@ -29,6 +29,7 @@ std::unique_ptr<juce::AudioProcessor> NativeInstruments::create(const juce::Plug
 {
     if(d.pluginFormatName!="Tracksmith Native")return {};
     if(d.fileOrIdentifier==NativeClickProcessor::identifier)return std::make_unique<NativeClickProcessor>();
+    if(d.fileOrIdentifier=="tracksmith-native-tone3000")return createTracksmithTone3000();
     if(d.fileOrIdentifier=="tracksmith-native-nam")return createTracksmithNativeNam();
     if(d.fileOrIdentifier=="tracksmith-native-groove-drums")return std::make_unique<NativeGroove>();return {};
 }
@@ -42,4 +43,4 @@ void NativeInstruments::bindGrooveToSong(juce::AudioProcessor* p,std::function<v
 juce::Array<juce::var> NativeInstruments::grooveNoteMap(juce::AudioProcessor* p){juce::Array<juce::var> result;if(auto* kit=dynamic_cast<Groove*>(p))for(int note:kit->getKit()->notes)result.add(note);return result;}
 void NativeInstruments::useSongMidi(juce::AudioProcessor* p){if(auto* kit=dynamic_cast<Groove*>(p))kit->stopGroovePreview();}
 
-bool NativeInstruments::consumeGrooveChanges(juce::AudioProcessor* p){if(auto* kit=dynamic_cast<Groove*>(p))return kit->nativeStateChanged.exchange(false);return false;}
+bool NativeInstruments::consumeGrooveChanges(juce::AudioProcessor* p){if(auto* kit=dynamic_cast<Groove*>(p))return kit->nativeStateChanged.exchange(false);return consumeTracksmithTone3000Changes(p);}

@@ -5,3 +5,5 @@ BUILD17-native-build.log
 Time Warp validation media/
 Time-Warp-regression.tracksmith
 BUILD19-native-build.log
+
+.env.local

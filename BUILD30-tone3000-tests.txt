@@ -1,0 +1,1 @@
+PASS: local A2 + IR chain, finite audio, missing-file errors, Tracksmith session/parameter/chain recall, dirty notifications and native editor render.

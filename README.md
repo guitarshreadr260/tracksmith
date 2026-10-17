@@ -1,10 +1,10 @@
-# Tracksmith - Build 29
+# Tracksmith - Build 30
 
-Build 29 is the current local build: resizable Edit tracks, larger waveforms and expandable instrument piano rolls, with saved per-track heights. Published GitHub main remains Build 24. Current editable application source is in `Tracksmith/`; Prototype 16 and older downloads below are historical snapshots.
+Build 30 is the current local development preview: native TONE3000 replaces NAM for new inserts and guitar tracks, with legacy NAM session compatibility preserved. Published GitHub main remains Build 24. Current editable application source is in `Tracksmith/`; Prototype 16 and older downloads below are historical snapshots.
 
 Includes traditional DAW menus, R/T zoom, clip editing and fades, Time Warp, instrument-track piano rolls, MIDI groove file drops, audio/MIDI clipboard shortcuts, aligned mixer controls, GGD/Kontakt output inputs and the recording Stop fix. No Library sidebar.
 
-[Build 29 notes](BUILD29-TRACK-HEIGHTS.md) | [Build 28 notes](BUILD28-TRANSPORT-PIANO.md) | [Build 27 notes](BUILD27-EDIT-WORKFLOW.md) | [Build 26 notes](BUILD26-MIXER-FIX.md) | [Build 25 notes](BUILD25-RECORDING.md) | [Build 25 validation](BUILD25-VALIDATION.txt) | [Build 24 release notes](BUILD24-RELEASE.md) | [Current status](PROJECT-STATUS.md) | [GGD routing](BUILD22-ROUTING.md) | [Stop fix](BUILD23-STOP-FIX.md)
+[Build 30 notes](BUILD30-TONE3000.md) | [Build 29 notes](BUILD29-TRACK-HEIGHTS.md) | [Build 28 notes](BUILD28-TRANSPORT-PIANO.md) | [Build 27 notes](BUILD27-EDIT-WORKFLOW.md) | [Build 26 notes](BUILD26-MIXER-FIX.md) | [Build 25 notes](BUILD25-RECORDING.md) | [Build 25 validation](BUILD25-VALIDATION.txt) | [Build 24 release notes](BUILD24-RELEASE.md) | [Current status](PROJECT-STATUS.md) | [GGD routing](BUILD22-ROUTING.md) | [Stop fix](BUILD23-STOP-FIX.md)
 
 Session format is 13 (reads versions 1-12). Save a new filename when comparing with older builds. Portable executables and large runtime assets remain local; no new installer or executable download is published by this source update.
 

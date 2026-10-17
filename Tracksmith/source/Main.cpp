@@ -852,11 +852,11 @@ private:
         const auto eq=stock.getParentDirectory().getChildFile("Tracksmith EQ 7.vst3");
         auto descriptions=std::make_shared<juce::Array<juce::PluginDescription>>(pluginLibrary()->getTypes());
         juce::PopupMenu menu;menu.addSectionHeader("Plugin browser · saved VST3s");
-        for(int i=0;i<descriptions->size();++i){const auto& d=descriptions->getReference(i);if(query.isNotEmpty()&&!(d.name+" "+d.manufacturerName).containsIgnoreCase(query))continue;const bool allowed=!d.isInstrument||(channel<128&&engine.plugins.midiLanes[channel].enabled&&index==0);menu.addItem(100+i,d.name+" — "+d.manufacturerName+(d.isInstrument?" (Instrument)":""),allowed);}
+        for(int i=0;i<descriptions->size();++i){const auto& d=descriptions->getReference(i);if(d.name=="Tracksmith NAM"||d.name=="AVRX NAM")continue;if(query.isNotEmpty()&&!(d.name+" "+d.manufacturerName).containsIgnoreCase(query))continue;const bool allowed=!d.isInstrument||(channel<128&&engine.plugins.midiLanes[channel].enabled&&index==0);menu.addItem(100+i,d.name+" — "+d.manufacturerName+(d.isInstrument?" (Instrument)":""),allowed);}
         const auto& unavailable=engine.plugins.channels[channel][static_cast<size_t>(index)];menu.addItem(3,"Retry unavailable insert with saved settings",unavailable&&!unavailable->instance);
         menu.addItem(4,"Search plugins...");menu.addSeparator();
         auto stockFallback=[&](int id,const juce::File& file){bool listed=false;for(const auto& d:*descriptions)if(juce::File(d.fileOrIdentifier).getFileName()==file.getFileName()){listed=true;break;}if(file.exists()&&!listed)menu.addItem(id,file.getFileNameWithoutExtension());};
-        stockFallback(11,plate);stockFallback(12,delay);stockFallback(9,limiter);stockFallback(10,deesser);stockFallback(8,fet);stockFallback(7,busComp);stockFallback(6,gate);stockFallback(5,eq);stockFallback(1,stock);menu.addItem(2,"Add / rescan VST3...");
+        stockFallback(11,plate);stockFallback(12,delay);stockFallback(9,limiter);stockFallback(10,deesser);stockFallback(8,fet);stockFallback(7,busComp);stockFallback(6,gate);stockFallback(5,eq);menu.addItem(13,"TONE3000 · Built in");menu.addItem(2,"Add / rescan VST3...");
         menu.showMenuAsync(juce::PopupMenu::Options(),[safe=juce::Component::SafePointer<MainComponent>(this),channel,index,stock,eq,gate,busComp,fet,limiter,deesser,plate,delay,descriptions](int result)
         {
             if(!safe||safe->loading||safe->sessionBusy||safe->recordingBusy||safe->pluginBusy)return;
@@ -875,7 +875,7 @@ private:
             else if(result==7)safe->discoverPlugin(busComp,channel,index);
             else if(result==6)safe->discoverPlugin(gate,channel,index);
             else if(result==5)safe->discoverPlugin(eq,channel,index);
-            else if(result==1)safe->discoverPlugin(stock,channel,index);
+            else if(result==13)safe->createInsert(channel,index,NativeInstruments::tone3000Description());
             else if(result==2)safe->choosePlugin(channel,index);
             else if(result>=100&&result-100<descriptions->size()){
                 const auto d=descriptions->getReference(result-100);
@@ -1355,7 +1355,7 @@ private:
             auto name=message.getProperty("name","Untitled session").toString().trim().substring(0,80);if(name.isEmpty())name="Untitled session";
             const auto tempo=message.getProperty("bpm",120);if(!(tempo.isInt()||tempo.isDouble())||!std::isfinite(static_cast<double>(tempo))||static_cast<double>(tempo)<20||static_cast<double>(tempo)>300)return;
             const auto instrument=message.getProperty("instrument",{}).toString();if(instrument.isNotEmpty()&&instrument!="guitar"&&instrument!="drums")return;
-            confirmDiscard("Start a new session?",[safe=juce::Component::SafePointer<MainComponent>(this),name,tempo,instrument]{if(!safe)return;safe->engine.playback.playing=false;SessionJobResult result;result.session.bpm=static_cast<double>(tempo);SessionTrack track;track.name=instrument=="guitar"?"Guitar":instrument=="drums"?"Drums":"Audio 1";track.midiTrack=instrument=="drums";track.inputChannels=track.midiTrack?2:1;track.armed=instrument=="guitar";result.session.tracks.push_back(track);safe->sessionWorker.onFinished(std::move(result));if(instrument.isNotEmpty()){safe->createInsert(0,0,NativeInstruments::description(instrument=="drums"));if(instrument=="guitar"){safe->engine.monitor.track=0;safe->engine.monitor.enabled=true;safe->engine.monitorOverrides[0]=1;safe->engine.monitorLevels[0]=1;safe->engine.monitor.gain=1;safe->applyChannels();}}safe->newSessionName=name;safe->markDirty();safe->status="New session ready. Add tracks or record your first part.";safe->publish(true);});return;
+            confirmDiscard("Start a new session?",[safe=juce::Component::SafePointer<MainComponent>(this),name,tempo,instrument]{if(!safe)return;safe->engine.playback.playing=false;SessionJobResult result;result.session.bpm=static_cast<double>(tempo);SessionTrack track;track.name=instrument=="guitar"?"Guitar":instrument=="drums"?"Drums":"Audio 1";track.midiTrack=instrument=="drums";track.inputChannels=track.midiTrack?2:1;track.armed=instrument=="guitar";result.session.tracks.push_back(track);safe->sessionWorker.onFinished(std::move(result));if(instrument.isNotEmpty()){safe->createInsert(0,0,instrument=="drums"?NativeInstruments::description(true):NativeInstruments::tone3000Description());if(instrument=="guitar"){safe->engine.monitor.track=0;safe->engine.monitor.enabled=true;safe->engine.monitorOverrides[0]=1;safe->engine.monitorLevels[0]=1;safe->engine.monitor.gain=1;safe->applyChannels();}}safe->newSessionName=name;safe->markDirty();safe->status="New session ready. Add tracks or record your first part.";safe->publish(true);});return;
         }
         if(type=="cancelStartupScan"){startupScan.cancel();return;}
         if (type == "ready") { automationCurvesChanged=true;publish(true); return; }
@@ -1575,7 +1575,7 @@ private:
             if(loading||recordingBusy||sessionBusy||pluginBusy||exportBusy||trackCount>=128)return;
             const auto instrument=message.getProperty("instrument",{}).toString();if(instrument!="guitar"&&instrument!="drums")return;const bool drums=instrument=="drums";const int id=trackCount;
             auto* add=new juce::DynamicObject();add->setProperty("type","addTrack");add->setProperty("kind",drums?"MIDI":"AUDIO");add->setProperty("name",drums?"Drums":"Guitar");add->setProperty("inputChannels",drums?2:1);command(juce::var(add));if(trackCount!=id+1)return;
-            createInsert(static_cast<size_t>(id),0,NativeInstruments::description(drums));
+            createInsert(static_cast<size_t>(id),0,drums?NativeInstruments::description(true):NativeInstruments::tone3000Description());
             if(!drums){for(int other=0;other<trackCount;++other)controls.channels[other].armed=false;controls.channels[id].armed=true;engine.monitor.track=id;engine.monitor.enabled=true;engine.monitorOverrides[id]=1;engine.monitorLevels[id]=1;engine.monitor.gain=1;engine.inputSource=engine.trackInputs[id].load();engine.inputMeterChannels=1;applyChannels();}
             status=drums?"Drums ready. Tap the kit or add a starter beat.":"Guitar ready. NAM is built in; choose your input and play.";publish(true,id);return;
         }

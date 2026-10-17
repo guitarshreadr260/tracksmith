@@ -1,0 +1,23 @@
+Build 30 native TONE3000 development preview - October 17, 2026
+PASS Windows Release build, native ASIO enabled, TONE3000 compiled into app.
+PASS TypeScript/Vite production build and all 10 UI unit suites.
+PASS headless Edge full editing/mixer/MIDI/transport/track-height workflow, no browser errors.
+PASS native A2 NAM + generated WAV IR chain: finite, nonzero output.
+PASS empty chain and A2-only output finite.
+PASS missing local model reports an error.
+PASS full insert state through Tracksmith session-format-13 encode/decode, including native identity.
+PASS restored chain/model loads and parameter recall.
+PASS structural changes signal dirty tracking and notifications coalesce.
+PASS native editor construction/render; screenshot inspected.
+PASS complete existing session-format suite.
+PASS full Groove/recording/monitoring/click tests and native TONE3000/legacy NAM coexistence.
+     Test drum assets resolved from the packaged runtime. Optional external VST3 fixture not supplied.
+PASS packaged native workflow regression: track identity/order/colors/heights/sends/routing recall.
+PASS packaged mixer regression: 48 tracks, 1000 fader commands, Stop remains responsive.
+
+Audio test initially failed because the test omitted host sample-rate initialization; corrected to match PluginRack initialization and reran successfully.
+Legacy instrument test initially lacked its old hard-coded asset directory; added an environment override and reran against packaged assets successfully.
+
+NOT VERIFIED: authenticated TONE3000 account sign-in/download, real-interface live monitoring/listening and long-session stability.
+Local publishable API key configured; no secret key used. No public API-release/commercial approval is implied.
+Nothing pushed to GitHub. Earlier build folders unchanged.

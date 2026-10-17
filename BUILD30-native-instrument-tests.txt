@@ -1,0 +1,1 @@
+Full Groove visuals/navigation, analyzer-to-song notes, sample packs/layers, Sound Lab state, song alignment, dirty tracking, NAM and VST3 coexistence passed.

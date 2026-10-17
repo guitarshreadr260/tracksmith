@@ -59,6 +59,8 @@ target_link_libraries(Tracksmith PRIVATE TracksmithWebAssets
     juce::juce_gui_extra juce::juce_audio_utils juce::juce_dsp
     juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
 
+include(cmake/Tone3000.cmake)
+
 option(TRACKSMITH_STUDIO_TESTS "Build UI-prototype native regression checks" OFF)
 if(TRACKSMITH_STUDIO_TESTS)
     juce_add_console_app(StudioPluginRoutingTests PRODUCT_NAME "Studio plugin routing tests")
@@ -76,7 +78,7 @@ if(TRACKSMITH_STUDIO_TESTS)
     juce_generate_juce_header(StudioInstrumentTests)
     target_sources(StudioInstrumentTests PRIVATE tests/FullGrooveInstrumentTests.cpp source/NativeInstruments.cpp source/GrooveFull/PluginProcessor.cpp source/GrooveFull/PluginEditor.cpp source/GrooveFull/Preset.cpp source/GrooveFull/DrumPack.cpp source/GrooveFull/GuitarEngine.cpp source/GrooveFull/GuitarPanel.cpp source/GrooveFull/NativeNam.cpp source/GrooveFull/Tone3000.cpp plugins/AvrxNam/Plugin.cpp plugins/AvrxNam/NativeNam.cpp)
     target_compile_definitions(StudioInstrumentTests PRIVATE JUCE_MODAL_LOOPS_PERMITTED=1 TRACKSMITH_NATIVE_INSTRUMENTS=1 JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_PLUGINHOST_VST3=1 JUCE_VST3_CAN_REPLACE_VST2=0 _SILENCE_CXX20_OLD_SHARED_PTR_ATOMIC_SUPPORT_DEPRECATION_WARNING)
-    target_link_libraries(StudioInstrumentTests PRIVATE TracksmithNativeNamCore TracksmithGrooveArtwork juce::juce_audio_utils juce::juce_dsp juce::juce_cryptography bcrypt crypt32)
+    target_link_libraries(StudioInstrumentTests PRIVATE TracksmithTone3000 TracksmithNativeNamCore TracksmithGrooveArtwork juce::juce_audio_utils juce::juce_dsp juce::juce_cryptography bcrypt crypt32)
     juce_add_console_app(StudioScanTests PRODUCT_NAME "Studio scan tests")
     target_sources(StudioScanTests PRIVATE tests/StartupScanTests.cpp)
     target_compile_definitions(StudioScanTests PRIVATE JUCE_USE_CURL=0 JUCE_PLUGINHOST_VST3=1 JUCE_VST3_CAN_REPLACE_VST2=0 JUCE_MODAL_LOOPS_PERMITTED=1)

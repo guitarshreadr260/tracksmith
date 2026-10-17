@@ -1,3 +1,9 @@
+# Build 30 - October 17, 2026
+
+Local native TONE3000 preview replaces NAM for new inserts and guitar tracks. Legacy NAM sessions retain their original engine. Includes native chains/editor and OAuth configuration, isolated host device management/settings and session dirty tracking. Online sign-in/download and listening require user confirmation; distribution is subject to API access terms. [Notes](BUILD30-TONE3000.md). Published main remains Build 24.
+
+---
+
 # Build 29 - October 17, 2026
 
 Local build: drag the bottom edge of Edit tracks to resize, choose height presets, and double-click to reset. Audio waveforms grow; instrument piano rolls show more pitches with aligned keys. Heights save in sessions as optional version-13 metadata. [Notes and validation](BUILD29-TRACK-HEIGHTS.md). Published main remains Build 24.
