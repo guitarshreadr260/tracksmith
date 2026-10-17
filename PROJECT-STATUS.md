@@ -1,3 +1,9 @@
+# Build 25 - October 17, 2026
+
+Local recording reliability build based on published Build 24 main. Fixes repeated Stop extending latency drain; expands recording, punch, printed playback and session recall regression coverage; supplies a fresh local Windows portable application. [Notes](BUILD25-RECORDING.md) | [Validation](BUILD25-VALIDATION.txt). Live GGD/ASIO testing remains pending.
+
+---
+
 # Current status - Build 24
 
 Updated October 17, 2026. Build 24 promotes the cumulative Build 23 source to main and updates the repository documentation and application About label. No audio-engine or session-format changes in Build 24.

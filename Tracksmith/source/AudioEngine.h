@@ -184,7 +184,7 @@ public:
     std::atomic<double> playStart {0}, selectionStart {0}, selectionEnd {0};
     double takeStart=0; bool recordPlanActive=false; int planTrack=-1;
     std::atomic<int64_t> planPosition{0};int64_t punchBegin=0,punchEnd=0;
-    std::atomic<bool> alignRecording{true},stopAfterLatency{false};
+    std::atomic<bool> alignRecording{true},stopAfterLatency{false},stopDrainRequested{false};
     std::atomic<int> recordingCorrection{0};
     std::atomic<bool> logicalRecordGate{false};
     bool takeWasPunch=false; double takeEnd=0; bool continueAfterPunch=false;
@@ -298,15 +298,16 @@ public:
             punchBegin=punching?static_cast<int64_t>(std::llround((selectedStart-origin)*rate)):0;
             punchEnd=punching?static_cast<int64_t>(std::llround((selectedEnd-origin)*rate)):std::numeric_limits<int64_t>::max();
             plugins.rebuildCompensation(playback);
-            recordingCorrection=RecordingAlignment::correction(device->getInputLatencyInSamples(),device->getOutputLatencyInSamples(),plugins.totalLatency,alignRecording.load());if(pluginSource>=0)recordingCorrection=alignRecording.load()?std::max(0,plugins.channels[pluginSource][0]->instance->getLatencySamples()):0;stopAfterLatency=false;
+            recordingCorrection=RecordingAlignment::correction(device->getInputLatencyInSamples(),device->getOutputLatencyInSamples(),plugins.totalLatency,alignRecording.load());if(pluginSource>=0)recordingCorrection=alignRecording.load()?std::max(0,plugins.channels[pluginSource][0]->instance->getLatencySamples()):0;stopAfterLatency=false;stopDrainRequested=false;
             playback.seekSeconds=origin;
             countIn.start(preRollBars.load(), rate, playback.bpm.load()); countInBeats = countIn.beatsLeft(); playback.playing = countIn.total == 0; }
         attach(); return started;
     }
     void stopRecording(bool cancelled = false, bool keepPlaying = false, bool drain = false)
     {
-        if(drain&&recorder.isActive()&&countInBeats.load()==0){stopAfterLatency=true;return;}
-        stopAfterLatency=false;
+        // Only the first Stop sets the endpoint. Repeated requests must not extend a latency drain.
+        if(drain&&recorder.isActive()&&countInBeats.load()==0){if(!stopDrainRequested.exchange(true))stopAfterLatency=true;return;}
+        stopAfterLatency=false;stopDrainRequested=false;
         const bool wasPlaying=playback.playing.load();
         recorder.requestStop(); // An intentional stop must not be reported as an input-device failure.
         devices.removeAudioCallback(this);
@@ -432,12 +433,12 @@ public:
         if(!recordPlanActive){renderNormal(inputs,inputChannels,outputs,channels,count,true);return;}
         int offset=0;
         if(stopAfterLatency.exchange(false)){
-            if(planPosition.load()<punchBegin){countInCancelled=true;recorder.requestStop();recordPlanActive=false;playback.recording=false;playback.recordTrack=-1;playback.playing=false;renderNormal(inputs,inputChannels,outputs,channels,count,false);return;}
+            if(planPosition.load()<punchBegin){countInCancelled=true;stopDrainRequested=false;recorder.requestStop();recordPlanActive=false;playback.recording=false;playback.recordTrack=-1;playback.playing=false;renderNormal(inputs,inputChannels,outputs,channels,count,false);return;}
             punchEnd=planPosition.load();takeWasPunch=false;
         }
         const int delay=recordingCorrection.load();
         const auto captureBegin=RecordingAlignment::delayed(punchBegin,delay),captureEnd=RecordingAlignment::delayed(punchEnd,delay);
-        const auto finishCapture=[&]{recorder.requestStop();recordPlanActive=false;logicalRecordGate=false;playback.recording=false;playback.recordTrack=-1;if(!takeWasPunch)playback.playing=false;};
+        const auto finishCapture=[&]{recorder.requestStop();stopDrainRequested=false;recordPlanActive=false;logicalRecordGate=false;playback.recording=false;playback.recordTrack=-1;if(!takeWasPunch)playback.playing=false;};
         while(offset<count)
         {
             const auto position=planPosition.load();

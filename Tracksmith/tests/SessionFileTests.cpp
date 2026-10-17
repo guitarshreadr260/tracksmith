@@ -45,6 +45,17 @@ int main()
     auto legacyRouting=SessionFile::encode(source,file);auto* firstRoute=legacyRouting.getProperty("tracks",{}).getArray()->getReference(0).getDynamicObject();firstRoute->removeProperty("inputSource");firstRoute->removeProperty("inputChannels");
     require(SessionFile::decode(legacyRouting,file,routed).wasOk()&&routed.tracks[0].inputSource==0&&routed.tracks[0].inputChannels==1,"older sessions default to first mono input");
     firstRoute->setProperty("inputSource",32);require(SessionFile::decode(legacyRouting,file,routed).failed(),"invalid saved recording input rejects");
+    // Recall a routed drum session containing both recorded media and instrument MIDI/state.
+    SavedSession drumSession;drumSession.tracks.resize(3);
+    auto& receiver=drumSession.tracks[0];receiver.name="Printed Kick";receiver.timelineEnabled=true;receiver.audioFile=wav;receiver.sources={wav};receiver.clips={{1,0,0,0,1}};receiver.inputSource=PluginInput::encode(2,0);receiver.inputChannels=2;
+    auto& mono=drumSession.tracks[1];mono.name="Printed Snare";mono.inputSource=PluginInput::encode(2,2);mono.inputChannels=1;
+    auto& instrument=drumSession.tracks[2];instrument.name="Drums";instrument.midiTrack=true;instrument.notes={{1,36,10,.25,.1,.8f},{2,38,10,.5,.1,.7f}};
+    juce::MemoryBlock state("saved-kit-output-state",22);auto* insert=new juce::DynamicObject();insert->setProperty("channel",2);insert->setProperty("slot",0);insert->setProperty("description","<PLUGIN name=\"Drum fixture\"/>");insert->setProperty("state",state.toBase64Encoding());insert->setProperty("bypass",false);drumSession.inserts.add(juce::var(insert));
+    const auto drumFile=folder.getChildFile("Drums.tracksmith");require(SessionFile::write(drumFile,SessionFile::encode(drumSession,drumFile)).wasOk(),"routed drum session writes");SavedSession drumRecall;
+    require(SessionFile::read(drumFile,drumRecall).wasOk(),"routed drum session reopens from disk");
+    require(drumRecall.tracks[0].inputSource==PluginInput::encode(2,0)&&drumRecall.tracks[0].inputChannels==2&&drumRecall.tracks[1].inputSource==PluginInput::encode(2,2)&&drumRecall.tracks[1].inputChannels==1,"stereo and mono plugin output routes survive recall");
+    require(drumRecall.tracks[0].audioFile==wav&&drumRecall.tracks[0].sources[0]==wav&&drumRecall.tracks[0].clips[0].length==1&&drumRecall.tracks[2].notes.size()==2&&drumRecall.tracks[2].notes[1].pitch==38,"recorded media layout and drum MIDI survive recall");
+    require(drumRecall.inserts.size()==1&&drumRecall.inserts[0].getProperty("state",{}).toString()==state.toBase64Encoding()&&!static_cast<bool>(drumRecall.inserts[0].getProperty("bypass",true)),"kit state bytes and bypass survive recall");
     auto invalid=SessionFile::encode(source,file);invalid.getDynamicObject()->setProperty("version",99);
     const auto oldBpm=restored.bpm;require(SessionFile::decode(invalid,file,restored).failed() && restored.bpm==oldBpm,"unknown versions reject without changing model");
     invalid=SessionFile::encode(source,file);invalid.getDynamicObject()->setProperty("bpm","120");require(SessionFile::decode(invalid,file,restored).failed(),"numeric strings reject");

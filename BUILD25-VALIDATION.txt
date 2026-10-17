@@ -1,0 +1,20 @@
+Build 25 validation, October 17, 2026
+
+BEFORE FIX: native regression failed on Build 24 engine with:
+FAIL: Repeated Stop finishes original latency drain without extending capture
+
+AFTER FIX: native routing/recording integration passed:
+- Original Build 23 Stop checks at 0, 1 and 128 samples of correction.
+- Repeated Stop during a 4096-sample correction drain: fixed endpoint, 997-frame take, closed recorder and stopped transport.
+- Eight repeated instrument-output Record/Stop passes: two receivers, isolated stereo kick and mono snare, exact 24925-frame WAVs, sample alignment preserved.
+- Twelve repeated punch passes: eight natural completions (2000 frames and continued playback), four cancellations before punch start (zero captured frames and halted transport).
+- Printed kick file decodes with waveform and plays immediately with plugin input monitoring off.
+- Existing hardware-input capture, routed offline mix, plugin input availability and track-deletion remapping checks pass.
+- Full native session format suite passes, including on-disk stereo/mono drum routes, MIDI, recorded media/clip references and plugin-state bytes/bypass recall.
+
+TypeScript/Vite production build and all eight UI suites passed.
+Headless Edge workflow passed: Mix input choices, routed payloads, mixer alignment, Stop button and Space during finalization, MIDI editing/drop/clipboard and Time Warp controls; no browser errors. Browser state is mocked.
+Windows native Release application built with ASIO enabled. Existing compiler warnings remain.
+Packaged executable contains the Build 25 UI label. The packaged executable also passed its native editing/undo regression (BUILD25-packaged-editing-regression.txt). Runtime assets copied from the existing Build 23 portable package.
+
+Limits: fixture-driven native tests do not load GGD/Kontakt or an ASIO device; session tests verify serialized plugin-state bytes, not a loaded GGD kit's restoration. Multi-hour recording and listening tests remain pending.

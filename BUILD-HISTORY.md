@@ -1,3 +1,9 @@
+# Build 25 - October 17, 2026
+
+Local recording reliability build based on published Build 24 main. Fixes repeated Stop extending latency drain; expands recording, punch, printed playback and session recall regression coverage; supplies a fresh local Windows portable application. [Notes](BUILD25-RECORDING.md) | [Validation](BUILD25-VALIDATION.txt). Live GGD/ASIO testing remains pending.
+
+---
+
 # Build 24 - October 17, 2026
 
 Current main checkpoint: menus/shortcuts (17), editing (18), Time Warp (19-20), inline MIDI and clipboard (20), drum stems (21), plugin-output recording and aligned mixer inputs (22), and recording Stop fix (23). Build 24 updates release identity and documentation, retaining the Build 23 engine. Build 16 is preserved by tag; history is not rewritten.
