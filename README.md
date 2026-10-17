@@ -1,10 +1,10 @@
-# Tracksmith - Build 25
+# Tracksmith - Build 26
 
-Build 25 is the current local recording reliability build, based on the published Build 24 main checkpoint. Repeated Stop now preserves the first capture endpoint during latency drain. Current editable application source is in `Tracksmith/`; Prototype 16 and older downloads below are historical snapshots.
+Build 26 is the current local mixer-response build, based on Build 25. It removes waveform publications from fader changes, restores Ctrl+= Edit/Mix switching and keeps Space working after a fader adjustment. Published GitHub main remains Build 24. Current editable application source is in `Tracksmith/`; Prototype 16 and older downloads below are historical snapshots.
 
 Includes traditional DAW menus, R/T zoom, clip editing and fades, Time Warp, instrument-track piano rolls, MIDI groove file drops, audio/MIDI clipboard shortcuts, aligned mixer controls, GGD/Kontakt output inputs and the recording Stop fix. No Library sidebar.
 
-[Build 25 notes](BUILD25-RECORDING.md) | [Build 25 validation](BUILD25-VALIDATION.txt) | [Build 24 release notes](BUILD24-RELEASE.md) | [Current status](PROJECT-STATUS.md) | [GGD routing](BUILD22-ROUTING.md) | [Stop fix](BUILD23-STOP-FIX.md)
+[Build 26 notes](BUILD26-MIXER-FIX.md) | [Build 25 notes](BUILD25-RECORDING.md) | [Build 25 validation](BUILD25-VALIDATION.txt) | [Build 24 release notes](BUILD24-RELEASE.md) | [Current status](PROJECT-STATUS.md) | [GGD routing](BUILD22-ROUTING.md) | [Stop fix](BUILD23-STOP-FIX.md)
 
 Session format is 12. Save a new filename when comparing with older builds. Portable executables and large runtime assets remain local; no new installer or executable download is published by this source update.
 

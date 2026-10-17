@@ -74,6 +74,9 @@ function Studio(){
   if(!target.armed)update(target,{armed:true});command({type:'record',id:target.id,channels:target.inputChannels||1});
  }
  useEffect(()=>{function key(e:KeyboardEvent){
+  const mixShortcut=e.ctrlKey&&!e.altKey&&!e.metaKey&&((e.code==='Equal'&&!e.shiftKey)||(e.code==='KeyM'&&e.shiftKey));
+  if(mixShortcut&&!e.isComposing){e.preventDefault();if(!e.repeat&&!launcher&&!ioOpen&&!details&&!instrumentPicker&&!audio.stemPlan)registry.execute('view.mix');return;}
+  if(e.code==='Space'&&!e.ctrlKey&&!e.altKey&&!e.metaKey&&!e.shiftKey&&!e.isComposing&&(e.target as HTMLElement).closest('input[type="range"]')&&!launcher&&!ioOpen&&!details&&!instrumentPicker&&!audio.stemPlan){e.preventDefault();if(!e.repeat)registry.execute('transport.play');return;}
   if(e.defaultPrevented||audio.stemPlan||ioOpen||launcher||details||instrumentPicker||e.isComposing||(e.target as HTMLElement).closest('input,textarea,select,[contenteditable],.elastic-editor'))return;
   if((e.target as HTMLElement).closest('[role=\"menubar\"]'))return;
   const plain=!e.ctrlKey&&!e.altKey&&!e.metaKey&&!e.shiftKey;
@@ -130,7 +133,7 @@ function Studio(){
  register('Edit','edit.delete','Clear selection',()=>clipboardEdit('clear'),available&&hasEditSelection,'Delete');
  register('Edit','edit.duplicate','Duplicate selection',()=>clipboardEdit('duplicate'),available&&hasEditSelection,'Ctrl+D');
  register('View','view.edit','Edit workspace',()=>setView('edit'),true,undefined,view==='edit');
- register('View','view.mix','Mixer',()=>setView(view==='mix'?'edit':'mix'),true,'Ctrl+Shift+M',view==='mix');
+ register('View','view.mix','Mixer',()=>setView(view==='mix'?'edit':'mix'),true,'Ctrl+=',view==='mix');entries[entries.length-1].aliases=['Ctrl+Shift+M'];
  register('View','view.piano','Piano roll',()=>{setView('edit');setEditor(!editor)},!!chosen&&chosen.kind==='MIDI',undefined,editor);
  register('View','view.zoomIn','Zoom in',()=>setZoom(z=>Math.min(3,z+.25)),view!=='mix'&&zoom<3,'T');
  register('View','view.zoomOut','Zoom out',()=>setZoom(z=>Math.max(.75,z-.25)),view!=='mix'&&zoom>.75,'R');
@@ -161,8 +164,8 @@ function Studio(){
  register('Window','window.details','Detailed controls…',()=>setDetails(true));
  register('Window','window.start','Session start screen',()=>{setLauncher(true);setNewSetup(false)},!audio.recording);
  register('Window','window.ez','EZ workspace',()=>setView(view==='ez'?'edit':'ez'),true,undefined,view==='ez');
- register('Help','help.shortcuts','Keyboard shortcuts',()=>setNotice('Ctrl+X Cut · Ctrl+C Copy · Ctrl+V Paste at edit cursor · Ctrl+A select all on track · Ctrl+B Clear · Ctrl+D Duplicate · Alt-drag clip/insert to copy · Ctrl+D duplicate clip · Ctrl+T trim · Alt+Left/Right nudge · Ctrl+Shift+M mixer · R zoom out · T zoom in · Ctrl+N new · Ctrl+O open · Ctrl+S save · Ctrl+Z undo · Ctrl+Shift+Z redo · Ctrl+E split · Delete selected clip/note · Space play/stop · F12 record · Numpad 1/2 shuttle · F2/F4 snap off/on'));
- register('Help','help.about','About Tracksmith Build 25',()=>setNotice('Tracksmith Build 25 · Recording reliability, fixed repeated Stop and normal GGD output recording.'));
+ register('Help','help.shortcuts','Keyboard shortcuts',()=>setNotice('Ctrl+X Cut · Ctrl+C Copy · Ctrl+V Paste at edit cursor · Ctrl+A select all on track · Ctrl+B Clear · Ctrl+D Duplicate · Alt-drag clip/insert to copy · Ctrl+D duplicate clip · Ctrl+T trim · Alt+Left/Right nudge · Ctrl+= Edit/Mix (also Ctrl+Shift+M) · R zoom out · T zoom in · Ctrl+N new · Ctrl+O open · Ctrl+S save · Ctrl+Z undo · Ctrl+Shift+Z redo · Ctrl+E split · Delete selected clip/note · Space play/stop · F12 record · Numpad 1/2 shuttle · F2/F4 snap off/on'));
+ register('Help','help.about','About Tracksmith Build 26',()=>setNotice('Tracksmith Build 26 · Responsive mixer controls and Ctrl+= Edit/Mix switching.'));
  register('Audio','transport.play','Play / stop',play,native&&(!disabled||audio.recordingBusy||audio.recording||audio.playing),'Space');
  register('Audio','transport.stop','Stop',()=>command({type:'stop'}),native);
  register('Audio','transport.start','Return to start',()=>command({type:'seek',beat:0}),available);

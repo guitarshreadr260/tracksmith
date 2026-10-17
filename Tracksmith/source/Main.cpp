@@ -272,6 +272,24 @@ public:
             send(R"({"type":"elastic","track":0,"id":1,"preview":true,"anchors":[{"source":0,"target":0},{"source":1,"target":1.1},{"source":2,"target":2}]})");wait();send(R"({"type":"elasticPreview","action":"original"})");send(R"({"type":"elasticPreview","action":"apply"})");check(!elasticPreview&&!loading&&lane.clips[0].elasticAnchors[1].target==1.1&&undoClips.size()==historyBefore+1,"apply correction while listening to original commits once");send(R"({"type":"undo"})");check(lane.clips[0].source==sourceBefore,"audition apply undo restores previous correction");
         }catch(const std::exception& e){failure=e.what();}report.replaceWithText(failure.isEmpty()?"PASS: attack suggestions without mutation, audition A/B/discard/apply/undo/loop safety; asynchronous Time Warp render, original PCM preservation, new media/provenance, WAV/session reopening, undo/redo, cache reuse, cancel safety and undoable original restoration.":"FAIL: "+failure);return failure.isEmpty();
     }
+    bool mixerRegression(const juce::File& report){
+        const auto fail=[&](const juce::String& reason){report.replaceWithText("FAIL: "+reason);return false;};
+        trackCount=48;juce::Array<juce::var> wave;for(int n=0;n<12000;++n)wave.add((n%100)/100.0);
+        for(int id=0;id<trackCount;++id){trackNames[id]="Printed drum "+juce::String(id);trackInfo[id].waveform=wave;engine.playback.tracks[id].clips={{1,0,0,0,10}};}
+        publish(true);const auto fullBytes=juce::JSON::toString(exportSnapshot).getNumBytesAsUTF8();exportSnapshot.getDynamicObject()->setProperty("mixerSentinel",true);
+        const auto begin=juce::Time::getMillisecondCounterHiRes();
+        for(int n=0;n<1000;++n){auto* change=new juce::DynamicObject();change->setProperty("type","track");change->setProperty("id",n%trackCount);change->setProperty("gain",(n%100)/100.0);change->setProperty("pan",0);change->setProperty("muted",false);change->setProperty("solo",false);change->setProperty("armed",false);command(juce::var(change));}
+        const auto elapsed=juce::Time::getMillisecondCounterHiRes()-begin;
+        if(!static_cast<bool>(exportSnapshot.getProperty("mixerSentinel",false)))return fail("Fader commands synchronously republished the entire UI");
+        if(std::abs(engine.playback.tracks[39].gain.load()-.99f)>1.e-5)return fail("Last fader value did not reach audio atomics");
+        publish();const auto leanBytes=juce::JSON::toString(exportSnapshot).getNumBytesAsUTF8();
+        if(!exportSnapshot.hasProperty("project")||exportSnapshot.getProperty("tracks",{}).getArray()->getReference(0).hasProperty("waveform")||exportSnapshot.getProperty("clips",{}).getArray()->getReference(0).hasProperty("waveform")||leanBytes*10>=fullBytes)return fail("Mixer state failed to exclude waveform payloads");
+        const auto gain=exportSnapshot.getProperty("project",{}).getProperty("tracks",{}).getArray()->getReference(39).getProperty("gain",0);
+        if(std::abs(static_cast<double>(gain)-.99)>1.e-5)return fail("Coalesced project state lost final fader position");
+        engine.playback.playing=true;auto* stop=new juce::DynamicObject();stop->setProperty("type","stop");command(juce::var(stop));
+        if(engine.playback.playing.load()||static_cast<bool>(exportSnapshot.getProperty("playing",true)))return fail("Stop did not halt playback after fader flood");
+        report.replaceWithText("PASS: 48 tracks, 1000 fader commands applied without synchronous waveform/state publications; final gain retained; Stop halted playback. Full snapshot "+juce::String(static_cast<juce::int64>(fullBytes))+" bytes; coalesced mixer snapshot "+juce::String(static_cast<juce::int64>(leanBytes))+" bytes; command handling "+juce::String(elapsed,2)+" ms (synthetic, no device/plugin).\n");return true;
+    }
     bool clipboardRegression(const juce::File& reference,const juce::File& report){
         juce::String failure;auto check=[](bool ok,const char* text){if(!ok)throw std::runtime_error(text);};auto send=[&](const char* json){command(juce::JSON::parse(json));};try{
             auto wav=decodeWav(reference,16*1024*1024,[]{return false;});check(wav.error.isEmpty(),"fixture WAV");trackCount=3;auto& a=engine.playback.tracks[0];auto& b=engine.playback.tracks[1];a.left=wav.left;a.right=wav.right;a.sourceRate=wav.rate;a.timelineEnabled=true;a.clips={{1,0,0,.25,1},{2,0,2,1,1}};a.clips[0].fadeIn=.01;trackInfo[0].file=reference;trackInfo[0].fileName=reference.getFileName();trackInfo[0].waveform=wav.waveform;syncPlaylist(0);syncPlaylist(1);
@@ -1185,6 +1203,10 @@ private:
         {
             juce::Array<juce::var> playlists;
             for(int track=0;track<trackCount;++track){syncPlaylist(track);for(const auto& p:trackPlaylists[track]){auto* item=new juce::DynamicObject();item->setProperty("track",track);item->setProperty("id",p.id);item->setProperty("name",p.name);item->setProperty("active",p.id==activePlaylists[track]);juce::Array<juce::var> c,n;for(const auto& clip:p.clips){auto value=SessionFile::encodeClip(clip);auto* detail=value.getDynamicObject();detail->setProperty("track",track);const auto& info=trackInfo[track];const auto* media=clip.source>0&&clip.source<=static_cast<int>(info.extra.size())?&info.extra[clip.source-1]:nullptr;detail->setProperty("name",media?media->fileName:info.fileName);detail->setProperty("sourceDuration",engine.playback.tracks[track].sourceDuration(clip.source));c.add(value);}for(const auto& note:p.notes)n.add(SessionFile::encodeNote(note));item->setProperty("clips",c);item->setProperty("notes",n);playlists.add(juce::var(item));}}object->setProperty("playlists",playlists);
+        }
+        if(includeWaveform || projectControlsPending)
+        {
+            projectControlsPending=false;
             auto* project = new juce::DynamicObject();
             project->setProperty("bpm", controls.bpm); project->setProperty("master", engine.playback.masterGain.load());
             project->setProperty("selectTrack", selectTrack);
@@ -1343,7 +1365,7 @@ private:
         if (type == "stop")
         {
             if (recordingBusy) { if(engine.recorder.isActive()||engine.playback.recording.load())engine.stopRecording(true,false,true);else engine.playback.playing=false;engine.continueAfterPunch=false; status = "Finalizing recorded WAV..."; }
-            else { engine.resetPluginGraph(); engine.playback.playing = false; engine.playback.seekSeconds = engine.dynamicTransport.load()?engine.playStart.load():0.0; }
+            else { engine.playback.playing = false; engine.playback.seekSeconds = engine.dynamicTransport.load()?engine.playStart.load():0.0;engine.resetPluginGraph(); }
             publish(); return;
         }
         if(type=="elastic"){elasticCommand(message);return;}
@@ -1694,7 +1716,7 @@ private:
             if (!std::isfinite(gain)) return;
             const auto level = static_cast<float>(juce::jlimit(0.0, 1.0, gain));
             if (engine.playback.masterGain.load() != level) markDirty();
-            engine.playback.masterGain = level;
+            engine.playback.masterGain = level;projectControlsPending=true;
             return;
         }
         const auto oldBpm = controls.bpm; const auto oldLoop = engine.playback.loop.load();
@@ -1733,9 +1755,9 @@ private:
             const auto target=juce::jlimit(0.0,engine.dynamicTransport.load()?86400.0:engine.playback.duration(),controls.beat*60.0/controls.bpm);engine.playback.seekSeconds=target;if(engine.dynamicTransport.load())engine.playStart=target;
             engine.playback.playing = wasPlaying;
         }
-        else if (type == "track") {applyChannels();automationTick();}
+        else if (type == "track") {applyChannels();automationTick();projectControlsPending=true;return;}
         if(type=="transport")automationTick();
-        publish(type == "track");
+        publish();
     }
     juce::WebBrowserComponent::Options makeOptions()
     {
@@ -1847,6 +1869,7 @@ private:
     int restoreIndex = 0;
     juce::StringArray missingPlugins;
     uint64_t pluginChangeSerial = 0, savingPluginSerial = 0;
+    bool projectControlsPending=false;
     int diagnosticTicks = 0;
     juce::File generationGrooveFolder;
     juce::File sessionFile;
@@ -1902,6 +1925,7 @@ public:
     void initialise(const juce::String& args) override {
         juce::StringArray tokens;tokens.addTokens(args,true);tokens.removeEmptyStrings();
         if(tokens.size()==3&&tokens[0]=="--scan-vst3"){PluginDiscovery::scan(tokens[1].unquoted(),tokens[2].unquoted());quit();return;}
+        if(tokens.size()==2&&tokens[0]=="--mixer-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->mixerRegression(juce::File(tokens[1].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==3&&tokens[0]=="--clipboard-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->clipboardRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==3&&tokens[0]=="--midi-drop-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->midiDropRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==3&&tokens[0]=="--elastic-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->elasticRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
@@ -1910,7 +1934,7 @@ public:
         PluginDiscovery::recover();
         mainWindow=std::make_unique<MainWindow>();
     }
-    bool moreThanOneInstanceAllowed() override { return getCommandLineParameters().contains("--clipboard-regression")||getCommandLineParameters().contains("--midi-drop-regression")||getCommandLineParameters().contains("--scan-vst3")||getCommandLineParameters().contains("--editing-regression")||getCommandLineParameters().contains("--insert-transfer-regression")||getCommandLineParameters().contains("--elastic-regression"); }
+    bool moreThanOneInstanceAllowed() override { return getCommandLineParameters().contains("--mixer-regression")||getCommandLineParameters().contains("--clipboard-regression")||getCommandLineParameters().contains("--midi-drop-regression")||getCommandLineParameters().contains("--scan-vst3")||getCommandLineParameters().contains("--editing-regression")||getCommandLineParameters().contains("--insert-transfer-regression")||getCommandLineParameters().contains("--elastic-regression"); }
     void shutdown() override { mainWindow.reset(); }
     void systemRequestedQuit() override { if (mainWindow) mainWindow->requestClose(); else quit(); }
 private:

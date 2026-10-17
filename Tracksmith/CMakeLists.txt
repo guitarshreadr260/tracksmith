@@ -8,6 +8,7 @@ FetchContent_Declare(JUCE
     GIT_TAG 8.0.10
     GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(JUCE)
+include(cmake/BrowserShortcuts.cmake)
 
 # JUCE 8.0.10 searches this parent folder for *Microsoft.Web.WebView2*.
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/vendor/Microsoft.Web.WebView2/build/native/include/WebView2.h")

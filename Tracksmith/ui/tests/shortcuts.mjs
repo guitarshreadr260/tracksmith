@@ -8,10 +8,10 @@ assert.ok(start>=0&&end>start);
 const handler=ts.transpileModule(source.slice(start,end)+';return key;', {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
 function press(code,options={}){
  const actions=[],context={audio:{},ioOpen:false,launcher:false,details:false,instrumentPicker:false,shuttle:d=>actions.push(d),lastShuttle:{current:0},...options};
- context.registry=createCommandRegistry([{id:'zoom.in',menu:'View',label:'In',shortcut:'T',repeatable:true,enabled:true,run:()=>actions.push('in')},{id:'zoom.out',menu:'View',label:'Out',shortcut:'R',repeatable:true,enabled:true,run:()=>actions.push('out')}]);
+ context.registry=createCommandRegistry([{id:'zoom.in',menu:'View',label:'In',shortcut:'T',repeatable:true,enabled:true,run:()=>actions.push('in')},{id:'zoom.out',menu:'View',label:'Out',shortcut:'R',repeatable:true,enabled:true,run:()=>actions.push('out')},{id:'view.mix',menu:'View',label:'Mixer',enabled:true,run:()=>actions.push('mix')},{id:'transport.play',menu:'Audio',label:'Play',enabled:true,run:()=>actions.push('transport')}]);
  let prevented=false;
  const key=new Function(...Object.keys(context),handler)(...Object.values(context));
- key({code,ctrlKey:false,altKey:false,metaKey:false,shiftKey:false,repeat:false,isComposing:false,defaultPrevented:false,...options,target:{closest:selector=>selector.includes('input')?options.editable:options.menu},preventDefault(){prevented=true}});
+ key({code,ctrlKey:false,altKey:false,metaKey:false,shiftKey:false,repeat:false,isComposing:false,defaultPrevented:false,...options,target:{closest:selector=>selector==='input[type="range"]'?options.range:selector.includes('input')?options.editable:options.menu},preventDefault(){prevented=true}});
  return {actions,prevented};
 }
 assert.deepEqual(press('KeyR').actions,['out']);assert.deepEqual(press('KeyT').actions,['in']);
@@ -22,3 +22,11 @@ assert.deepEqual(press('Numpad1').actions,[-1]);assert.deepEqual(press('Numpad2'
 console.log('Current Studio shortcut handler: R/T, repeat, typing/modifier/modal/menu/IME/handled-event guards and shuttle PASS');
 
 assert.deepEqual(press('KeyT',{audio:{stemPlan:{stage:'ready'}}}).actions,[]);
+
+assert.deepEqual(press('Equal',{ctrlKey:true,editable:true}).actions,['mix']);
+assert.equal(press('Equal',{ctrlKey:true,editable:true}).prevented,true);
+assert.deepEqual(press('Equal',{ctrlKey:true,repeat:true}).actions,[]);
+assert.deepEqual(press('Space',{range:true,editable:true}).actions,['transport']);
+assert.deepEqual(press('Space',{editable:true}).actions,[]);
+assert.deepEqual(press('Space',{range:true,editable:true,repeat:true}).actions,[]);
+console.log('Ctrl+= switches with focused controls; Space controls transport from faders while text entry stays protected PASS');

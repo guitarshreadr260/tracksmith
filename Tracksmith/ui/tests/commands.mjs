@@ -39,7 +39,7 @@ file.registry.shortcut(key('KeyS',{ctrlKey:true,repeat:true}));assert.equal(file
 console.log('R/T zoom direction, repeat, bounds, mixer guard, modifiers, Ctrl-only save and repeat suppression PASS');
 
 const duplicate=fixture({selection:{id:5,track:3}});duplicate.registry.shortcut(key('KeyD',{ctrlKey:true}));assert.deepEqual(duplicate.sent,[{type:'clipboard',track:3,ids:[5],action:'duplicate'}]);
-const mixer=fixture();assert.equal(mixer.registry.shortcut(key('Equal',{ctrlKey:true})),false);assert.equal(mixer.registry.shortcut(key('KeyM',{ctrlKey:true,shiftKey:true})),true);
+const mixer=fixture();assert.equal(mixer.registry.shortcut(key('Equal',{ctrlKey:true})),true);assert.equal(mixer.registry.shortcut(key('KeyM',{ctrlKey:true,shiftKey:true})),true);
 console.log('Build 18 duplicate and non-conflicting mixer shortcuts PASS');
 
 for(const [code,action] of [['KeyX','cut'],['KeyC','copy'],['KeyB','clear']]){const test=fixture();test.registry.shortcut(key(code,{ctrlKey:true}));assert.deepEqual(test.sent,[{type:'clipboard',track:3,ids:[8],action}]);}

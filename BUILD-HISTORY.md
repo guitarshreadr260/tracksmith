@@ -1,3 +1,9 @@
+# Build 26 - October 17, 2026
+
+Local mixer-response and shortcut fix. User confirmed drums printed in Build 25. Lightweight fader feedback, Ctrl+= Edit/Mix switching, native browser zoom suppression and fader-focused Space transport are implemented. [Details and validation](BUILD26-MIXER-FIX.md). Real-device confirmation remains pending; published main remains Build 24.
+
+---
+
 # Build 25 - October 17, 2026
 
 Local recording reliability build based on published Build 24 main. Fixes repeated Stop extending latency drain; expands recording, punch, printed playback and session recall regression coverage; supplies a fresh local Windows portable application. [Notes](BUILD25-RECORDING.md) | [Validation](BUILD25-VALIDATION.txt). Live GGD/ASIO testing remains pending.
