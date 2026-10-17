@@ -1,0 +1,7 @@
+PASS: Ctrl+= Edit/Mix toggle, focused fader adjustment followed by Space Stop, unchanged browser viewport scale
+PASS: 256-bar default/full-song zoom, explicit audio move/select/trim tools, F7, stable-ID track reorder buttons/drag, custom colors and send destination/level/pre/mute controls
+PASS: solid colors/contrasting waveforms, synchronized keyboard arrow/wheel/drag scrolling, main/selection counters, independent nudge, selection pre/post-roll, Big counter, display presets and clip fade-in
+PASS: track drag resize, waveform expansion, Escape rollback, saved-height payload, presets and synchronized expanding piano rows
+PASS: click track has no note lane or keyboard and cannot open piano roll
+PASS: generator prompt/duration dispatch, busy controls, stop-waiting, audition control, insertion position and folder command
+PASS: stem menu, output names and selection, tail, progress, cancel and routing guidance; clipboard;  attack suggestion/result, strength quantization, audition A/B controls, instrument-lane MIDI file drop at snapped beat, in-track piano keyboard, move/transpose and draw commands, bar/beat drop guide and no-file explanation; no browser errors.

@@ -1,3 +1,9 @@
+# Build 32 - local generation prototype - October 17, 2026
+
+Real local ACE-Step instrumental generation, audition controls and explicit new-track insertion with undo/redo. Windows prototype only; earlier builds unchanged. [Usage, architecture and limits](BUILD32-GENERATION.md). GitHub main remains Build 30; Mac preparation remains deferred.
+
+---
+
 # Tracksmith - Build 31 macOS preparation
 
 Apple Silicon source preparation for the first M2 Mac build. Windows compilation and regressions passed; macOS compilation and runtime validation are pending on the Mac. [Mac build instructions](BUILD31-MAC-START.md). GitHub main remains the Build 30 source checkpoint.

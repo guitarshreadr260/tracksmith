@@ -1,3 +1,9 @@
+# Build 32 - local generation prototype - October 17, 2026
+
+Real local ACE-Step instrumental generation, audition controls and explicit new-track insertion with undo/redo. Windows prototype only; earlier builds unchanged. [Usage, architecture and limits](BUILD32-GENERATION.md). GitHub main remains Build 30; Mac preparation remains deferred.
+
+---
+
 # Build 31 - macOS preparation - October 17, 2026
 
 Local branch build-31-macos prepares an arm64 M2 Mac build script, Apple platform wiring and permission checks. Windows compilation/session/workflow/mixer checks passed. Mac compilation/runtime remain pending. [Instructions and limits](BUILD31-MAC-START.md).

@@ -1,0 +1,1 @@
+PASS: track reorder before/after, stable audio/MIDI/plugin-input/aux identities, colors, send level/pre/mute session recall, invalid color rejection and deletion remapping.

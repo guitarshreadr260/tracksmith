@@ -1,0 +1,16 @@
+Build 32 generation prototype - October 17, 2026
+PASS isolated ACE-Step installation and localhost-only CUDA API startup on RTX 4070 SUPER 12 GB.
+PASS real 16-second instrumental generation; no mock audio in product.
+PASS independent WAV inspection: stereo 48 kHz, 768000 frames, all samples finite, nonzero peak ~0.89125.
+PASS native Generate command -> local engine -> WAV/manifest -> decode -> insertion at 4.5 seconds -> session source reference -> undo/redo.
+PASS invalid duration rejected without submission; cancelling client preserves earlier results and timeline.
+PASS native Windows Release app build with ASIO and existing TONE3000 local configuration.
+PASS all 10 existing UI unit suites and TypeScript/Vite production build.
+PASS headless Edge full studio workflow plus generator prompt/duration, busy/cancel controls, result audio element, insertion position and folder action; no browser errors.
+PASS generator dialog screenshot inspected.
+See packaged workflow/mixer reports for final regression results.
+
+Not verified: listening-based musical quality, native WebView2 audition playback, strict generated BPM/key or seamless loop accuracy, real-interface recording under simultaneous GPU load, Mac runtime.
+The model reported the requested duration; musical alignment is not inferred from metadata.
+Stop waiting stops the client wait only; backend queued generation can continue.
+No GitHub push; downloaded runtime, environment, models and machine configuration remain local.
