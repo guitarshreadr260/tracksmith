@@ -12,8 +12,8 @@ const block=source.slice(source.indexOf(' const available='),source.indexOf(' re
 const js=ts.transpileModule(block+';return registry;', {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
 function fixture(overrides={}){
  const sent=[],changes=[];
- const context={allTrack:null,editCursor:null,editFocus:'timeline',pianoContext:undefined,disabled:false,audio:{recording:false,seconds:2,canMidiUndo:true},chosen:{id:3,kind:'MIDI'},selection:{id:8,track:3,midi:true},selected:3,tracks:[{}],rangeStart:0,rangeEnd:4,rangeTrack:null,view:'edit',clips:[{id:5,track:3,start:1,length:2,offset:0,sourceDuration:8}],elasticOpen:false,setElasticOpen:()=>{},gridStep:.25,native:true,bpm:120,play:()=>sent.push({type:'play'}),record:()=>sent.push({type:'record'}),editor:false,playlist:false,zoom:1,snap:true,command:c=>sent.push(c),addInstrument:()=>changes.push('add'),createCommandRegistry,...overrides};
- for(const key of ['setAllTrack','setEditFocus','setLauncher','setNewSetup','setSelection','setRangeTrack','setView','setLibraryOpen','setEditor','setZoom','setPlaylist','setSnap','setIOOpen','setDetails','setNotice'])context[key]=v=>changes.push([key,v]);
+ const context={tool:'smart',moveInsertion:()=>{},allTrack:null,editCursor:null,editFocus:'timeline',pianoContext:undefined,disabled:false,audio:{recording:false,seconds:2,canMidiUndo:true},chosen:{id:3,kind:'MIDI'},selection:{id:8,track:3,midi:true},selected:3,tracks:[{}],rangeStart:0,rangeEnd:4,rangeTrack:null,view:'edit',clips:[{id:5,track:3,start:1,length:2,offset:0,sourceDuration:8}],elasticOpen:false,setElasticOpen:()=>{},gridStep:.25,native:true,bpm:120,play:()=>sent.push({type:'play'}),record:()=>sent.push({type:'record'}),editor:false,playlist:false,zoom:1,snap:true,command:c=>sent.push(c),addInstrument:()=>changes.push('add'),createCommandRegistry,...overrides};
+ for(const key of ['setTool','setAllTrack','setEditFocus','setLauncher','setNewSetup','setSelection','setRangeTrack','setView','setLibraryOpen','setEditor','setZoom','setPlaylist','setSnap','setIOOpen','setDetails','setNotice'])context[key]=v=>changes.push([key,v]);
  return {registry:new Function(...Object.keys(context),js)(...Object.values(context)),sent,changes};
 }
 const midi=fixture();assert.deepEqual([...new Set(midi.registry.commands.map(c=>c.menu))],menuNames);
@@ -28,11 +28,11 @@ console.log('Command registry: menu coverage, availability, dispatch, MIDI undo,
 
 const key=(code,extra={})=>({code,ctrlKey:false,metaKey:false,altKey:false,shiftKey:false,repeat:false,...extra});
 const zoom=fixture();assert.equal(zoom.registry.shortcut(key('KeyT')),true);assert.equal(zoom.changes.at(-1)[1](1),1.25);
-zoom.registry.shortcut(key('KeyR'));assert.equal(zoom.changes.at(-1)[1](1),.75);
-zoom.registry.shortcut(key('KeyT',{repeat:true}));assert.equal(zoom.changes.at(-1)[1](2.9),3);
+zoom.registry.shortcut(key('KeyR'));assert.equal(zoom.changes.at(-1)[1](1),.8);
+zoom.registry.shortcut(key('KeyT',{repeat:true}));assert.equal(zoom.changes.at(-1)[1](63),64);
 for(const modifier of ['ctrlKey','metaKey','altKey','shiftKey'])assert.equal(zoom.registry.shortcut(key('KeyR',{[modifier]:true})),false);
-const minimum=fixture({zoom:.75});minimum.registry.shortcut(key('KeyR'));assert.equal(minimum.changes.length,0);
-const maximum=fixture({zoom:3});maximum.registry.shortcut(key('KeyT'));assert.equal(maximum.changes.length,0);
+const minimum=fixture({zoom:.5});minimum.registry.shortcut(key('KeyR'));assert.equal(minimum.changes.length,0);
+const maximum=fixture({zoom:64});maximum.registry.shortcut(key('KeyT'));assert.equal(maximum.changes.length,0);
 const mix=fixture({view:'mix'});mix.registry.shortcut(key('KeyT'));assert.equal(mix.changes.length,0);
 const file=fixture();assert.equal(file.registry.shortcut(key('KeyS')),false);file.registry.shortcut(key('KeyS',{ctrlKey:true}));assert.deepEqual(file.sent,[{type:'saveSession'}]);
 file.registry.shortcut(key('KeyS',{ctrlKey:true,repeat:true}));assert.equal(file.sent.length,1);

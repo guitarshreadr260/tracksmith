@@ -2,7 +2,7 @@
 #include <array>
 #include <vector>
 #include <cmath>
-struct MixerSend { int target=-1;float gain=0;bool pre=false; };
+struct MixerSend { int target=-1;float gain=0;bool pre=false;bool muted=false; };
 struct MixerRoute { bool aux=false;int output=-1;std::array<MixerSend,2> sends {};int hardwarePair=0; };
 inline bool validMixerRoutes(const std::vector<MixerRoute>& routes)
 {

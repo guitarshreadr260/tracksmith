@@ -30,7 +30,7 @@ public:
         bool timelineEnabled = false;
         Automation::Lane volumeAutomation,panAutomation;std::atomic<int> automationMode {0};
         std::atomic<bool> volumeTouched{false},panTouched{false},volumeLatched{false},panLatched{false};
-        MixerRoute routing;std::array<std::atomic<float>,2> sendLevels {};std::array<float,2> smoothSends {};
+        MixerRoute routing;std::array<std::atomic<float>,2> sendLevels {};std::array<std::atomic<bool>,2> sendMutes {};std::array<float,2> smoothSends {};
         bool midiTrack=false;double midiSeconds=0;
         std::atomic<float> stereoLeft {-1},stereoRight {1};
         int64_t residentFrames() const { int64_t result=static_cast<int64_t>(left.size());for(const auto& s:extra)result+=static_cast<int64_t>(s.left.size());return result; }
@@ -64,8 +64,8 @@ public:
         double duration() const noexcept { if(routing.aux)return 0;if(midiTrack)return midiSeconds;if(!timelineEnabled)return static_cast<double>(left.size()) / sourceRate;double end=0;for(const auto& c:clips)end=std::max(end,c.start+c.length);return end; }
     };
     std::array<Track, maxTracks> tracks;
-    MixerRoute routingSnapshot(size_t id) const { auto route=tracks[id].routing;for(size_t n=0;n<2;++n)route.sends[n].gain=tracks[id].sendLevels[n].load();return route; }
-    void setRouting(size_t id,const MixerRoute& route) { tracks[id].routing=route;for(size_t n=0;n<2;++n)tracks[id].sendLevels[n]=route.sends[n].gain; }
+    MixerRoute routingSnapshot(size_t id) const { auto route=tracks[id].routing;for(size_t n=0;n<2;++n){route.sends[n].gain=tracks[id].sendLevels[n].load();route.sends[n].muted=tracks[id].sendMutes[n].load();}return route; }
+    void setRouting(size_t id,const MixerRoute& route) { tracks[id].routing=route;for(size_t n=0;n<2;++n){tracks[id].sendLevels[n]=route.sends[n].gain;tracks[id].sendMutes[n]=route.sends[n].muted;} }
     using Input = void(*)(void*,float*,float*,int,int);
     using TrackInput=void(*)(void*,size_t,float*,float*,int,int);
     using SourceStage=void(*)(void*,int,int);SourceStage sourceStage=nullptr;void* sourceStageContext=nullptr;
@@ -125,7 +125,7 @@ public:
     {
         for(auto& pair:buses->hardwareLeft)pair.fill(0);for(auto& pair:buses->hardwareRight)pair.fill(0);
         bool sourceSolo=false,auxSolo=false;for(const auto& t:tracks)if(t.loaded()&&t.solo.load()){if(t.routing.aux)auxSolo=true;else sourceSolo=true;}
-        for(auto& t:tracks){const bool read=Automation::reads(t.automationMode.load(),t.volumeTouched.load(),t.volumeLatched.load(),automationBypass.load(),offlineSourceEnd>=0),readPan=Automation::reads(t.automationMode.load(),t.panTouched.load(),t.panLatched.load(),automationBypass.load(),offlineSourceEnd>=0);const double time=offlineSourceEnd>=0?0:std::max(0.0,seekSeconds.load()>=0?seekSeconds.load():seconds.load());const float gain=!t.muted.load()&&(t.routing.aux?(!auxSolo||t.solo.load()):(!sourceSolo||t.solo.load()))?(read?Automation::value(t.volumeAutomation,time,t.gain.load()):t.gain.load()):0,pan=readPan?Automation::value(t.panAutomation,time,t.pan.load()):t.pan.load();t.smoothLeft=gain*(pan>0?1-pan:1);t.smoothRight=gain*(pan<0?1+pan:1);for(size_t n=0;n<2;++n)t.smoothSends[n]=t.sendLevels[n].load();}
+        for(auto& t:tracks){const bool read=Automation::reads(t.automationMode.load(),t.volumeTouched.load(),t.volumeLatched.load(),automationBypass.load(),offlineSourceEnd>=0),readPan=Automation::reads(t.automationMode.load(),t.panTouched.load(),t.panLatched.load(),automationBypass.load(),offlineSourceEnd>=0);const double time=offlineSourceEnd>=0?0:std::max(0.0,seekSeconds.load()>=0?seekSeconds.load():seconds.load());const float gain=!t.muted.load()&&(t.routing.aux?(!auxSolo||t.solo.load()):(!sourceSolo||t.solo.load()))?(read?Automation::value(t.volumeAutomation,time,t.gain.load()):t.gain.load()):0,pan=readPan?Automation::value(t.panAutomation,time,t.pan.load()):t.pan.load();t.smoothLeft=gain*(pan>0?1-pan:1);t.smoothRight=gain*(pan<0?1+pan:1);for(size_t n=0;n<2;++n)t.smoothSends[n]=t.sendMutes[n].load()?0:t.sendLevels[n].load();}
     }
     void refreshDuration() noexcept
     {
@@ -308,7 +308,7 @@ private:
                 peaks[id]=std::max(peaks[id],std::max(std::abs(l),std::abs(r)));add(t.routing.output,n,l,r);
                 for(size_t send=0;send<2;++send)
                 {
-                    const float target=t.routing.sends[send].target>=0?t.sendLevels[send].load():0;
+                    const float target=t.routing.sends[send].target>=0&&!t.sendMutes[send].load()?t.sendLevels[send].load():0;
                     t.smoothSends[send]+=smoothing*(target-t.smoothSends[send]);
                     if(t.routing.sends[send].target>=0)add(t.routing.sends[send].target,n,(t.routing.sends[send].pre?(audible?left[n]:0):l)*t.smoothSends[send],(t.routing.sends[send].pre?(audible?right[n]:0):r)*t.smoothSends[send]);
                 }

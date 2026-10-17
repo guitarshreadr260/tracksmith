@@ -22,6 +22,7 @@ export function instrumentKind(t:ProjectTrack):GlyphKind{
  return t.kind==='AUX'||t.clickTrack?'fx':t.kind==='MIDI'?'midi':'audio';
 }
 export function trackColor(t:ProjectTrack,index:number){
+ if(t.color&&/^#[0-9a-f]{6}$/i.test(t.color))return t.color;
  const palette:Partial<Record<GlyphKind,string>>={drums:'#39b6df',bass:'#df955c',guitar:'#43cbb6',vocal:'#a27bdb',keys:'#d0ac57',synth:'#638ee1',fx:'#98afbc'};
  return palette[instrumentKind(t)]??['#45c6c1','#6d9dd9','#b18bd3','#d9a262'][index%4];
 }

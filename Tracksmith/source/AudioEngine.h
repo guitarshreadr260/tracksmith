@@ -371,7 +371,7 @@ public:
             }
             else { std::vector<float>().swap(track.left); std::vector<float>().swap(track.right); }
             track.volumeAutomation.clear();track.panAutomation.clear();track.automationMode=0;track.stereoLeft=-1;track.stereoRight=1;
-            track.routing={};for(auto& level:track.sendLevels)level=0;track.extra.clear();track.clips.clear();track.timelineEnabled=true;track.midiTrack=false;track.midiSeconds=0;plugins.midiLanes[id].enabled=false;plugins.midiLanes[id].notes.clear();plugins.midiLanes[id].reset();
+            track.routing={};for(auto& level:track.sendLevels)level=0;for(auto& mute:track.sendMutes)mute=false;track.extra.clear();track.clips.clear();track.timelineEnabled=true;track.midiTrack=false;track.midiSeconds=0;plugins.midiLanes[id].enabled=false;plugins.midiLanes[id].notes.clear();plugins.midiLanes[id].reset();
             for(auto& audio:session.extraAudio[id])
             { PlaybackCore::Track::Source source;if(audio){source.left=std::move(audio->left);source.right=std::move(audio->right);source.rate=audio->rate;}track.extra.push_back(std::move(source)); }
             if (id < session.session.tracks.size())

@@ -1,3 +1,9 @@
+# Build 27 - October 17, 2026
+
+Local edit-workflow build: selectable tools; R/T zoom; 256-bar arrangement space with a wider initial ruler; saved track display order/colors; insert-style send slots and controls; no piano roll on click tracks. Session format 13 reads 1-12. [Build notes and validation](BUILD27-EDIT-WORKFLOW.md). Published main remains Build 24.
+
+---
+
 # Build 26 - October 17, 2026
 
 Local mixer-response and shortcut fix. User confirmed drums printed in Build 25. Lightweight fader feedback, Ctrl+= Edit/Mix switching, native browser zoom suppression and fader-focused Space transport are implemented. [Details and validation](BUILD26-MIXER-FIX.md). Real-device confirmation remains pending; published main remains Build 24.

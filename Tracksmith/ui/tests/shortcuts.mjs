@@ -30,3 +30,5 @@ assert.deepEqual(press('Space',{range:true,editable:true}).actions,['transport']
 assert.deepEqual(press('Space',{editable:true}).actions,[]);
 assert.deepEqual(press('Space',{range:true,editable:true,repeat:true}).actions,[]);
 console.log('Ctrl+= switches with focused controls; Space controls transport from faders while text entry stays protected PASS');
+
+assert.deepEqual(press('KeyT',{range:true,editable:true}).actions,['in']);assert.deepEqual(press('KeyR',{range:true,editable:true}).actions,['out']);console.log('R/T zoom remains usable after a fader owns focus PASS');

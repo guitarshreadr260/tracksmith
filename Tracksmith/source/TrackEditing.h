@@ -6,7 +6,7 @@ inline void moveTrack(PlaybackCore::Track& a,PlaybackCore::Track& b)
 {
  a.left=std::move(b.left);a.right=std::move(b.right);a.sourceRate=b.sourceRate;a.extra=std::move(b.extra);a.clips=std::move(b.clips);a.timelineEnabled=b.timelineEnabled;
  a.volumeAutomation=std::move(b.volumeAutomation);a.panAutomation=std::move(b.panAutomation);a.automationMode=b.automationMode.load();a.volumeTouched=false;a.panTouched=false;a.volumeLatched=false;a.panLatched=false;
- a.routing=b.routing;for(size_t s=0;s<2;++s)a.sendLevels[s]=b.sendLevels[s].load();a.smoothSends={};a.midiTrack=b.midiTrack;a.midiSeconds=b.midiSeconds;a.gain=b.gain.load();a.pan=b.pan.load();a.peak=0;a.peakLeft=0;a.peakRight=0;a.stereoLeft=b.stereoLeft.load();a.stereoRight=b.stereoRight.load();a.muted=b.muted.load();a.solo=b.solo.load();a.smoothLeft=0;a.smoothRight=0;
+ a.routing=b.routing;for(size_t s=0;s<2;++s){a.sendLevels[s]=b.sendLevels[s].load();a.sendMutes[s]=b.sendMutes[s].load();}a.smoothSends={};a.midiTrack=b.midiTrack;a.midiSeconds=b.midiSeconds;a.gain=b.gain.load();a.pan=b.pan.load();a.peak=0;a.peakLeft=0;a.peakRight=0;a.stereoLeft=b.stereoLeft.load();a.stereoRight=b.stereoRight.load();a.muted=b.muted.load();a.solo=b.solo.load();a.smoothLeft=0;a.smoothRight=0;
 }
 inline bool remove(AudioEngine& e,int id,int count)
 {

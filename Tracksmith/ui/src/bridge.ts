@@ -6,6 +6,9 @@ export type IOState={deviceKey:string;sessionDeviceKey:string;matched:boolean;ma
 export type ElasticAnchor={source:number;target:number};
 export type StemPlan={stage:'preparing'|'cancelling'|'choosing'|'ready'|'rendering'|'failed';track:number;instrument:string;error?:string;seconds:number;outputs:{id:number;name:string;channels:number}[]};
 export type Command =
+ | {type:'editCursor';position:number}
+ | {type:'trackColor';id:number;color:string}
+ | {type:'trackOrder';id:number;before:number;after?:boolean}
  | {type:'drumStems';action:'prepare'|'cancel'|'openInstrument';track?:number}
  | {type:'drumStems';action:'render';outputs:{id:number;name:string}[];tail:number}
  | {type:'clipboard';action:'copy'|'cut'|'paste'|'clear'|'duplicate';track:number;ids?:number[];start?:number;end?:number;position?:number}
@@ -41,7 +44,7 @@ export type Command =
  | {type:'pluginAutomation';channel:number;slot:number;action:'select'|'put'|'delete'|'clear'|'mode'|'writeMode'|'undo'|'redo';parameter?:string;time?:number;value?:number;read?:boolean;mode?:number}
  | {type:'automation';track:number;action:'mode'|'put'|'delete'|'clear'|'undo'|'redo';parameter?:'volume'|'pan';mode?:number;time?:number;value?:number}
  | {type:'playlist';track:number;action:'new'|'duplicate'|'rename'|'switch'|'promote'|'up'|'down'|'delete'|'undo'|'redo';id?:number;name?:string}
- | { type:'routing';id:number;output?:number;send?:number;target?:number;pre?:boolean;hardwarePair?:number }
+ | { type:'routing';id:number;output?:number;send?:number;target?:number;muted?:boolean;pre?:boolean;hardwarePair?:number }
  | {type:'monitorArmed';enabled:boolean}
  | { type:'sendLevel';id:number;send:number;gain:number }
  | { type: 'exportMix'; selection:boolean; bits:16|24; tail:number }
@@ -73,7 +76,7 @@ export type Command =
  | { type: 'master'; gain: number }
  | { type: 'track'; id: number; gain: number; pan: number; muted: boolean; solo: boolean; armed: boolean };
 export type AudioTrackState = { peakLeft?:number;peakRight?:number; id: number; fileName: string; duration: number; peak: number; waveform?: number[] };
-export type ProjectTrack = { clickTrack?:boolean;drumNoteMap?:number[];ezInstrument?:'guitar'|'drums'; stereoLeft?:number;stereoRight?:number; output?:number;hardwarePair?:number;sends?:{target:number;gain:number;pre?:boolean}[]; inputSource?:number;inputChannels?:1|2; kind?:string; id: number; name: string; gain: number; pan: number; muted: boolean; solo: boolean; armed: boolean };
+export type ProjectTrack = { color?:string;displayOrder?:number; clickTrack?:boolean;drumNoteMap?:number[];ezInstrument?:'guitar'|'drums'; stereoLeft?:number;stereoRight?:number; output?:number;hardwarePair?:number;sends?:{target:number;gain:number;pre?:boolean;muted?:boolean}[]; inputSource?:number;inputChannels?:1|2; kind?:string; id: number; name: string; gain: number; pan: number; muted: boolean; solo: boolean; armed: boolean };
 export type InsertState = { token?:number; channel: number; slot: number; name: string; bypass: boolean; missing: boolean; latency: number; compensation: number };
 export type TimelineClip = { elasticSourceWaveform?:number[];elasticSourceDuration?:number; elasticSource?:number;elasticOffset?:number;elasticLength?:number;elasticAnchors?:ElasticAnchor[]; fadeIn?:number;fadeOut?:number;fadeOffset?:number;fadeSpan?:number;blend?:boolean; id:number; track:number; source:number; start:number; offset:number; length:number; sourceDuration:number; name:string; waveform?:number[] };
 export type MidiNote = { track:number;id:number;pitch:number;channel:number;start:number;length:number;velocity:number };

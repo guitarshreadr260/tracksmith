@@ -24,6 +24,7 @@ struct SessionTrack
     int inputSource=0,inputChannels=1;
     float stereoLeft=-1,stereoRight=1;
     bool midiTrack=false;std::vector<MidiNote> notes;
+    int displayOrder=-1;juce::String color;
 };
 struct SavedSession
 {
@@ -70,7 +71,7 @@ inline bool decodeNote(const juce::var& entry,MidiNote& n)
 inline juce::var encode(const SavedSession& session, const juce::File& destination)
 {
     auto* root = new juce::DynamicObject();
-    root->setProperty("format", "TracksmithSession"); root->setProperty("version", 12);
+    root->setProperty("format", "TracksmithSession"); root->setProperty("version", 13);
     root->setProperty("mainOutputPair",session.mainOutputPair);root->setProperty("ioDeviceKey",session.ioDeviceKey);
     juce::Array<juce::var> inserts;for(const auto& original:session.inserts){auto item=original.clone();if(!item.hasProperty("automation"))item.getDynamicObject()->setProperty("automation",juce::Array<juce::var>());inserts.add(item);}root->setProperty("inserts", inserts);
     root->setProperty("preRollBars", session.preRollBars); root->setProperty("metronomeGain", session.metronomeGain);
@@ -79,9 +80,9 @@ inline juce::var encode(const SavedSession& session, const juce::File& destinati
     juce::Array<juce::var> tracks;
     for (const auto& track : session.tracks)
     {
-        auto* item = new juce::DynamicObject(); item->setProperty("name", track.name);
+        auto* item = new juce::DynamicObject(); item->setProperty("name", track.name);item->setProperty("displayOrder",track.displayOrder<0?tracks.size():track.displayOrder);item->setProperty("color",track.color);
         item->setProperty("aux",track.routing.aux);item->setProperty("output",track.routing.output);item->setProperty("hardwarePair",track.routing.hardwarePair);
-        juce::Array<juce::var> sends;for(const auto& send:track.routing.sends){auto* entry=new juce::DynamicObject();entry->setProperty("target",send.target);entry->setProperty("gain",send.gain);entry->setProperty("pre",send.pre);sends.add(juce::var(entry));}item->setProperty("sends",sends);
+        juce::Array<juce::var> sends;for(const auto& send:track.routing.sends){auto* entry=new juce::DynamicObject();entry->setProperty("target",send.target);entry->setProperty("gain",send.gain);entry->setProperty("pre",send.pre);entry->setProperty("muted",send.muted);sends.add(juce::var(entry));}item->setProperty("sends",sends);
         item->setProperty("audio", track.audioFile == juce::File() ? juce::String() : track.audioFile.getRelativePathFrom(destination.getParentDirectory()));
         item->setProperty("stereoLeft",track.stereoLeft);item->setProperty("stereoRight",track.stereoRight);
         item->setProperty("inputSource",track.inputSource);item->setProperty("inputChannels",track.inputChannels);
@@ -106,7 +107,7 @@ inline juce::Result decode(const juce::var& root, const juce::File& source, Save
     auto fail = [] { return juce::Result::fail("Invalid or unsupported Tracksmith session."); };
     if (!root.isObject() || root.getProperty("format", {}).toString() != "TracksmithSession") return fail();
     const auto version = root.getProperty("version", {});
-    if (!version.isInt() || (static_cast<int>(version) != 1 && static_cast<int>(version) != 2 && static_cast<int>(version) != 3 && static_cast<int>(version) != 4 && static_cast<int>(version) != 5 && static_cast<int>(version) != 6 && static_cast<int>(version) != 7 && static_cast<int>(version) != 8 && static_cast<int>(version) != 9 && static_cast<int>(version) != 10 && static_cast<int>(version) != 11 && static_cast<int>(version) != 12)) return fail();
+    if (!version.isInt() || (static_cast<int>(version) != 1 && static_cast<int>(version) != 2 && static_cast<int>(version) != 3 && static_cast<int>(version) != 4 && static_cast<int>(version) != 5 && static_cast<int>(version) != 6 && static_cast<int>(version) != 7 && static_cast<int>(version) != 8 && static_cast<int>(version) != 9 && static_cast<int>(version) != 10 && static_cast<int>(version) != 11 && static_cast<int>(version) != 12 && static_cast<int>(version) != 13)) return fail();
     const auto number = [](const juce::var& object, const char* key, double low, double high, double& result)
     {
         const auto value = object.getProperty(key, {});
@@ -143,6 +144,8 @@ inline juce::Result decode(const juce::var& root, const juce::File& source, Save
         SessionTrack track; track.name = name.toString().trim(); double gain = 0.75, pan = 0.0;
         if (!number(item,"gain",0,1,gain) || !number(item,"pan",-1,1,pan)
             || !boolean(item,"muted",track.muted) || !boolean(item,"solo",track.solo) || !boolean(item,"armed",track.armed)) return fail();
+        track.displayOrder=static_cast<int>(parsed.tracks.size());
+        if(static_cast<int>(version)>=13){const auto order=item.getProperty("displayOrder",{}),color=item.getProperty("color",{});if(!order.isInt()||static_cast<int>(order)<0||static_cast<int>(order)>=array->size()||!color.isString())return fail();track.displayOrder=static_cast<int>(order);track.color=color.toString();if(track.color.isNotEmpty()&&(track.color.length()!=7||track.color[0]!='#'||!track.color.substring(1).containsOnly("0123456789abcdefABCDEF")))return fail();for(const auto& previous:parsed.tracks)if(previous.displayOrder==track.displayOrder)return fail();}
         track.gain = static_cast<float>(gain); track.pan = static_cast<float>(pan);
         double pl=-1,pr=1;if(item.hasProperty("stereoLeft")&&!number(item,"stereoLeft",-1,1,pl))return fail();if(item.hasProperty("stereoRight")&&!number(item,"stereoRight",-1,1,pr))return fail();track.stereoLeft=static_cast<float>(pl);track.stereoRight=static_cast<float>(pr);
         if(item.hasProperty("inputSource")){const auto value=item.getProperty("inputSource",{});if(!value.isInt()||static_cast<int>(value)<(parsed.legacyInputRouting?0:-1)||(static_cast<int>(value)>(parsed.legacyInputRouting?3:31)&&!(static_cast<int>(version)>=12&&PluginInput::encoded(static_cast<int>(value)))))return fail();track.inputSource=static_cast<int>(value);}
@@ -176,6 +179,7 @@ inline juce::Result decode(const juce::var& root, const juce::File& source, Save
             const auto busOutput=item.getProperty("output",{});if(!boolean(item,"aux",track.routing.aux)||!busOutput.isInt())return fail();track.routing.output=static_cast<int>(busOutput);
             const auto sendList=item.getProperty("sends",{});const auto* sends=sendList.getArray();if(!sends||sends->size()!=2)return fail();
             for(int n=0;n<2;++n){const auto& send=(*sends)[n];const auto target=send.getProperty("target",{});double sendGain=0;if(!send.isObject()||!target.isInt()||!number(send,"gain",0,1,sendGain))return fail();track.routing.sends[n]={static_cast<int>(target),static_cast<float>(sendGain)};}
+            if(static_cast<int>(version)>=13)for(int n=0;n<2;++n){const auto mute=(*sends)[n].getProperty("muted",{});if(!mute.isBool())return fail();track.routing.sends[n].muted=static_cast<bool>(mute);}
             if(static_cast<int>(version)>=9){const auto pair=item.getProperty("hardwarePair",{});if(!pair.isInt())return fail();track.routing.hardwarePair=static_cast<int>(pair);for(int n=0;n<2;++n){const auto pre=(*sends)[n].getProperty("pre",{});if(!pre.isBool())return fail();track.routing.sends[n].pre=static_cast<bool>(pre);}}
             if(track.routing.aux&&(track.midiTrack||track.armed||track.audioFile!=juce::File()||!track.clips.empty()||!track.notes.empty()||track.sources.size()!=1))return fail();
         }

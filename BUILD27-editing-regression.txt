@@ -1,0 +1,1 @@
+PASS: Native clip duplicate/undo/redo and audio/MIDI delete undo/redo across track changes, scoped range deletion/undo, signed waveform extraction, timeline analysis to drum MIDI.
