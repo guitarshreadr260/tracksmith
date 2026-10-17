@@ -28,4 +28,9 @@ inline Plan plan(bool dynamic,bool explicitPunch,double marker,double selectedSt
     if(p.punch&&p.origin>p.start){p.error="Move the playback start before the highlighted punch range.";return p;}
     return p;
 }
+inline Plan audition(double start,double end,double bpm,int preBars,int postBars,double mediaEnd,double rate){
+    Plan p;if(!hasRange(start,end,rate)||!std::isfinite(bpm)||bpm<20||bpm>300||preBars<0||preBars>8||postBars<0||postBars>8||!std::isfinite(mediaEnd)||mediaEnd<=start){p.error="Select a non-empty range inside the song before playing the selection.";return p;}
+    p.origin=std::max(0.,start-preBars*4*60/bpm);p.start=start;p.end=std::min(mediaEnd,end+postBars*4*60/bpm);return p;
+}
+
 }

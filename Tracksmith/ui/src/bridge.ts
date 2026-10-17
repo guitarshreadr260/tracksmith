@@ -6,6 +6,7 @@ export type IOState={deviceKey:string;sessionDeviceKey:string;matched:boolean;ma
 export type ElasticAnchor={source:number;target:number};
 export type StemPlan={stage:'preparing'|'cancelling'|'choosing'|'ready'|'rendering'|'failed';track:number;instrument:string;error?:string;seconds:number;outputs:{id:number;name:string;channels:number}[]};
 export type Command =
+ | {type:'selectionPlay';preBars:number;postBars:number}
  | {type:'editCursor';position:number}
  | {type:'trackColor';id:number;color:string}
  | {type:'trackOrder';id:number;before:number;after?:boolean}

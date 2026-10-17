@@ -1,3 +1,9 @@
+# Build 28 - October 17, 2026
+
+Local build: opaque track-colored clips, mini-keyboard/note-grid pitch scrolling, expanded editable transport counters and selection fields, independent nudge, selection playback pre/post-roll and Big Counter/display presets. Session format remains 13. [Notes and validation](BUILD28-TRANSPORT-PIANO.md). Published main remains Build 24.
+
+---
+
 # Build 27 - October 17, 2026
 
 Local edit-workflow build: selectable tools; R/T zoom; 256-bar arrangement space with a wider initial ruler; saved track display order/colors; insert-style send slots and controls; no piano roll on click tracks. Session format 13 reads 1-12. [Build notes and validation](BUILD27-EDIT-WORKFLOW.md). Published main remains Build 24.

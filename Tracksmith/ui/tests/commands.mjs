@@ -12,7 +12,7 @@ const block=source.slice(source.indexOf(' const available='),source.indexOf(' re
 const js=ts.transpileModule(block+';return registry;', {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
 function fixture(overrides={}){
  const sent=[],changes=[];
- const context={tool:'smart',moveInsertion:()=>{},allTrack:null,editCursor:null,editFocus:'timeline',pianoContext:undefined,disabled:false,audio:{recording:false,seconds:2,canMidiUndo:true},chosen:{id:3,kind:'MIDI'},selection:{id:8,track:3,midi:true},selected:3,tracks:[{}],rangeStart:0,rangeEnd:4,rangeTrack:null,view:'edit',clips:[{id:5,track:3,start:1,length:2,offset:0,sourceDuration:8}],elasticOpen:false,setElasticOpen:()=>{},gridStep:.25,native:true,bpm:120,play:()=>sent.push({type:'play'}),record:()=>sent.push({type:'record'}),editor:false,playlist:false,zoom:1,snap:true,command:c=>sent.push(c),addInstrument:()=>changes.push('add'),createCommandRegistry,...overrides};
+ const context={nudgeStep:.5,tool:'smart',moveInsertion:()=>{},allTrack:null,editCursor:null,editFocus:'timeline',pianoContext:undefined,disabled:false,audio:{recording:false,seconds:2,canMidiUndo:true},chosen:{id:3,kind:'MIDI'},selection:{id:8,track:3,midi:true},selected:3,tracks:[{}],rangeStart:0,rangeEnd:4,rangeTrack:null,view:'edit',clips:[{id:5,track:3,start:1,length:2,offset:0,sourceDuration:8}],elasticOpen:false,setElasticOpen:()=>{},gridStep:.25,native:true,bpm:120,play:()=>sent.push({type:'play'}),record:()=>sent.push({type:'record'}),editor:false,playlist:false,zoom:1,snap:true,command:c=>sent.push(c),addInstrument:()=>changes.push('add'),createCommandRegistry,...overrides};
  for(const key of ['setTool','setAllTrack','setEditFocus','setLauncher','setNewSetup','setSelection','setRangeTrack','setView','setLibraryOpen','setEditor','setZoom','setPlaylist','setSnap','setIOOpen','setDetails','setNotice'])context[key]=v=>changes.push([key,v]);
  return {registry:new Function(...Object.keys(context),js)(...Object.values(context)),sent,changes};
 }
@@ -50,3 +50,5 @@ console.log('Clipboard shortcuts, edit-cursor paste, select all, clear and compa
 
 const finishing=fixture({disabled:true,audio:{loading:true,recordingBusy:true,recording:false,playing:true}});assert.equal(finishing.registry.execute('transport.stop'),true);assert.deepEqual(finishing.sent,[{type:'stop'}]);
 console.log('Stop remains available during recording finalization PASS');
+
+const nudge=fixture({chosen:{id:3,kind:'AUDIO'},selection:{id:5,track:3},nudgeStep:.5,gridStep:.25});nudge.registry.execute('clip.nudgeRight');assert.deepEqual(nudge.sent,[{type:'clipEdit',track:3,id:5,action:'move',position:1.25}]);console.log('Audio clip nudge uses independent Nudge value, not Grid value PASS');

@@ -1,0 +1,1 @@
+PASS: 48 tracks, 1000 fader commands applied without synchronous waveform/state publications; final gain retained; Stop halted playback. Full snapshot 17258365 bytes; coalesced mixer snapshot 65677 bytes; command handling 3.51 ms (synthetic, no device/plugin).

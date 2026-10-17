@@ -83,6 +83,7 @@ public:
     // Offline-only limits, configured with the live callback detached.
     std::atomic<bool> automationBypass{false};
     double offlineSourceEnd = -1, offlineRenderEnd = -1;
+    std::atomic<double> selectionPlaybackEnd{-1};
     double deviceRate = 48000.0;
     int automationSourceLatencyFrames=0,automationAuxLatencyFrames=0;
     int playbackLatencyFrames = 0; // Updated only while the callback is detached.
@@ -134,7 +135,7 @@ public:
     }
     void reset() noexcept
     {
-        cursorSeconds = 0.0; startSeconds = 0.0; seconds = 0.0; seekSeconds = -1.0; playing = false; peak = 0.0f; clipping = false;
+        selectionPlaybackEnd=-1;cursorSeconds = 0.0; startSeconds = 0.0; seconds = 0.0; seekSeconds = -1.0; playing = false; peak = 0.0f; clipping = false;
         framesSinceSeek = 0; loopHasWrapped = false;
         for (auto& track : tracks) { track.smoothLeft = track.smoothRight = 0.0f; track.peak = 0.0f; track.smoothSends.fill(0); }
         smoothMaster = masterGain.load(std::memory_order_relaxed);
@@ -155,7 +156,9 @@ public:
         const double loopBegin=std::clamp(loopRangeStart.load(),0.0,sourceLength);
         const double rangeEnd=loopRangeEnd.load();const double loopLimit=rangeEnd>loopBegin && loopBegin<sourceLength?std::min(sourceLength,rangeEnd):sourceLength;
         const double loopStart=loopLimit>loopBegin?loopBegin:0.0;
-        const auto sessionLength = offlineRenderEnd >= 0 ? offlineRenderEnd + latencySeconds : (capturing || (!repeating && nativeClickTrackPresent.load() && metronome.load())) ? std::numeric_limits<double>::max() : (repeating?loopLimit:sourceLength) + (sourceLength > 0 && !repeating ? latencySeconds : 0);
+        const auto baseSessionLength = offlineRenderEnd >= 0 ? offlineRenderEnd + latencySeconds : (capturing || (!repeating && nativeClickTrackPresent.load() && metronome.load())) ? std::numeric_limits<double>::max() : (repeating?loopLimit:sourceLength) + (sourceLength > 0 && !repeating ? latencySeconds : 0);
+        const auto selectedEnd=selectionPlaybackEnd.load();
+        const double sessionLength=!capturing&&!repeating&&offlineRenderEnd<0&&std::isfinite(selectedEnd)&&selectedEnd>=0?std::min(baseSessionLength,selectedEnd+latencySeconds):baseSessionLength;
         const auto tempo = bpm.load(std::memory_order_relaxed);
         const bool clickEnabled = metronome.load(std::memory_order_relaxed) && !nativeClickTrackPresent.load(std::memory_order_relaxed);
         if (!clickEnabled) clickRemaining = 0;

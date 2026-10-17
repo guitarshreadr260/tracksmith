@@ -1379,6 +1379,7 @@ private:
         }
         if (type == "stop")
         {
+            engine.playback.selectionPlaybackEnd=-1;
             if (recordingBusy) { if(engine.recorder.isActive()||engine.playback.recording.load())engine.stopRecording(true,false,true);else engine.playback.playing=false;engine.continueAfterPunch=false; status = "Finalizing recorded WAV..."; }
             else { engine.playback.playing = false; engine.playback.seekSeconds = engine.dynamicTransport.load()?engine.playStart.load():0.0;engine.resetPluginGraph(); }
             publish(); return;
@@ -1387,6 +1388,13 @@ private:
         if (loading || sessionBusy || pluginBusy) return;
         if (recordingBusy && type != "track" && type != "master" && type != "sendLevel") return;
         if(type.startsWith("io")){ioCommand(message);return;}
+        if(type=="selectionPlay"){
+            const auto pre=message.getProperty("preBars",{}),post=message.getProperty("postBars",{});if(!pre.isInt()||!post.isInt()||engine.playback.recording.load())return;
+            if(engine.playback.loop.load()){status="Turn Loop off to audition the selection with pre/post-roll.";publish();return;}
+            const auto plan=TransportSelection::audition(engine.selectionStart.load(),engine.selectionEnd.load(),controls.bpm,static_cast<int>(pre),static_cast<int>(post),engine.playback.duration(),engine.playback.deviceRate);
+            auto* device=engine.devices.getCurrentAudioDevice();if(plan.error||!device||!device->isPlaying()){status=plan.error?plan.error:"Choose an active audio output before playing the selection.";publish();return;}
+            engine.playback.playing=false;engine.resetPluginGraph();engine.playback.selectionPlaybackEnd=plan.end;engine.playback.seekSeconds=plan.origin;controls.playing=true;engine.playback.playing=true;status="Playing selected range with pre/post-roll.";publish();return;
+        }
         if(type=="editCursor"){const auto v=message.getProperty("position",{});if(!(v.isDouble()||v.isInt()))return;const double seconds=static_cast<double>(v);if(!std::isfinite(seconds)||seconds<0||seconds>86400)return;if(!engine.playback.playing.load()){engine.playback.seekSeconds=seconds;if(engine.dynamicTransport.load())engine.playStart=seconds;}publish();return;}
         if(type=="trackColor"||type=="trackOrder"){
             const auto idValue=message.getProperty("id",{});if(!idValue.isInt())return;const int id=static_cast<int>(idValue);if(id<0||id>=trackCount)return;
@@ -1758,6 +1766,7 @@ private:
         if (type == "track") markDirty();
         if (type == "transport")
         {
+            engine.playback.selectionPlaybackEnd=-1;
             auto* device = engine.devices.getCurrentAudioDevice();
             if (controls.playing && (engine.playback.duration() <= 0.0 || device == nullptr || ! device->isPlaying()))
             { status = engine.playback.duration() <= 0.0 ? "Import a WAV before pressing Play." : "Choose an output in Audio settings."; engine.playback.playing = false; }
@@ -1776,7 +1785,7 @@ private:
         else if (type == "stop") { engine.playback.playing = false; engine.playback.seekSeconds = 0.0; }
         else if (type == "seek")
         {
-            const bool wasPlaying = engine.playback.playing.load(); engine.resetPluginGraph();
+            const bool wasPlaying = engine.playback.playing.load();engine.playback.selectionPlaybackEnd=-1; engine.resetPluginGraph();
             const auto target=juce::jlimit(0.0,engine.dynamicTransport.load()?86400.0:engine.playback.duration(),controls.beat*60.0/controls.bpm);engine.playback.seekSeconds=target;if(engine.dynamicTransport.load())engine.playStart=target;
             engine.playback.playing = wasPlaying;
         }
