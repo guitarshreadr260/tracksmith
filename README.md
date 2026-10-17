@@ -1,3 +1,7 @@
+# Tracksmith - Build 31 macOS preparation
+
+Apple Silicon source preparation for the first M2 Mac build. Windows compilation and regressions passed; macOS compilation and runtime validation are pending on the Mac. [Mac build instructions](BUILD31-MAC-START.md). GitHub main remains the Build 30 source checkpoint.
+
 # Tracksmith - Build 30
 
 Build 30 is the current local development preview: native TONE3000 replaces NAM for new inserts and guitar tracks, with legacy NAM session compatibility preserved. GitHub main now contains the Build 30 source checkpoint. The portable executable remains local. Current editable application source is in `Tracksmith/`; Prototype 16 and older downloads below are historical snapshots.

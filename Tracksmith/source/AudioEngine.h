@@ -1,6 +1,9 @@
 #pragma once
 #include "TransportSelection.h"
 #include <JuceHeader.h>
+#if JUCE_MAC
+#include "../t3k/plugin/include/AudioPermissions.h"
+#endif
 #include "PlaybackCore.h"
 #include "SessionFile.h"
 #include "RecordGroup.h"
@@ -248,6 +251,12 @@ public:
     { return juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile("Tracksmith/audio-device.xml"); }
     juce::Result ensureMonitorInputs(int first,int width){
         if(PluginInput::encoded(first))return plugins.inputAvailable(first,width)?juce::Result::ok():juce::Result::fail("The assigned instrument output is unavailable.");
+#if JUCE_MAC
+        if(AudioPermissions::getMicStatus()!=AudioPermissions::MicStatus::granted){
+            AudioPermissions::requestMicAccess([](bool){});
+            return juce::Result::fail("Allow Tracksmith microphone access in macOS Privacy & Security, then enable monitoring again.");
+        }
+#endif
         auto* device=devices.getCurrentAudioDevice();if(!device)return juce::Result::fail("Choose an audio input device in Audio settings.");
         if(!ioDeviceMatches.load())return juce::Result::fail("Review the interface change in Setup > I/O before monitoring.");
         if(first<0||first+width>InputRouting::maximumInputs||width<1||width>2)return juce::Result::fail("Choose a valid input pair.");
@@ -280,6 +289,12 @@ public:
         for(const auto& route:recordingRoutes)
             if(!(PluginInput::encoded(route.input)?plugins.inputAvailable(route.input,route.channels):InputRouting::available(route.input,route.channels,physicalInputs,[&](int ch){return activeInputs[ch];})))return juce::Result::fail("An armed track has an unavailable input or stereo pair.");
         int pluginSource=-1;bool hardware=false;for(const auto& route:recordingRoutes){if(PluginInput::encoded(route.input)){if(pluginSource>=0&&pluginSource!=PluginInput::track(route.input))return juce::Result::fail("Record outputs from one instrument at a time.");pluginSource=PluginInput::track(route.input);}else hardware=true;}if(pluginSource>=0&&hardware)return juce::Result::fail("Record plugin outputs and hardware inputs in separate passes.");
+#if JUCE_MAC
+        if(pluginSource<0&&AudioPermissions::getMicStatus()!=AudioPermissions::MicStatus::granted){
+            AudioPermissions::requestMicAccess([](bool){});
+            return juce::Result::fail("Allow Tracksmith microphone access in macOS Privacy & Security, then record again.");
+        }
+#endif
         const auto rate = device->getCurrentSampleRate();
         const auto selectedStart=selectionStart.load(),selectedEnd=selectionEnd.load();
         const auto pendingSeek=playback.seekSeconds.load();const auto insertion=pendingSeek>=0?pendingSeek:playback.seconds.load();

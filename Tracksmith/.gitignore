@@ -3,3 +3,7 @@ out/
 ui/node_modules/
 backups/
 vendor/
+
+# Native TONE3000 source dependency (not WebView2 SDK downloads)
+!t3k/plugin/ui/vendor/
+!t3k/plugin/ui/vendor/**

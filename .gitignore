@@ -7,3 +7,7 @@ Time-Warp-regression.tracksmith
 BUILD19-native-build.log
 
 .env.local
+
+Tracksmith/build-mac-*/
+
+/work/

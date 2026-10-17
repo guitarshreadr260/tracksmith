@@ -92,7 +92,11 @@ public:
         if(diagnostic)return;
         if (! juce::WebBrowserComponent::areOptionsSupported(makeOptions()))
         {
+#if JUCE_WINDOWS
             error.setText("Tracksmith needs the Microsoft Edge WebView2 Runtime. Install the Evergreen Runtime, then reopen Tracksmith.", juce::dontSendNotification);
+#else
+            error.setText("Tracksmith could not initialize the system web view. Check your macOS version and reopen Tracksmith.", juce::dontSendNotification);
+#endif
             error.setJustificationType(juce::Justification::centred);
             addAndMakeVisible(error);
             return;
@@ -802,8 +806,8 @@ private:
     {
         if (chooser) return;
         const auto stock = juce::File::getSpecialLocation(juce::File::currentExecutableFile).getParentDirectory().getChildFile("Stock Plugins");
-        chooser = std::make_unique<juce::FileChooser>("Choose a Windows x64 VST3 effect or instrument",
-            stock.isDirectory() ? stock : juce::File("C:/Program Files/Common Files/VST3"), "*.vst3");
+        chooser = std::make_unique<juce::FileChooser>("Choose a VST3 effect or instrument",
+            stock.isDirectory() ? stock : (juce::VST3PluginFormat().getDefaultLocationsToSearch().getNumPaths()>0?juce::VST3PluginFormat().getDefaultLocationsToSearch()[0]:juce::File::getSpecialLocation(juce::File::userHomeDirectory)), "*.vst3");
         chooser->launchAsync(juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::canSelectDirectories,
             [safe = juce::Component::SafePointer<MainComponent>(this), channel, index](const juce::FileChooser& selection)
             {
@@ -1797,11 +1801,13 @@ private:
     juce::WebBrowserComponent::Options makeOptions()
     {
         using Browser = juce::WebBrowserComponent;
-        return Browser::Options()
-            .withBackend(Browser::Options::Backend::webview2)
+        auto options = Browser::Options();
+#if JUCE_WINDOWS
+        options = options.withBackend(Browser::Options::Backend::webview2)
             .withWinWebView2Options(Browser::Options::WinWebView2()
-                .withUserDataFolder(juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile("Tracksmith/WebView2")))
-            .withNativeIntegrationEnabled()
+                .withUserDataFolder(juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile("Tracksmith/WebView2")));
+#endif
+        return options.withNativeIntegrationEnabled()
             .withEventListener("command", [this](const juce::var& message) { command(message); })
             .withResourceProvider([](const juce::String& path) -> std::optional<Browser::Resource>
             {

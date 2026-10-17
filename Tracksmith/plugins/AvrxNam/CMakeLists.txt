@@ -6,6 +6,8 @@ target_compile_features(AvrxNamCore PUBLIC cxx_std_20)
 target_compile_definitions(AvrxNamCore PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 if(MSVC)
     target_link_options(AvrxNamCore INTERFACE "/WHOLEARCHIVE:$<TARGET_FILE:AvrxNamCore>")
+elseif(APPLE)
+    target_link_options(AvrxNamCore INTERFACE "LINKER:-force_load,$<TARGET_FILE:AvrxNamCore>")
 endif()
 juce_add_plugin(AvrxNam COMPANY_NAME "Tracksmith" BUNDLE_ID "com.avrx.nam"
     PLUGIN_MANUFACTURER_CODE Avrx PLUGIN_CODE AvN1 FORMATS VST3 PRODUCT_NAME "Tracksmith NAM"

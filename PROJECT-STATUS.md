@@ -1,3 +1,9 @@
+# Build 31 - macOS preparation - October 17, 2026
+
+Local branch build-31-macos prepares an arm64 M2 Mac build script, Apple platform wiring and permission checks. Windows compilation/session/workflow/mixer checks passed. Mac compilation/runtime remain pending. [Instructions and limits](BUILD31-MAC-START.md).
+
+---
+
 # Build 30 - October 17, 2026
 
 Local native TONE3000 preview replaces NAM for new inserts and guitar tracks. Legacy NAM sessions retain their original engine. Includes native chains/editor and OAuth configuration, isolated host device management/settings and session dirty tracking. Online sign-in/download and listening require user confirmation; distribution is subject to API access terms. [Notes](BUILD30-TONE3000.md). GitHub main advances to this Build 30 source checkpoint. Portable binaries and the integration key remain local.

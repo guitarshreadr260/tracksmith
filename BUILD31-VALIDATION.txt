@@ -1,0 +1,12 @@
+Build 31 Mac preparation - October 17, 2026
+PASS TypeScript/Vite production build.
+PASS Bash syntax check for Build-Mac.sh using Git Bash.
+PASS Windows CMake configure and full Windows Release DAW compilation with ASIO.
+PASS native session-format suite.
+PASS native workflow regression (track order/identity/colors/heights/sends/routing recall).
+PASS native mixer regression (48 tracks, 1000 fader updates, Stop remains responsive).
+PASS clean-checkout dependency audit: restored QR-code source/header/license omitted by generic vendor ignore rule.
+PASS platform-specific source inspection: Windows WebView2/crypto guarded; Apple Objective-C++ implementations and frameworks selected; force-load NAM registrations; mic description and actual AVFoundation permission shim.
+
+NOT RUN: macOS configuration/compilation, M2 launch, CoreAudio playback/recording, WKWebView bridge and drops, Mac VST3 loading, online OAuth/download, signing or notarization. No Mac environment is attached to this chat.
+The source script targets local arm64 on the user's M2. Requires Mac-side tools and first build before claiming Mac compatibility.
