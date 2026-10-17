@@ -1,3 +1,9 @@
+# Build 33 - timeline audio references - October 17, 2026
+
+Local Windows build: audio clip drag/drop analysis and reference-conditioned variations. See [usage and limits](BUILD33-AUDIO-REFERENCE.md). Earlier builds preserved; no GitHub push.
+
+---
+
 # Build 32 - local generation prototype - October 17, 2026
 
 Real local ACE-Step instrumental generation, audition controls and explicit new-track insertion with undo/redo. Windows prototype only; earlier builds unchanged. [Usage, architecture and limits](BUILD32-GENERATION.md). GitHub main remains Build 30; Mac preparation remains deferred.

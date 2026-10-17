@@ -1,0 +1,1 @@
+PASS: native timeline clip analysis; exact source offset, 12-second trim and fades; original clip unchanged; real ACE-Step audio-conditioned variation, manifest reference and separate-track insertion.

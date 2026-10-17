@@ -19,6 +19,7 @@
 #include "NativeInstruments.h"
 #include "ElasticWorker.h"
 #include "GenerationWorker.h"
+#include "AudioReference.h"
 #include "DrumStemExport.h"
 
 static uint64_t nextTimelineEdit() { static uint64_t serial=0; return ++serial; }
@@ -90,6 +91,7 @@ public:
         setSize(1280, 820);
         elasticWorker.onFinished=[this](ElasticWorker::Result result){if(result.analysis)finishAttackAnalysis(std::move(result));else finishElastic(std::move(result.wav));};
         stemWorker.onFinished=[this](StemResult result){stemActive=stemRendering=loading=pluginBusy=false;stemPlan=juce::var();stemInstance.reset();status=result.cancelled?"Drum stem render cancelled. No export folder was published.":result.error.isNotEmpty()?result.error:"Rendered drum stems to "+result.folder.getFullPathName()+(result.clipped?". Some outputs clipped; lower their instrument levels and render again.":"")+(result.silent.isEmpty()?"":". Silent outputs: "+result.silent.joinIntoString(", "));publish(true);};
+        referenceWorker.onFinished=[this](AudioReferenceWorker::Result result){referenceBusy=false;if(result.revision!=sessionRevision)return;if(result.error.isEmpty()){audioReference=std::move(result);referenceMessage="Reference ready. Tempo and key are estimates; confirm them before generating.";}else referenceMessage=result.error;publish();};
         generationWorker.onFinished=[this](GenerationWorker::Result result){generationBusy=false;generationMessage=result.error.isNotEmpty()?result.error:"Variation ready. Audition it before inserting; timing and key are model requests, not guaranteed.";if(!result.items.empty()){generationRequest=result.request;for(auto& item:result.items)generationItems.push_back(std::move(item));if(generationItems.size()>4)generationItems.erase(generationItems.begin());}publish();};
         if(diagnostic)return;
         if (! juce::WebBrowserComponent::areOptionsSupported(makeOptions()))
@@ -164,7 +166,7 @@ public:
             const bool recovered=!result.saving&&pendingRecovery&&pendingRecovery->snapshot==result.file;
             if (!result.saving)
             {
-                ++sessionRevision;newSessionName.clear();nativeAnalysisPending=false;nativeAnalysisTrack=-1;nativeAnalysisToken=0;
+                ++sessionRevision;audioReference={};referenceWorker.cancel();referenceMessage={};newSessionName.clear();nativeAnalysisPending=false;nativeAnalysisTrack=-1;nativeAnalysisToken=0;
                 cleanRecovery();recoveryRun=RecoveryStore::newRun();recoverySourceRun={};recoverySuggestedFile={};recoveredName.clear();editRevision=0;lastAutosaveRevision=-1;savedRevision=0;recoveryGeneration=0;lastAutosaveTime=0;autosaveNotice="Autosave ready";lastAutosaveAttempt=juce::Time::getMillisecondCounterHiRes();
                 if(recovered){recoverySourceRun=pendingRecovery->run;recoveredName="Recovered "+pendingRecovery->name;const auto original=pendingRecovery->original;if(original!=juce::File())recoverySuggestedFile=original.getSiblingFile(original.getFileNameWithoutExtension()+" Recovered.tracksmith");const auto id=pendingRecovery->id;recoveries.erase(std::remove_if(recoveries.begin(),recoveries.end(),[&](const auto& e){return e.id==id;}),recoveries.end());}
 
@@ -238,7 +240,7 @@ public:
         startupScan.onProgress=[safe=juce::Component::SafePointer<MainComponent>(this)](StartupScan::Progress p){if(!safe)return;safe->startupProgress=p;safe->pluginBusy=p.active;if(!p.active)safe->status=p.failed?"Studio ready. "+juce::String(p.failed)+" plugin(s) skipped after failed discovery; manual rescan is available in the insert menu.":"Studio ready. VST3 library checked.";safe->publish();};
         pluginBusy=true;startupScan.begin();
     }
-    ~MainComponent() override { generationWorker.shutdown();stemWorker.shutdown(); elasticWorker.shutdown();startupScan.shutdown();stopTimer();recoveryWorker.onFinished={};recoveryWorker.shutdown(); }
+    ~MainComponent() override { referenceWorker.shutdown();generationWorker.shutdown();stemWorker.shutdown(); elasticWorker.shutdown();startupScan.shutdown();stopTimer();recoveryWorker.onFinished={};recoveryWorker.shutdown(); }
     void resized() override { browser.setBounds(getLocalBounds()); error.setBounds(getLocalBounds().reduced(30)); }
     void requestClose()
     {
@@ -310,6 +312,13 @@ public:
         engine.playback.playing=true;auto* stop=new juce::DynamicObject();stop->setProperty("type","stop");command(juce::var(stop));
         if(engine.playback.playing.load()||static_cast<bool>(exportSnapshot.getProperty("playing",true)))return fail("Stop did not halt playback after fader flood");
         report.replaceWithText("PASS: 48 tracks, 1000 fader commands applied without synchronous waveform/state publications; final gain retained; Stop halted playback. Full snapshot "+juce::String(static_cast<juce::int64>(fullBytes))+" bytes; coalesced mixer snapshot "+juce::String(static_cast<juce::int64>(leanBytes))+" bytes; command handling "+juce::String(elapsed,2)+" ms (synthetic, no device/plugin).\n");return true;
+    }
+    bool referenceRegression(const juce::File& source,const juce::File& report){
+        juce::String failure;try{auto check=[](bool ok,const char* text){if(!ok)throw std::runtime_error(text);};auto wav=decodeWav(source,4*1024*1024,[]{return false;});check(wav.error.isEmpty()&&wav.left.size()>wav.rate*14,"reference fixture decoded");const auto expected=wav.left[size_t(wav.rate*2.2)];engine.install(0,wav);trackInfo[0].file=source;auto& original=engine.playback.tracks[0];original.clips[0].start=3;original.clips[0].offset=2;original.clips[0].length=12;original.clips[0].fadeIn=.05;original.clips[0].fadeOut=.1;
+            command(juce::JSON::parse(R"({"type":"generateReference","track":0,"id":1})"));check(referenceBusy,"reference clip accepted");auto deadline=juce::Time::getMillisecondCounterHiRes()+30000;while(referenceBusy&&juce::Time::getMillisecondCounterHiRes()<deadline){referenceWorker.pollCompletion();juce::Thread::sleep(10);}check(!referenceBusy&&audioReference.file.existsAsFile(),"analysis completed with reference WAV");auto reference=decodeWav(audioReference.file,4*1024*1024,[]{return false;});check(reference.error.isEmpty()&&reference.left.size()==size_t(reference.rate*12),"trimmed reference duration");check(std::abs(reference.left[0])<.00001&&std::abs(reference.left[size_t(reference.rate*.2)]-expected)<.0001,"source offset and fade preserved");check(original.clips[0].offset==2&&original.clips[0].start==3&&original.clips[0].length==12,"source clip unchanged");
+            command(juce::JSON::parse(R"({"type":"generate","prompt":"Instrumental rock variation with clean guitars, warm bass and drums","key":"E Minor","duration":12,"seed":333,"useReference":true,"strength":0.5})"));check(generationBusy,"audio-conditioned request accepted");deadline=juce::Time::getMillisecondCounterHiRes()+180000;while(generationBusy&&juce::Time::getMillisecondCounterHiRes()<deadline){generationWorker.pollCompletion();juce::Thread::sleep(25);}if(generationBusy||generationItems.empty())throw std::runtime_error(generationMessage.toStdString());const auto& item=generationItems.back();const auto manifest=juce::JSON::parse(item.wav.file.withFileExtension(".json"));check(manifest.getProperty("reference",{}).toString()==audioReference.file.getFullPathName(),"reference request recorded in manifest");check(item.wav.left.size()>48000,"conditioned audio decoded");
+            auto* insert=new juce::DynamicObject;insert->setProperty("type","generateInsert");insert->setProperty("asset",item.asset);insert->setProperty("position",8.);command(juce::var(insert));check(trackCount==2&&engine.playback.tracks[1].clips[0].start==8,"variation inserted separately");check(original.clips[0].offset==2&&original.clips[0].start==3&&original.clips[0].length==12,"source untouched after conditioning");
+        }catch(const std::exception& e){failure=juce::String::fromUTF8(e.what());}report.replaceWithText(failure.isEmpty()?"PASS: native timeline clip analysis; exact source offset, 12-second trim and fades; original clip unchanged; real ACE-Step audio-conditioned variation, manifest reference and separate-track insertion.\n":"FAIL: "+failure+"\n");return failure.isEmpty();
     }
     bool generationRegression(const juce::File& report){
         juce::String failure;try{
@@ -1115,7 +1124,7 @@ private:
         auto* object = new juce::DynamicObject();
         juce::var snapshot(object);
         auto* device = engine.devices.getCurrentAudioDevice();
-        auto* generation=new juce::DynamicObject;generation->setProperty("busy",generationBusy);generation->setProperty("phase",generationWorker.phase.load());generation->setProperty("message",generationMessage);juce::Array<juce::var> variations;for(const auto& item:generationItems){auto* v=new juce::DynamicObject;v->setProperty("id",item.asset);v->setProperty("name",item.wav.name);v->setProperty("url","/generated/"+item.asset);v->setProperty("seconds",double(item.wav.left.size())/item.wav.rate);variations.add(juce::var(v));}generation->setProperty("items",variations);object->setProperty("generation",juce::var(generation));
+        auto* generation=new juce::DynamicObject;generation->setProperty("busy",generationBusy);generation->setProperty("phase",generationWorker.phase.load());generation->setProperty("message",generationMessage);juce::Array<juce::var> variations;for(const auto& item:generationItems){auto* v=new juce::DynamicObject;v->setProperty("id",item.asset);v->setProperty("name",item.wav.name);v->setProperty("url","/generated/"+item.asset);v->setProperty("seconds",double(item.wav.left.size())/item.wav.rate);variations.add(juce::var(v));}generation->setProperty("items",variations);auto* reference=new juce::DynamicObject;reference->setProperty("busy",referenceBusy);reference->setProperty("message",referenceMessage);reference->setProperty("name",audioReference.name);reference->setProperty("ready",audioReference.file.existsAsFile());reference->setProperty("seconds",audioReference.seconds);reference->setProperty("bpm",audioReference.bpm);reference->setProperty("tempoConfidence",audioReference.tempoConfidence);reference->setProperty("key",audioReference.key);reference->setProperty("keyConfidence",audioReference.keyConfidence);reference->setProperty("peakDb",audioReference.peakDb);reference->setProperty("rmsDb",audioReference.rmsDb);generation->setProperty("reference",juce::var(reference));object->setProperty("generation",juce::var(generation));
         object->setProperty("autosaveEnabled",autosaveEnabled);object->setProperty("autosaveBusy",recoveryWorker.isBusy());object->setProperty("autosaveTime",static_cast<double>(lastAutosaveTime));object->setProperty("autosaveNotice",autosaveNotice);
         juce::Array<juce::var> recoveryItems;for(const auto& entry:recoveries){auto* item=new juce::DynamicObject();item->setProperty("id",entry.id);item->setProperty("name",entry.name);item->setProperty("time",static_cast<double>(entry.time));recoveryItems.add(juce::var(item));}object->setProperty("recoveries",recoveryItems);
         object->setProperty("stemPlan",stemPlan);object->setProperty("stemProgress",stemWorker.progress.load());
@@ -1345,13 +1354,22 @@ private:
     {
         if (! message.isObject()) return;
         const auto type = message.getProperty("type", {}).toString();
+        if(type=="generateReferenceClear"){if(generationBusy||referenceBusy)return;audioReference={};referenceMessage="Reference removed.";publish();return;}
+        if(type=="generateReference"){
+            if(generationBusy||referenceBusy||loading||recordingBusy||sessionBusy||pluginBusy||exportBusy||elasticBusy||stemActive||engine.playback.playing.load()){referenceMessage="Stop playback and finish the current operation before analyzing a clip.";publish();return;}
+            const auto trackValue=message.getProperty("track",{}),clipValue=message.getProperty("id",{});if(!trackValue.isInt()||!clipValue.isInt())return;const int track=int(trackValue),id=int(clipValue);if(track<0||track>=trackCount||engine.playback.tracks[track].midiTrack)return;const auto& lane=engine.playback.tracks[track];const auto clip=std::find_if(lane.clips.begin(),lane.clips.end(),[&](const auto& c){return c.id==id;});
+            if(clip==lane.clips.end()||clip->source<0||clip->source>int(lane.extra.size())){referenceMessage="That audio clip is no longer available.";publish();return;}
+            const auto& left=clip->source?lane.extra[size_t(clip->source-1)].left:lane.left;const auto& right=clip->source?lane.extra[size_t(clip->source-1)].right:lane.right;const double rate=clip->source?lane.extra[size_t(clip->source-1)].rate:lane.sourceRate;const auto first=int64_t(std::floor(clip->offset*rate)),count=int64_t(std::floor(std::min(60.,clip->length)*rate));if(count<rate*.5||first<0||first+count>int64_t(left.size())||right.size()!=left.size()){referenceMessage="Use an available audio clip at least half a second long.";publish();return;}
+            AudioReferenceWorker::Request request;request.rate=rate;request.clip=*clip;request.name=trackNames[track]+" · clip "+juce::String(id)+(clip->length>60?" (first 60 seconds)":"");request.revision=sessionRevision;request.audio[0].assign(left.begin()+first,left.begin()+first+count);request.audio[1].assign(right.begin()+first,right.begin()+first+count);referenceBusy=referenceWorker.start(std::move(request));referenceMessage=referenceBusy?"Analyzing the trimmed clip and writing a local reference copy…":"Reference analyzer is busy.";publish();return;
+        }
         if(type=="generateCancel"){generationWorker.cancel();generationMessage="Stopping the client wait; the engine may finish its queued job.";publish();return;}
         if(type=="generateReveal"){GenerationWorker::folder().createDirectory();GenerationWorker::folder().revealToUser();return;}
         if(type=="generate"){
-            if(generationBusy)return;
+            if(generationBusy||referenceBusy)return;
             if(loading||recordingBusy||sessionBusy||pluginBusy||exportBusy||elasticBusy||stemActive||engine.playback.playing.load()){generationMessage="Stop playback and finish the current operation before starting generation.";publish();return;}
             GenerationWorker::Request request;request.prompt=message.getProperty("prompt",{}).toString().trim();request.key=message.getProperty("key",{}).toString().trim();const auto duration=message.getProperty("duration",{}),seed=message.getProperty("seed",-1);
             if(request.prompt.isEmpty()||request.prompt.length()>1000||request.key.length()>32||!(duration.isInt()||duration.isDouble())||!std::isfinite(double(duration))||double(duration)<10||double(duration)>60||!seed.isInt()||int(seed)<-1||controls.bpm<30||controls.bpm>300){generationMessage="Use a prompt up to 1000 characters, 10–60 seconds and a session tempo between 30 and 300 BPM.";publish();return;}
+            if(message.getProperty("useReference",false)==juce::var(true)){if(!audioReference.file.existsAsFile()){generationMessage="Drop or select a timeline audio clip as a reference first.";publish();return;}const auto strength=message.getProperty("strength",.5);if(!(strength.isInt()||strength.isDouble())||!std::isfinite(double(strength))||double(strength)<.1||double(strength)>1)return;request.reference=audioReference.file;request.strength=double(strength);}
             request.bpm=controls.bpm;request.duration=double(duration);request.seed=int(seed);generationBusy=generationWorker.start(request);generationMessage=generationBusy?"Submitting to the local ACE-Step engine…":"Generator client is busy.";publish();return;
         }
         if(type=="generateInsert"){
@@ -1971,6 +1989,7 @@ private:
     juce::var attackResult;int attackRevision=0;bool attackRunning=false,elasticPreviewRequest=false;
     bool elasticPreview=false,previewPlaying=false,previewOriginal=false,previewOldLoop=false;int previewTrack=-1;size_t previewSourceCount=0,previewMediaCount=0;TimelineClip previewCorrected;std::vector<TimelineClip> previewBefore;
     ElasticWorker elasticWorker;bool elasticBusy=false,elasticCancelled=false;int elasticTrack=-1;TimelineClip elasticClip;
+    AudioReferenceWorker referenceWorker;bool referenceBusy=false;AudioReferenceWorker::Result audioReference;juce::String referenceMessage;
     GenerationWorker generationWorker;bool generationBusy=false;juce::String generationMessage="Local instrumental prototype · ACE-Step engine on this computer.";GenerationWorker::Request generationRequest;std::vector<GenerationWorker::Item> generationItems;
     WavLoader loader;
     SessionWorker sessionWorker;
@@ -2006,6 +2025,7 @@ public:
         juce::StringArray tokens;tokens.addTokens(args,true);tokens.removeEmptyStrings();
         if(tokens.size()==3&&tokens[0]=="--scan-vst3"){PluginDiscovery::scan(tokens[1].unquoted(),tokens[2].unquoted());quit();return;}
         if(tokens.size()==2&&tokens[0]=="--workflow-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->workflowRegression(juce::File(tokens[1].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
+        if(tokens.size()==3&&tokens[0]=="--reference-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->referenceRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==2&&tokens[0]=="--generation-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->generationRegression(juce::File(tokens[1].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==2&&tokens[0]=="--mixer-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->mixerRegression(juce::File(tokens[1].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==3&&tokens[0]=="--clipboard-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->clipboardRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
@@ -2016,7 +2036,7 @@ public:
         PluginDiscovery::recover();
         mainWindow=std::make_unique<MainWindow>();
     }
-    bool moreThanOneInstanceAllowed() override { return getCommandLineParameters().contains("--generation-regression")||getCommandLineParameters().contains("--workflow-regression")||getCommandLineParameters().contains("--mixer-regression")||getCommandLineParameters().contains("--clipboard-regression")||getCommandLineParameters().contains("--midi-drop-regression")||getCommandLineParameters().contains("--scan-vst3")||getCommandLineParameters().contains("--editing-regression")||getCommandLineParameters().contains("--insert-transfer-regression")||getCommandLineParameters().contains("--elastic-regression"); }
+    bool moreThanOneInstanceAllowed() override { return getCommandLineParameters().contains("--reference-regression")||getCommandLineParameters().contains("--generation-regression")||getCommandLineParameters().contains("--workflow-regression")||getCommandLineParameters().contains("--mixer-regression")||getCommandLineParameters().contains("--clipboard-regression")||getCommandLineParameters().contains("--midi-drop-regression")||getCommandLineParameters().contains("--scan-vst3")||getCommandLineParameters().contains("--editing-regression")||getCommandLineParameters().contains("--insert-transfer-regression")||getCommandLineParameters().contains("--elastic-regression"); }
     void shutdown() override { mainWindow.reset(); }
     void systemRequestedQuit() override { if (mainWindow) mainWindow->requestClose(); else quit(); }
 private:

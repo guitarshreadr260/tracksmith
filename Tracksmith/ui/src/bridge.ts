@@ -5,9 +5,12 @@ export type IOChannel={id:number;name:string;hardwareName:string;active:boolean}
 export type IOState={deviceKey:string;sessionDeviceKey:string;matched:boolean;mainOutputPair:number;maxInputs:number;maxOutputs:number;maxRecordTracks:number;inputs:IOChannel[];outputs:IOChannel[]};
 export type ElasticAnchor={source:number;target:number};
 export type StemPlan={stage:'preparing'|'cancelling'|'choosing'|'ready'|'rendering'|'failed';track:number;instrument:string;error?:string;seconds:number;outputs:{id:number;name:string;channels:number}[]};
-export type GenerationState={busy:boolean;phase:number;message:string;items:{id:string;name:string;url:string;seconds:number}[]};
+export type GenerationReference={busy:boolean;ready:boolean;message:string;name:string;seconds:number;bpm:number;key:string;peakDb:number;rmsDb:number;tempoConfidence:number;keyConfidence:number};
+export type GenerationState={reference?:GenerationReference;busy:boolean;phase:number;message:string;items:{id:string;name:string;url:string;seconds:number}[]};
 export type Command =
- | {type:'generate';prompt:string;key:string;duration:number;seed:number}
+ | {type:'generate';prompt:string;key:string;duration:number;seed:number;useReference?:boolean;strength?:number}
+ | {type:'generateReference';track:number;id:number}
+ | {type:'generateReferenceClear'}
  | {type:'generateCancel'|'generateReveal'}
  | {type:'generateInsert';asset:string;position:number}
  | {type:'trackHeight';id:number;height:number}

@@ -1,0 +1,9 @@
+Build 33 - October 17, 2026
+PASS Windows Release build, ASIO enabled.
+PASS TypeScript/Vite production build.
+PASS browser workflow suite including real timeline drag/drop, no clip movement, analysis busy controls, explicit tempo/key, reference strength and generation payload.
+PASS native audio reference unit test: copied source, fades, duration/levels, WAV frames, silent/NaN/cancel guards, pulse tempo.
+PASS packaged native workflow, mixer and real text-generation regressions.
+PASS real native reference regression: 12-second trim/source offset/fades, unchanged original, ACE-Step conditioned generation, manifest and separate-track insertion.
+UI screenshot visually inspected. Live hardware and musical quality require user testing. Mac not tested.
+Executable SHA256: AAC4B4BAF28CB8674BFD7836C65A586B46F8A2C505480B27161FB7A2368666A7
