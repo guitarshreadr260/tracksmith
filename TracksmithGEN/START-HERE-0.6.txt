@@ -1,0 +1,52 @@
+TRACKSMITH GEN 0.6 / GENERATION APPROACHES + WORKFLOW IMPROVEMENTS
+
+INSTALL
+Close GEN and any separate ACE model terminal. Extract this ZIP and run
+UPDATE-GEN.cmd. Open GEN in your existing folder afterward. No model reinstall
+or new weight download is required for your currently cached models.
+Your saved takes and installed ACE environment remain in place.
+
+WHAT CHANGED
+- Generation approach selector: Balanced, Direct, Larger planner, Extended.
+- Generation progress activity bar, current engine stage and elapsed time.
+- Remembers the prompt draft, Part/Song mode, approach, duration, take count,
+  tempo, key and whether suggestions are enabled.
+- Ctrl+Enter generates/cancels; Space plays/pauses when not editing text.
+- Generation failures remain visible instead of being replaced by progress.
+- Saved take details include the generation approach used.
+
+APPROACHES
+Balanced: existing SFT / 0.6B planner, 50 steps, guidance 7.
+Direct: SFT without musical planner, 50 steps, guidance 10.
+Larger planner: SFT / cached 1.7B planner, 50 steps, guidance 7.
+Extended: SFT / cached 1.7B planner, 100 steps, guidance 7.
+All require CUDA. Caption rewriting remains off. The 1.7B planner is already
+cached on your PC; if unavailable elsewhere, choose Balanced or Direct.
+
+These choices do not establish a quality ranking. Direct is faster in the
+short test; additional planning/steps may or may not sound better. The audio
+checkpoint remains SFT in every approach. Choose based on what you hear.
+Create variation uses the selected take's prompt and your CURRENT approach.
+
+LISTEN TO THE TESTS
+Open Quality-Trial / LISTEN.html. Four approaches, each with a lead guitar
+and a metalcore request, eight actual 20-second GPU WAVs. A=current;
+B=Direct; C=larger planner; D=extended rendering. FINDINGS.md has timings and
+limits. There are no assigned subjective listening scores or declared winner.
+
+SOUND LIMITS
+Part mode is prompt guidance, not guaranteed instrument isolation. No new
+stem-conditioned checkpoint, reference following, vocals or mastering model
+was added. Key/tempo control is still model guidance and needs verification.
+Preview playback may use mono fallback; WAV export preserves original stereo.
+If all four approaches sound weak, a new audio checkpoint is the next step;
+these settings alone are not presented as a proven audio-quality fix.
+
+VALIDATION
+Eight real GPU configuration trials; standard regression checks; remembered
+settings save/load check; direct-profile native C# -> GPU Python worker ->
+WAV -> saved/reopened library integration check. Audible playback and
+subjective quality remain for local listening.
+
+SOURCE
+Studio.cs, TracksmithGEN.cs, AudioLab.cs, AceBridge.cs, ace_worker.py, build.ps1.

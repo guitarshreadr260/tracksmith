@@ -1,0 +1,17 @@
+*.exe
+*.pdb
+__pycache__/
+*.pyc
+GEN-Library/
+gen-*.xml
+gen-*.txt
+GPU-smoke-*/
+gpu-smoke-result.txt
+test-results.txt
+ui-check.png
+setup/ACE-Step-1.5/
+setup/tools/
+setup/model-cache/
+*.wav
+*.mp3
+*.flac

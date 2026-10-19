@@ -1,3 +1,9 @@
+# Standalone Tracksmith GEN 0.6
+
+The standalone Windows GEN prototype is saved in [TracksmithGEN/](TracksmithGEN/README.md), with its native UI, ACE-Step CUDA worker, four generation approaches, setup/update scripts and validation notes. This has independent version numbering from the DAW checkpoint documented below. Model weights, local audio and runtime environments are not included.
+
+---
+
 # Current GitHub source checkpoint: Build 33
 
 See [checkpoint details](BUILD33-GITHUB-CHECKPOINT.md) and [audio-reference usage](BUILD33-AUDIO-REFERENCE.md). Historical checkpoint statements below describe earlier builds.
