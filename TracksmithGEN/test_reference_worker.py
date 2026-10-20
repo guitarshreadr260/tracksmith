@@ -60,8 +60,9 @@ class ReferenceTests(unittest.TestCase):
                 calls.append(kwargs)
                 return kwargs['init_audio'][1].unsqueeze(0) * .8
         request = ET.Element('request')
+        long_prompt = ('A guitar variation in D minor at 110 BPM. ' * 50) + 'END OF PROMPT'
         for key, value in dict(source=str(self.source), start=1, duration=5, amount=.7,
-                               count=3, prompt='A guitar variation', seed=42).items():
+                               count=3, prompt=long_prompt, seed=42).items():
             ET.SubElement(request, key).text = str(value)
         path = self.root / 'request.xml'
         ET.ElementTree(request).write(path)
@@ -75,6 +76,7 @@ class ReferenceTests(unittest.TestCase):
             worker.run(path)
         self.assertEqual([call['seed'] for call in calls], [42, 43, 44])
         for call in calls:
+            self.assertEqual(call['prompt'], long_prompt)
             self.assertEqual(call['init_noise_level'], .7)
             self.assertEqual(call['init_audio'][0], 44100)
             self.assertEqual(tuple(call['init_audio'][1].shape), (2, 220500))
@@ -83,6 +85,7 @@ class ReferenceTests(unittest.TestCase):
         self.assertEqual(len(manifest.findall('take')), 3)
         self.assertEqual(manifest.get('amount'), '0.7')
         self.assertEqual(manifest.get('source_name'), self.source.name)
+        self.assertEqual(manifest.get('prompt'), long_prompt)
 
 
 if __name__ == '__main__':

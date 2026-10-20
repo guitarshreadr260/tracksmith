@@ -1,0 +1,33 @@
+TRACKSMITH GEN 0.7.1 / PROMPT-FIRST UPDATE
+
+UPDATE
+Close GEN. Extract the package and run UPDATE-GEN.cmd. Choose your existing
+GEN folder. The updater backs up program files and keeps saved takes, model
+installations and preferences. Reopen TracksmithGEN.exe from that folder.
+
+CHANGES
+- Removed the main generation Key and Tempo controls and the suggestions box.
+- Write key, BPM, style, instrumentation and arrangement instructions in the prompt.
+- Enlarged the main prompt editor.
+- Removed GEN's 512-character checks from text generation and audio-guided
+  variations, including both Python workers. Both prompt editors accept long text.
+- Old key/tempo selector preferences are ignored; they no longer inject defaults.
+- Long prompts are retained in requests, preferences and saved-take details.
+- Duration and take count remain separate output controls.
+
+The models still have their own text-token context sizes. Removing the app's
+character cap does not enlarge or retrain those models. GEN passes and stores
+the full prompt, but a model may internally use only part of a very long one.
+Put the most important musical instructions first.
+
+The audio-guided workflow from 0.7 is retained: Import WAV / MP3, choose a
+5-30 second section, set variation amount, generate, and compare A/B.
+See START-HERE-0.7.txt for the full guide and model setup information.
+
+VALIDATION
+The native build and regression suite passed, including a 50,000-character
+editor -> request -> preferences roundtrip and no selector-default injection.
+Five worker tests passed, covering long prompt forwarding for both engines,
+MP3/crop/source-preservation behavior, seeds and audio-conditioning controls.
+Long prompt forwarding tests verify exact text; they do not claim that models
+attend to every character or that output sound quality improves.

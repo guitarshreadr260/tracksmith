@@ -57,8 +57,8 @@ def run(request):
         raise ValueError('Unknown reference operation.')
     if not 0.05 <= amount <= 0.95 or not 1 <= count <= 3:
         raise ValueError('Use 5-95% variation and 1-3 takes.')
-    if mode == 'generate' and not 1 <= len(prompt) <= 512:
-        raise ValueError('Describe the variation using 1-512 characters.')
+    if mode == 'generate' and not prompt:
+        raise ValueError('Describe the variation you want first.')
     reference = out / 'reference.wav'
     if source == reference:
         raise ValueError('Input and prepared output must be different files.')

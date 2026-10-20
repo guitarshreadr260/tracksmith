@@ -1,8 +1,16 @@
-# Tracksmith GEN standalone 0.7
+# Tracksmith GEN standalone 0.7.1
 
 Native Windows music-generation prototype. Text-only generation retains the
 ACE-Step worker from 0.6. The new audio-guided workflow uses the separate
 Stable Audio 3 Small Music environment installed during the guitar-model trial.
+
+## Prompt-first controls
+
+Key and tempo are specified only in the main generation prompt. The selectors
+and their hidden preference defaults were removed. GEN has no 512-character
+app limit in either generation workflow; full prompts are passed and stored.
+Model token contexts remain finite, so very long prompts can still be truncated
+internally by a model. See START-HERE-0.7.1.txt for update details.
 
 ## Audio-guided workflow
 
@@ -33,7 +41,7 @@ are handled by the existing trial setup; credentials are not part of this repo.
 
 ## Validation
 
-The native build and legacy regression suite passed. Four reference tests cover
+The native build and legacy regression suite passed. Five worker tests cover
 MP3 decoding, section boundaries, source preservation, and audio-conditioning
 parameter/seed propagation. A real 5-second CUDA WAV-guided bridge test passed,
 including saved-reference linkage and byte-preserving generated-WAV storage.
@@ -47,4 +55,3 @@ The latter two require cached model assets and the reference environment.
 
 GEN is independent of the JUCE/React Tracksmith DAW. This source branch does not
 modify the DAW or redistribute model weights, credentials or recordings.
-

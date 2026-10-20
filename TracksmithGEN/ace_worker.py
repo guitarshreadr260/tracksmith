@@ -17,7 +17,7 @@ def main():
  from acestep.llm_inference import LLMHandler
  from acestep.inference import GenerationParams,GenerationConfig,generate_music
  caption=root.findtext('caption','').strip();duration=int(root.findtext('duration','15'));count=int(root.findtext('count','1'))
- if not caption or len(caption)>512:raise ValueError('Keep the complete prompt between 1 and 512 characters.')
+ if not caption:raise ValueError('Describe the music you want first.')
  if not 10<=duration<=120 or not 1<=count<=3:raise ValueError('Use 10-120 seconds and 1-3 takes.')
  bpm=int(root.findtext('bpm','0'));key=root.findtext('key','');seed=int(root.findtext('seed','-1'))
  profiles={'balanced':(50,7.0,'acestep-5Hz-lm-0.6B',True),'direct':(50,10.0,None,False),'planner':(50,7.0,'acestep-5Hz-lm-1.7B',True),'extended':(100,7.0,'acestep-5Hz-lm-1.7B',True)}

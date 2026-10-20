@@ -13,7 +13,7 @@ using System.Xml.Linq;
 
 namespace TracksmithGEN {
 public static class PromptBuilder {
- public static string Compose(string text,bool song,int bpm,string key){if(string.IsNullOrWhiteSpace(text))throw new ArgumentException("Describe the music you want first.");return (song?"Instrumental song idea. ":"Isolated instrumental part. ")+text.Trim()+(bpm>0?". "+bpm+" BPM"+(key=="Any"?"":", "+key):"")+". Instrumental, no vocals.";}
+ public static string Compose(string text,bool song){if(string.IsNullOrWhiteSpace(text))throw new ArgumentException("Describe the music you want first.");return (song?"Instrumental song idea. ":"Isolated instrumental part. ")+text.Trim()+". Instrumental, no vocals.";}
  public static string Expand(string idea,string instrument,bool song,int version){
   if(string.IsNullOrWhiteSpace(idea))throw new ArgumentException("Type a word or sentence first, such as hope or a quiet night drive.");
   string s=idea.Trim(),q=s.ToLowerInvariant();string mood="expressive and evocative",feel="a steady groove",texture="warm tone and clear melodic phrasing";
@@ -56,12 +56,12 @@ public class NativePlayer:IDisposable {
 public class StudioForm:Form {
  readonly Color bg=Color.FromArgb(14,16,21),surface=Color.FromArgb(23,26,33),border=Color.FromArgb(46,50,62),muted=Color.FromArgb(151,157,174),accent=Color.FromArgb(128,112,245);
  Panel create=new Panel(),center=new Panel(),details=new Panel(),transport=new Panel();FlowLayoutPanel cards=new FlowLayoutPanel();
- ComboBox mode=new ComboBox(),instrument=new ComboBox(),key=new ComboBox(),approach=new ComboBox();TextBox prompt=new TextBox(),search=new TextBox(),title=new TextBox(),detailPrompt=new TextBox();NumericUpDown duration=new NumericUpDown(),tempo=new NumericUpDown(),count=new NumericUpDown();
- Label status=new Label(),detailMeta=new Label(),playingTitle=new Label(),clock=new Label(),engineLabel=new Label();Button generate,play,favorite;CheckBox favorites=new CheckBox(),suggestions=new CheckBox();TrackBar seek=new TrackBar(),volume=new TrackBar();
+ ComboBox mode=new ComboBox(),instrument=new ComboBox(),approach=new ComboBox();TextBox prompt=new TextBox(),search=new TextBox(),title=new TextBox(),detailPrompt=new TextBox();NumericUpDown duration=new NumericUpDown(),count=new NumericUpDown();
+ Label status=new Label(),detailMeta=new Label(),playingTitle=new Label(),clock=new Label(),engineLabel=new Label();Button generate,play,favorite;CheckBox favorites=new CheckBox();TrackBar seek=new TrackBar(),volume=new TrackBar();
  TakeStore store;SavedTake selected,loaded;NativePlayer player=new NativePlayer();Process inference;bool busy,cancelled,scrubbing;string enginePath;Timer timer=new Timer();int generationSerial,promptVersion;string lastIdea,lastExpansion;ProgressBar progress=new ProgressBar();Stopwatch generationWatch=new Stopwatch();string generationStage="Starting GPU worker";
  string BaseDir{get{return AppDomain.CurrentDomain.BaseDirectory;}}
  public StudioForm(){
-  Text="Tracksmith GEN / GPU Studio 0.7 / Audio-guided";ClientSize=new Size(1360,850);MinimumSize=new Size(1260,740);BackColor=bg;ForeColor=Color.FromArgb(237,238,244);Font=new Font("Segoe UI",10);StartPosition=FormStartPosition.CenterScreen;
+  Text="Tracksmith GEN / GPU Studio 0.7.1 / Prompt-first";ClientSize=new Size(1360,850);MinimumSize=new Size(1260,740);BackColor=bg;ForeColor=Color.FromArgb(237,238,244);Font=new Font("Segoe UI",10);StartPosition=FormStartPosition.CenterScreen;
   enginePath=AceBridge.DefaultRoot();string settings=Path.Combine(BaseDir,"gen-ace-root.txt");if(File.Exists(settings))enginePath=File.ReadAllText(settings).Trim();
   create.AutoScroll=true;details.AutoScroll=true;create.BackColor=surface;details.BackColor=surface;transport.BackColor=surface;Controls.AddRange(new Control[]{create,center,details,transport});
   LabelAt(create,"TRACKSMITH",24,20,260,35,19,true);var gen=LabelAt(create,"GEN  /  CREATE",25,58,260,28,11,true);gen.ForeColor=accent;
@@ -69,15 +69,13 @@ public class StudioForm:Form {
   LabelAt(create,"Create",25,147,270,22,10,false);Choice(mode,create,25,175,280,new[]{"Instrument part","Full song idea"});
   LabelAt(create,"Generation approach",25,220,280,25,10,false).ForeColor=muted;instrument.Items.Add("From prompt");instrument.SelectedIndex=0;
   Choice(approach,create,25,248,280,new[]{"Balanced / current settings","Direct / no musical planner","Larger musical planner","Extended render / 100 steps"});
-  LabelAt(create,"One word, a sentence, or a full prompt",25,293,280,25,10,false);prompt.Multiline=true;prompt.ScrollBars=ScrollBars.Vertical;prompt.Text="Hope";TextStyle(prompt);prompt.SetBounds(25,324,280,94);create.Controls.Add(prompt);
-  ButtonAt(create,"Expand idea",25,427,90,31,()=>{string idea=prompt.Text==lastExpansion?lastIdea:prompt.Text;lastIdea=idea;lastExpansion=PromptBuilder.Expand(idea,instrument.Text,mode.SelectedIndex==1,promptVersion++);prompt.Text=lastExpansion;status.Text="Expanded your idea with local musical rules. Edit the prompt freely, then click Multi Platinum.";});
-  ButtonAt(create,"Restore",122,427,80,31,()=>{if(lastIdea!=null)prompt.Text=lastIdea;});
-  ButtonAt(create,"Preview",209,427,96,31,()=>{MessageBox.Show(this,PromptBuilder.Compose(prompt.Text,mode.SelectedIndex==1,suggestions.Checked?(int)tempo.Value:0,key.Text),"Exact prompt sent to the engine",MessageBoxButtons.OK,MessageBoxIcon.Information);});
-  LabelAt(create,"Duration / seconds",25,468,155,22,9,false);Number(duration,create,25,495,128,10,120,15);
-  LabelAt(create,"Takes",177,468,128,22,9,false);Number(count,create,177,495,128,1,3,1);
-  LabelAt(create,"Tempo / BPM",25,542,140,22,9,false);Number(tempo,create,25,569,128,40,240,100);
-  LabelAt(create,"Key",177,542,128,22,9,false);Choice(key,create,177,569,128,new[]{"Any","C major","G major","D major","A major","E major","A minor","E minor","B minor","D minor"});
-  suggestions.Text="Add tempo/key suggestions";suggestions.SetBounds(25,610,280,27);create.Controls.Add(suggestions);LabelAt(create,"Optional prompt hints; results may vary.",25,640,280,23,9,false).ForeColor=muted;
+  LabelAt(create,"One word, a sentence, or a full prompt",25,293,280,25,10,false);prompt.Multiline=true;prompt.MaxLength=0;prompt.ScrollBars=ScrollBars.Vertical;prompt.Text="Hope";TextStyle(prompt);prompt.SetBounds(25,324,280,198);create.Controls.Add(prompt);
+  ButtonAt(create,"Expand idea",25,532,90,31,()=>{string idea=prompt.Text==lastExpansion?lastIdea:prompt.Text;lastIdea=idea;lastExpansion=PromptBuilder.Expand(idea,instrument.Text,mode.SelectedIndex==1,promptVersion++);prompt.Text=lastExpansion;status.Text="Expanded your idea with local musical rules. Edit the prompt freely, then click Multi Platinum.";});
+  ButtonAt(create,"Restore",122,532,80,31,()=>{if(lastIdea!=null)prompt.Text=lastIdea;});
+  ButtonAt(create,"Preview",209,532,96,31,()=>{MessageBox.Show(this,PromptBuilder.Compose(prompt.Text,mode.SelectedIndex==1),"Exact prompt sent to the engine",MessageBoxButtons.OK,MessageBoxIcon.Information);});
+  LabelAt(create,"Duration / seconds",25,576,155,22,9,false);Number(duration,create,25,603,128,10,120,15);
+  LabelAt(create,"Takes",177,576,128,22,9,false);Number(count,create,177,603,128,1,3,1);
+  LabelAt(create,"Write key and tempo in your prompt.",25,642,280,24,9,false).ForeColor=muted;
   generate=ButtonAt(create,"Multi Platinum",25,671,280,45,async()=>await Generate(false));generate.BackColor=accent;
   ButtonAt(create,"Engine settings",25,723,135,30,()=>EngineSettings());ButtonAt(create,"Sketch tools",170,723,135,30,()=>{using(var old=new MainForm())old.ShowDialog(this);});
   LabelAt(center,"Your creations",24,23,350,42,24,true);LabelAt(center,"Ideas become parts. Parts become music.",25,70,550,26,10,false).ForeColor=muted;
@@ -111,14 +109,22 @@ public class StudioForm:Form {
  void TextStyle(TextBox t){t.BackColor=Color.FromArgb(32,36,46);t.ForeColor=ForeColor;t.BorderStyle=BorderStyle.FixedSingle;}
  void Choice(ComboBox c,Control p,int x,int y,int w,string[] items){c.DropDownStyle=ComboBoxStyle.DropDownList;c.DrawMode=DrawMode.Normal;c.DropDownHeight=240;c.Items.AddRange(items);c.SetBounds(x,y,w,30);c.BackColor=Color.White;c.ForeColor=Color.Black;p.Controls.Add(c);c.SelectedIndex=0;}
  void RefreshExpandedIdea(){if(lastIdea!=null&&prompt.Text==lastExpansion){lastExpansion=PromptBuilder.Expand(lastIdea,instrument.Text,mode.SelectedIndex==1,promptVersion);prompt.Text=lastExpansion;}}
- public void TestInstrumentSelection(){foreach(bool song in new[]{true,false}){string p=PromptBuilder.Compose("metalcore with heavy guitars in D minor",song,100,"Any");if(p.ToLowerInvariant().Contains("piano")||!p.Contains("heavy guitars"))throw new Exception("Unexpected instrument injection.");}string detailed="metal core in the key of d minor. emotional, hopeful. heavy guitars and melodic phrasing";string expanded=PromptBuilder.Expand(detailed,"From prompt",true,0);if(!expanded.StartsWith(detailed)||expanded.Contains("gently driving"))throw new Exception("Detailed direction was overwritten.");}
+ public void TestInstrumentSelection(){foreach(bool song in new[]{true,false}){string p=PromptBuilder.Compose("metalcore with heavy guitars in D minor",song);if(p.ToLowerInvariant().Contains("piano")||!p.Contains("heavy guitars"))throw new Exception("Unexpected instrument injection.");}string detailed="metal core in the key of d minor. emotional, hopeful. heavy guitars and melodic phrasing";string expanded=PromptBuilder.Expand(detailed,"From prompt",true,0);if(!expanded.StartsWith(detailed)||expanded.Contains("gently driving"))throw new Exception("Detailed direction was overwritten.");}
  void Number(NumericUpDown n,Control p,int x,int y,int w,int min,int max,int val){n.Minimum=min;n.Maximum=max;n.Value=val;n.SetBounds(x,y,w,30);n.BackColor=Color.FromArgb(32,36,46);n.ForeColor=ForeColor;p.Controls.Add(n);}
  void Error(Exception ex){status.Text=ex.Message;MessageBox.Show(this,ex.Message,"Tracksmith GEN",MessageBoxButtons.OK,MessageBoxIcon.Information);}
  void NeedSelected(){if(selected==null)throw new Exception("Select a take first.");}
  public void TestRememberedSettings(){prompt.Text="Remember this guitar idea";mode.SelectedIndex=1;approach.SelectedIndex=2;duration.Value=20;count.Value=2;SavePreferences();prompt.Text="Changed";approach.SelectedIndex=0;duration.Value=10;LoadPreferences();if(prompt.Text!="Remember this guitar idea"||approach.SelectedIndex!=2||duration.Value!=20||count.Value!=2||mode.SelectedIndex!=1)throw new Exception("Preference roundtrip failed");}
+ public void TestPromptOnly(){
+  string text="D minor, 110 BPM. "+new string('x',50000)+" END OF PROMPT";prompt.Text=text;if(prompt.Text!=text||prompt.MaxLength!=0)throw new Exception("Prompt editor truncated long text.");
+  string sent=PromptBuilder.Compose(prompt.Text,true);if(!sent.Contains(text)||sent.Contains("100 BPM"))throw new Exception("Prompt changed or default tempo injected.");
+  string request=Path.Combine(Path.GetTempPath(),"GEN-long-prompt-"+Guid.NewGuid()+".xml");try{AceBridge.WriteRequest(request,"model",sent,10,1,0,"Any",42);var root=XDocument.Load(request).Root;if((string)root.Element("caption")!=sent||(string)root.Element("bpm")!="0"||(string)root.Element("key")!="")throw new Exception("Prompt request roundtrip failed.");}finally{File.Delete(request);}
+  SavePreferences();prompt.Text="changed";LoadPreferences();if(prompt.Text!=text)throw new Exception("Long prompt preferences truncated.");
+  var prefs=XDocument.Load(Path.Combine(BaseDir,"gen-preferences.xml"));if(prefs.Root.Element("tempo")!=null||prefs.Root.Element("key")!=null||prefs.Root.Element("suggestions")!=null)throw new Exception("Selector preferences still persisted.");
+  prompt.Text="Hope";
+ }
  string ProfileId(){return new[]{"balanced","direct","planner","extended"}[Math.Max(0,approach.SelectedIndex)];}
- void SavePreferences(){new XDocument(new XElement("preferences",new XElement("prompt",prompt.Text),new XElement("scope",mode.SelectedIndex),new XElement("approach",approach.SelectedIndex),new XElement("duration",duration.Value),new XElement("count",count.Value),new XElement("tempo",tempo.Value),new XElement("key",key.SelectedIndex),new XElement("suggestions",suggestions.Checked))).Save(Path.Combine(BaseDir,"gen-preferences.xml"));}
- void LoadPreferences(){string path=Path.Combine(BaseDir,"gen-preferences.xml");if(!File.Exists(path))return;try{var p=XDocument.Load(path).Root;prompt.Text=(string)p.Element("prompt")??"Hope";mode.SelectedIndex=Math.Max(0,Math.Min(1,(int?)p.Element("scope")??0));approach.SelectedIndex=Math.Max(0,Math.Min(3,(int?)p.Element("approach")??0));duration.Value=Math.Max(duration.Minimum,Math.Min(duration.Maximum,(decimal?)p.Element("duration")??15));count.Value=Math.Max(1,Math.Min(3,(decimal?)p.Element("count")??1));tempo.Value=Math.Max(40,Math.Min(240,(decimal?)p.Element("tempo")??100));key.SelectedIndex=Math.Max(0,Math.Min(key.Items.Count-1,(int?)p.Element("key")??0));suggestions.Checked=(bool?)p.Element("suggestions")??false;}catch(Exception ex){status.Text="Saved preferences could not be loaded: "+ex.Message;}}
+ void SavePreferences(){new XDocument(new XElement("preferences",new XElement("prompt",prompt.Text),new XElement("scope",mode.SelectedIndex),new XElement("approach",approach.SelectedIndex),new XElement("duration",duration.Value),new XElement("count",count.Value))).Save(Path.Combine(BaseDir,"gen-preferences.xml"));}
+ void LoadPreferences(){string path=Path.Combine(BaseDir,"gen-preferences.xml");if(!File.Exists(path))return;try{var p=XDocument.Load(path).Root;prompt.Text=(string)p.Element("prompt")??"Hope";mode.SelectedIndex=Math.Max(0,Math.Min(1,(int?)p.Element("scope")??0));approach.SelectedIndex=Math.Max(0,Math.Min(3,(int?)p.Element("approach")??0));duration.Value=Math.Max(duration.Minimum,Math.Min(duration.Maximum,(decimal?)p.Element("duration")??15));count.Value=Math.Max(1,Math.Min(3,(decimal?)p.Element("count")??1));}catch(Exception ex){status.Text="Saved preferences could not be loaded: "+ex.Message;}}
  void RefreshCards(){if(store==null)return;cards.SuspendLayout();while(cards.Controls.Count>0){var old=cards.Controls[0];cards.Controls.RemoveAt(0);old.Dispose();}string q=search.Text.Trim();
   var visible=store.Items.Where(t=>(!favorites.Checked||t.Favorite)&&(q.Length==0||(t.Title+" "+t.Instrument+" "+t.Prompt).IndexOf(q,StringComparison.OrdinalIgnoreCase)>=0)).ToArray();
   foreach(var t in visible){var card=new Panel{Width=Math.Max(350,cards.ClientSize.Width-25),Height=132,Margin=new Padding(4,4,4,12),BackColor=selected==t?Color.FromArgb(38,35,60):surface,Cursor=Cursors.Hand};
@@ -129,7 +135,7 @@ public class StudioForm:Form {
   if(visible.Length==0)LabelAt(cards,store.Items.Count==0?"Your first idea starts here.\nDescribe your music and click Multi Platinum.":"No takes match this view.",10,10,500,100,12,false).ForeColor=muted;
   cards.ResumeLayout();
  }
- void SelectTake(SavedTake t,bool refresh){selected=t;title.Text=t.Title;detailPrompt.Text=t.Prompt;detailMeta.Text=t.Instrument+"\n"+t.Mode+" / prompt BPM "+t.Tempo+"\n"+t.Created+(string.IsNullOrEmpty(t.ReferenceId)?"":"\nReference: "+t.SourceName+" / change "+t.VariationAmount);favorite.Text=t.Favorite?"Remove favorite":"Add favorite";
+ void SelectTake(SavedTake t,bool refresh){selected=t;title.Text=t.Title;detailPrompt.Text=t.Prompt;detailMeta.Text=t.Instrument+"\n"+t.Mode+"\n"+t.Created+(string.IsNullOrEmpty(t.ReferenceId)?"":"\nReference: "+t.SourceName+" / change "+t.VariationAmount);favorite.Text=t.Favorite?"Remove favorite":"Add favorite";
   if(t.Peaks==null){try{t.Peaks=TakeStore.WavePeaks(Path.Combine(store.Root,t.File));}catch(Exception ex){status.Text="Audio unavailable: "+ex.Message;}}
   if(refresh)RefreshCards();
  }
@@ -146,13 +152,12 @@ public class StudioForm:Form {
  async Task Generate(bool variation){
   if(busy){Cancel();return;}if(store==null)return;
   string description=prompt.Text.Trim(),chosenMode=mode.Text,repo=enginePath,chosenProfile=ProfileId();
-  int bpm=suggestions.Checked?(int)tempo.Value:0,length=(int)duration.Value,total=(int)count.Value;
-  string chosenKey=suggestions.Checked?key.Text:"Any";
+  int bpm=0,length=(int)duration.Value,total=(int)count.Value;
+  string chosenKey="Any";
   try{
-   if(variation){NeedSelected();description=selected.Prompt;chosenMode=selected.Mode;bpm=selected.Tempo;chosenKey="Any";}
-   else description=PromptBuilder.Compose(description,mode.SelectedIndex==1,bpm,chosenKey);
+   if(variation){NeedSelected();description=selected.Prompt;chosenMode=selected.Mode;bpm=0;chosenKey="Any";}
+   else description=PromptBuilder.Compose(description,mode.SelectedIndex==1);
    if(!AceBridge.Valid(repo))throw new Exception("Use Engine settings to choose your existing ACE-Step-1.5 folder. No reinstall needed.");
-   if(description.Length>512)throw new Exception("Shorten the complete prompt to 512 characters or fewer. Preview exact prompt shows what will be sent.");
    string worker=Path.Combine(BaseDir,"ace_worker.py");if(!File.Exists(worker))throw new Exception("Copy ace_worker.py beside TracksmithGEN.exe from the update ZIP.");
    busy=true;cancelled=false;generate.Text="Cancel generation";progress.Visible=true;generationWatch.Restart();generationStage="Starting GPU worker";
    string job=Path.Combine(Path.GetTempPath(),"GEN-GPU-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(job);

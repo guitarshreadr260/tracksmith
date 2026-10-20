@@ -67,7 +67,7 @@ public class ReferenceForm:Form {
   LabelAt("Section / seconds",220,155,180,22,10);Number(duration,220,181,150,5,30,15);duration.DecimalPlaces=1;
   LabelAt("Takes",420,155,160,22,10);Number(count,420,181,100,1,3,1);
   ButtonAt("Preview section",550,179,180,34,async()=>await Run(true));
-  LabelAt("Describe your variation",25,235,650,24,10);prompt.Multiline=true;prompt.ScrollBars=ScrollBars.Vertical;prompt.SetBounds(25,266,705,78);prompt.MaxLength=512;prompt.Text="A melodic electric guitar variation with clear phrasing and natural articulation. Keep the musical character of the recording.";Controls.Add(prompt);
+  LabelAt("Describe your variation",25,235,650,24,10);prompt.Multiline=true;prompt.ScrollBars=ScrollBars.Vertical;prompt.SetBounds(25,266,705,78);prompt.MaxLength=0;prompt.Text="A melodic electric guitar variation with clear phrasing and natural articulation. Keep the musical character of the recording.";Controls.Add(prompt);
   amountLabel=LabelAt("Variation amount: 50%",25,362,650,25,11);amount.SetBounds(20,392,715,40);amount.Minimum=5;amount.Maximum=95;amount.Value=50;amount.TickFrequency=10;Controls.Add(amount);amount.ValueChanged+=(s,e)=>amountLabel.Text="Variation amount: "+amount.Value+"%";
   LabelAt("Lower: stays closer to source                    Higher: allows more change",25,435,705,25,10);
   generate=ButtonAt("Generate variation",25,478,260,43,async()=>await Run(false));
