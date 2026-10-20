@@ -1,8 +1,15 @@
-# Tracksmith GEN standalone 0.7.1
+# Tracksmith GEN standalone 0.7.2
 
-Native Windows music-generation prototype. Text-only generation retains the
-ACE-Step worker from 0.6. The new audio-guided workflow uses the separate
+Native Windows music-generation prototype. Multi Platinum now selects between Stable Audio 3 Small Music and the original
+ACE-Step worker. Stable Audio is the default for older preferences without an engine choice. The new audio-guided workflow uses the separate
 Stable Audio 3 Small Music environment installed during the guitar-model trial.
+
+## Multi Platinum engines
+
+Choose Stable Audio 3 / new engine or ACE-Step / original engine. Stable uses
+its own cached Python environment and text-only worker, with no reference WAV
+and no ACE dependency. ACE approach settings are disabled for Stable. The engine
+choice persists; saved takes show the engine used. See START-HERE-0.7.2.txt.
 
 ## Prompt-first controls
 
@@ -41,7 +48,7 @@ are handled by the existing trial setup; credentials are not part of this repo.
 
 ## Validation
 
-The native build and legacy regression suite passed. Five worker tests cover
+The native build and legacy regression suite passed. Seven worker tests cover
 MP3 decoding, section boundaries, source preservation, and audio-conditioning
 parameter/seed propagation. A real 5-second CUDA WAV-guided bridge test passed,
 including saved-reference linkage and byte-preserving generated-WAV storage.
@@ -55,3 +62,7 @@ The latter two require cached model assets and the reference environment.
 
 GEN is independent of the JUCE/React Tracksmith DAW. This source branch does not
 modify the DAW or redistribute model weights, credentials or recordings.
+
+A real Multi Platinum-handler CUDA test also passed for Stable Audio text-only
+generation with ACE unavailable, including saved/reopened output and engine
+identity. This does not assess subjective music quality.

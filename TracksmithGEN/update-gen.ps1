@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 try {
     Add-Type -AssemblyName System.Windows.Forms
-    $names = @('TracksmithGEN.exe', 'ace_worker.py', 'reference_worker.py')
+    $names = @('TracksmithGEN.exe', 'ace_worker.py', 'reference_worker.py', 'stable_worker.py')
     foreach ($name in $names) {
         if (-not (Test-Path -LiteralPath (Join-Path $PSScriptRoot $name))) {
             throw "Package file missing: $name"

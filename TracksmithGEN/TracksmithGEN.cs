@@ -199,6 +199,10 @@ public class MainForm:Form {
 }
 static class Program {
  [STAThread] static int Main(string[] args) {
+  if(args.Length==2&&args[0]=="--stable-ui-test"){
+   Application.EnableVisualStyles();int code=1;using(var form=new StudioForm()){form.Shown+=async(s,e)=>{try{await form.TestStableWorkflow(args[1]);File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"stable-ui-test-result.txt"),"PASS: Multi Platinum -> selected Stable Audio 3 engine with ACE unavailable -> real CUDA text generation -> stereo WAV -> full-prompt saved take -> reopen and playback duration. Sound quality remains unrated.");code=0;}catch(Exception ex){File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"stable-ui-test-result.txt"),"FAIL: "+ex);}finally{form.Close();}};Application.Run(form);}return code;
+  }
+
   if(args.Length==3&&args[0]=="--reference-ui-test"){
    Application.EnableVisualStyles();int code=1;string testDir=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"reference-ui-test-"+DateTime.Now.ToString("yyyyMMdd-HHmmss"));using(var form=new ReferenceForm(new TakeStore(testDir),args[1])){form.Shown+=async(s,e)=>{try{await form.TestWorkflow(args[2]);File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"reference-ui-test-result.txt"),"PASS: reference dialog -> real CUDA audio-guided generation -> saved original/variation -> playback length and seek. Audible quality remains unrated.");code=0;}catch(Exception ex){File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"reference-ui-test-result.txt"),"FAIL: "+ex);}finally{form.Close();}};Application.Run(form);}return code;
   }
@@ -234,7 +238,7 @@ static class Program {
    var saved=new TakeStore(Path.Combine(dir,"saved"));string source=Path.Combine(dir,"Bass.wav");var item=saved.Add(source,"Rock & <Hope>",expanded,"Piano","Instrument part",100);item.Favorite=true;saved.Save();var reopened=new TakeStore(saved.Root);if(reopened.Items.Count!=1||reopened.Items[0].Title!="Rock & <Hope>"||!reopened.Items[0].Favorite)throw new Exception("Saved library roundtrip failed");
    if(!File.ReadAllBytes(source).SequenceEqual(File.ReadAllBytes(Path.Combine(saved.Root,item.File))))throw new Exception("Original audio preservation failed");
    using(var audioPlayer=new NativePlayer()){audioPlayer.Open(source);if(Math.Abs(audioPlayer.Length-8000)>30)throw new Exception("Playback length incorrect");audioPlayer.Volume(600);audioPlayer.Seek(1000);if(Math.Abs(audioPlayer.Position-1000)>40)throw new Exception("Playback seek failed");}
-   using(var ui=new StudioForm()){ui.Show();Application.DoEvents();ui.TestInstrumentSelection();ui.TestRememberedSettings();ui.TestPromptOnly();ui.Close();}
+   using(var ui=new StudioForm()){ui.Show();Application.DoEvents();ui.TestInstrumentSelection();ui.TestRememberedSettings();ui.TestPromptOnly();ui.TestEngineSelection();ui.Close();}
    File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-results.txt"),"PASS: five sketch instruments; WAV roundtrip; MIDI; invalid chords; subprocess prompt escaping; word/sentence prompt expansion; prompt alternatives; saved library rename/favorite roundtrip; original WAV byte preservation; playback length/volume/seek API (fallback in this environment). 50,000-character prompt editor/request/preferences roundtrip; no key/tempo selector defaults. This regression run does not assess inference or audible quality. Output: "+dir);return 0;
   }catch(Exception ex){File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-results.txt"),"FAIL: "+ex);return 1;}
  }

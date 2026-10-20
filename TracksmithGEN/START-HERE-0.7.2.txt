@@ -1,0 +1,53 @@
+TRACKSMITH GEN 0.7.2 / MULTI PLATINUM WITH TWO ENGINES
+
+UPDATE
+Close GEN, extract this package, and run UPDATE-GEN.cmd. Choose the folder
+containing your current GEN app. All four program files are copied, including
+the new stable_worker.py. Saved takes, settings and models are kept.
+Open TracksmithGEN.exe in the updated folder.
+
+USE THE NEW ENGINE
+1. Choose Stable Audio 3 / new engine under Generation engine.
+2. Choose Instrument part or Full song idea.
+3. Describe the music, including any key and tempo, in the prompt.
+4. Set duration (10-120 seconds) and take count (1-3), then click Multi Platinum.
+
+Stable Audio 3 Small Music is now connected directly to Multi Platinum for
+TEXT-ONLY generation. No recording or imported WAV is needed for this path.
+It is the default for new installs and older preferences without an engine
+selection. Your choice is remembered. Saved takes identify their actual engine.
+ACE-Step / original engine remains available in the same selector. The ACE
+approach selector applies only to ACE and is disabled when Stable is selected.
+
+EXISTING MODEL INSTALLATION
+This reuses your working Stable Audio guitar-trial environment and cached
+Small Music weights. No reinstall or additional model download is needed.
+Keep that existing .venv installation. GEN searches the original extracted
+trial folders in Downloads. If moved, choose Stable Audio, click Engine settings,
+and select python.exe inside that environment's .venv\Scripts folder.
+The same saved environment is used for audio-guided variations.
+Both engines require CUDA. Neither silently falls back to the other engine.
+
+PROMPT AND REFERENCE FEATURES
+Key and tempo selectors remain removed. Put those instructions in your prompt.
+GEN's 512-character app limit remains removed in both workflows. Model token
+contexts are still finite, so models may use only part of very long prompts.
+WAV/MP3 audio-guided variations and A/B comparison remain available separately
+through Import WAV / MP3 or Create variation.
+
+VALIDATION
+- Native compilation and regression suite passed, including engine switching,
+  remembered engine selection and long-prompt request/preferences roundtrip.
+- Seven worker tests passed for both text engines and audio-guided variations.
+- Real RTX 4070 SUPER test: main Studio's Multi Platinum generation handler ->
+  selected Stable Audio worker -> 10-second stereo output -> saved/reopened take
+  with full prompt and engine identity. ACE was intentionally unavailable in
+  that test to verify independence of the new route.
+- Input did not include an imported recording. Audible quality is unrated;
+  successful integration is not a claim that full arrangements sound better.
+
+SOURCE / TESTS
+StableBridge.cs and stable_worker.py implement the new route. build.ps1 builds
+the native app. Developer command --stable-ui-test PYTHON exercises the main
+generation path with cached models and produces stable-ui-test-result.txt.
+See test_stable_worker.py, test_ace_prompt.py and test_reference_worker.py.
