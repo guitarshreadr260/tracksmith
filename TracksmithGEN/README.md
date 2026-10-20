@@ -1,89 +1,50 @@
-# Tracksmith GEN standalone 0.6
+# Tracksmith GEN standalone 0.7
 
-Windows music-generation prototype with a native C# / WinForms interface and a
-separate Python CUDA worker using an existing ACE-Step 1.5 installation.
-This standalone project has its own version numbering, independent of the
-JUCE/React DAW in `../Tracksmith/`.
+Native Windows music-generation prototype. Text-only generation retains the
+ACE-Step worker from 0.6. The new audio-guided workflow uses the separate
+Stable Audio 3 Small Music environment installed during the guitar-model trial.
 
-## Features
+## Audio-guided workflow
 
-- Prompt-first Part / instrumental Song workflow and **Multi Platinum** button.
-- Four generation approaches: Balanced, Direct, Larger planner, Extended.
-- Local rule-based idea expansion, editable prompts and exact-prompt preview.
-- GPU stages, elapsed-time feedback and cancellation.
-- Persistent takes, search, favorites, rename and original stereo WAV export.
-- Remembered draft and generation settings; Ctrl+Enter and Space shortcuts.
-- Earlier chord-based MIDI sketch tools remain available.
+- Import mono/stereo WAV or MP3, select a 5-30 second section and preview it.
+- Describe a variation and adjust the input noise amount from 5-95%.
+- Generate 1-3 sequential CUDA variations using the actual selected audio.
+- Switch original/generated playback at the current position, save takes with
+  source/seed/amount/reference linkage, and export the generated stereo WAV.
+- Original recordings stay intact; the prepared reference section is a copy.
 
-## Build and run
+This is variation, not stem isolation or accompaniment generation. It does not
+guarantee note, key or tempo preservation. A/B is not loudness-matched. B plays
+the last variation; the library contains every completed take.
 
-On Windows with .NET Framework 4.x and its C# compiler:
+See [START-HERE-0.7.txt](START-HERE-0.7.txt) for usage, environment selection,
+model limitations and validation. The original 0.6 guide and trial files are
+retained for history.
 
-```powershell
-.\build.ps1
-.\TracksmithGEN.exe
-```
+## Build
 
-Keep `ace_worker.py` beside the executable. Use a writable app folder so GEN
-can save its library and preferences. The GUI build does not install models.
+Run `build.ps1` with the Windows .NET Framework C# compiler installed. Keep both
+Python workers beside the executable. The build does not install dependencies
+or download models. Use a writable program folder for preferences and library.
 
-## GPU environment
-
-Reuse an existing ACE-Step 1.5 installation with its `.venv`, `acestep` source
-and cached `checkpoints`. Select that repository folder with Engine settings.
-The default lookup is
-`~/Downloads/TracksmithGEN-ACE-Step-GPU-Test-Kit/ACE-Step-1.5`.
-
-For a fresh test environment, `setup/SETUP-GPU.cmd` wraps the upstream source
-installation in a separate folder and checks actual CUDA computation. It
-downloads substantial dependencies/model assets on first use. After setup,
-select `setup/ACE-Step-1.5` from GEN's Engine settings. The browser launcher
-is optional; standalone GEN launches its own worker and writes WAV directly.
-
-Tested Windows stack: RTX 4070 Super 12GB, PyTorch `2.7.1+cu128`, ACE SFT
-audio checkpoint, 0.6B/1.7B planners. The worker uses cached assets with offline
-loading; it does not silently fall back to CPU-only generation.
-
-| Approach | SFT steps | Guidance | Musical planner |
-|---|---:|---:|---|
-| Balanced | 50 | 7 | 0.6B |
-| Direct | 50 | 10 | None |
-| Larger planner | 50 | 7 | 1.7B |
-| Extended | 100 | 7 | 1.7B |
-
-All approaches use SDPA, CPU offload, no quantization, no caption/metadata
-rewriting and WAV output. Planner-based modes keep semantic-code planning.
-The larger planner is not a different audio checkpoint or a proven quality
-upgrade. Missing cached planners produce an error rather than a download.
+The reference worker reuses the trial's `.venv/Scripts/python.exe` and cached
+Small Music weights. It works offline and requires CUDA. Model access/terms
+are handled by the existing trial setup; credentials are not part of this repo.
 
 ## Validation
 
-```powershell
-Start-Process .\TracksmithGEN.exe -ArgumentList '--self-test' -Wait
-Get-Content .\test-results.txt
+The native build and legacy regression suite passed. Four reference tests cover
+MP3 decoding, section boundaries, source preservation, and audio-conditioning
+parameter/seed propagation. A real 5-second CUDA WAV-guided bridge test passed,
+including saved-reference linkage and byte-preserving generated-WAV storage.
+A separate real MP3 dialog test passed generation, save, playback-length and
+seek checks. These use sample audio; audible quality remains unrated.
 
-# Requires cached models and the default installed ACE path.
-Start-Process .\TracksmithGEN.exe -ArgumentList '--gpu-smoke-test','direct' -Wait
-Get-Content .\gpu-smoke-result.txt
-```
+Run `python -m unittest -v test_reference_worker.py` using the Stable Audio
+environment. Native developer checks: `--self-test`, `--reference-smoke-test
+SOURCE PYTHON`, and `--reference-ui-test SOURCE PYTHON`. Quote paths with spaces.
+The latter two require cached model assets and the reference environment.
 
-See [validation](tests/VALIDATION.md) and
-[measured configuration comparisons](tests/QUALITY-FINDINGS.md). The quality
-trial script accepts `ACE_REPO OUTPUT_DIRECTORY` arguments and runs with the
-ACE environment's Python. Generated audio and local settings are excluded
-from source control.
+GEN is independent of the JUCE/React Tracksmith DAW. This source branch does not
+modify the DAW or redistribute model weights, credentials or recordings.
 
-## Current limits
-
-Instrumental text-to-music only, 10-120 seconds, 1-3 sequential takes. Part mode
-does not guarantee isolation. Tempo/key guidance needs musical verification.
-Imported WAVs are for audition/organization, not accompaniment conditioning.
-Fallback preview playback is mono; original stereo export is preserved.
-The idea expander is rule-based, not another language model. Interactive
-listening quality is not established by successful automated generation.
-
-## Updating an existing installation
-
-After building, `UPDATE-GEN.cmd` copies the executable and worker to the
-existing GEN folder and keeps a backup executable. It preserves saved takes
-and the separate ACE installation. See [usage](START-HERE-0.6.txt).

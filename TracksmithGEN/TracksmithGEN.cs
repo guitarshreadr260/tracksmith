@@ -199,6 +199,13 @@ public class MainForm:Form {
 }
 static class Program {
  [STAThread] static int Main(string[] args) {
+  if(args.Length==3&&args[0]=="--reference-ui-test"){
+   Application.EnableVisualStyles();int code=1;string testDir=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"reference-ui-test-"+DateTime.Now.ToString("yyyyMMdd-HHmmss"));using(var form=new ReferenceForm(new TakeStore(testDir),args[1])){form.Shown+=async(s,e)=>{try{await form.TestWorkflow(args[2]);File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"reference-ui-test-result.txt"),"PASS: reference dialog -> real CUDA audio-guided generation -> saved original/variation -> playback length and seek. Audible quality remains unrated.");code=0;}catch(Exception ex){File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"reference-ui-test-result.txt"),"FAIL: "+ex);}finally{form.Close();}};Application.Run(form);}return code;
+  }
+  if(args.Length==2&&args[0]=="--render-reference-ui"){
+   Application.EnableVisualStyles();using(var form=new ReferenceForm(new TakeStore(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"ui-reference-library")),args[1])){form.Show();Application.DoEvents();using(var bitmap=new Bitmap(form.Width,form.Height)){form.DrawToBitmap(bitmap,new Rectangle(0,0,form.Width,form.Height));bitmap.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"reference-ui-check.png"));}form.Close();}return 0;
+  }
+  if(args.Length==3&&args[0]=="--reference-smoke-test")return ReferenceBridge.Smoke(args[1],args[2]);
   if(args.Length>0&&args[0]=="--gpu-smoke-test")return AceBridge.Smoke(args.Length>1?args[1]:"balanced");
   if(args.Length==3&&args[0]=="--echo-arg") {File.WriteAllText(args[2],args[1]);return 0;}
   if(args.Length>0&&args[0]=="--self-test")return SelfTest();

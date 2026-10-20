@@ -28,14 +28,14 @@ public static class PromptBuilder {
  }
 }
 public class SavedTake {
- public string Id,Title,Prompt,Instrument,Mode,File,Created;public bool Favorite; public int Tempo; public float[] Peaks;
+ public string Id,Title,Prompt,Instrument,Mode,File,Created,ReferenceId,SourceName,SourceStart,VariationAmount,Seed;public bool Favorite; public int Tempo; public float[] Peaks;
 }
 public class TakeStore {
  public readonly string Root; public List<SavedTake> Items=new List<SavedTake>();
  public TakeStore(string root){Root=root;Directory.CreateDirectory(root);Load();}
  public void Load(){string path=Path.Combine(Root,"library.xml");if(!System.IO.File.Exists(path))return;
-  foreach(var x in XDocument.Load(path).Root.Elements("take")){string file=(string)x.Attribute("file");if(file==null||Path.GetFileName(file)!=file)continue;Items.Add(new SavedTake{Id=(string)x.Attribute("id"),Title=(string)x.Element("title"),Prompt=(string)x.Element("prompt"),Instrument=(string)x.Element("instrument"),Mode=(string)x.Element("mode"),File=file,Created=(string)x.Element("created"),Favorite=(bool?)x.Element("favorite")??false,Tempo=(int?)x.Element("tempo")??100});}}
- public void Save(){var xml=new XDocument(new XElement("library",Items.Select(t=>new XElement("take",new XAttribute("id",t.Id),new XAttribute("file",t.File),new XElement("title",t.Title),new XElement("prompt",t.Prompt),new XElement("instrument",t.Instrument),new XElement("mode",t.Mode),new XElement("created",t.Created),new XElement("favorite",t.Favorite),new XElement("tempo",t.Tempo)))));string path=Path.Combine(Root,"library.xml"),temp=path+".tmp";xml.Save(temp);if(System.IO.File.Exists(path))System.IO.File.Copy(path,path+".bak",true);System.IO.File.Copy(temp,path,true);System.IO.File.Delete(temp);}
+  foreach(var x in XDocument.Load(path).Root.Elements("take")){string file=(string)x.Attribute("file");if(file==null||Path.GetFileName(file)!=file)continue;Items.Add(new SavedTake{Id=(string)x.Attribute("id"),Title=(string)x.Element("title"),Prompt=(string)x.Element("prompt"),Instrument=(string)x.Element("instrument"),Mode=(string)x.Element("mode"),File=file,Created=(string)x.Element("created"),Favorite=(bool?)x.Element("favorite")??false,ReferenceId=(string)x.Element("referenceId"),SourceName=(string)x.Element("sourceName"),SourceStart=(string)x.Element("sourceStart"),VariationAmount=(string)x.Element("variationAmount"),Seed=(string)x.Element("seed"),Tempo=(int?)x.Element("tempo")??100});}}
+ public void Save(){var xml=new XDocument(new XElement("library",Items.Select(t=>new XElement("take",new XAttribute("id",t.Id),new XAttribute("file",t.File),new XElement("title",t.Title),new XElement("prompt",t.Prompt),new XElement("instrument",t.Instrument),new XElement("mode",t.Mode),new XElement("created",t.Created),new XElement("favorite",t.Favorite),new XElement("tempo",t.Tempo),new XElement("referenceId",t.ReferenceId),new XElement("sourceName",t.SourceName),new XElement("sourceStart",t.SourceStart),new XElement("variationAmount",t.VariationAmount),new XElement("seed",t.Seed)))));string path=Path.Combine(Root,"library.xml"),temp=path+".tmp";xml.Save(temp);if(System.IO.File.Exists(path))System.IO.File.Copy(path,path+".bak",true);System.IO.File.Copy(temp,path,true);System.IO.File.Delete(temp);}
  public SavedTake Add(string path,string title,string prompt,string instrument,string mode,int tempo){string id=Guid.NewGuid().ToString("N"),file=id+".wav";System.IO.File.Copy(path,Path.Combine(Root,file));var take=new SavedTake{Id=id,File=file,Title=title,Prompt=prompt,Instrument=instrument,Mode=mode,Tempo=tempo,Created=DateTime.Now.ToString("yyyy-MM-dd HH:mm"),Peaks=WavePeaks(path)};Items.Insert(0,take);try{Save();}catch{Items.Remove(take);throw;}return take;}
  public static float[] WavePeaks(string path){float[] samples=Engine.ReadWav(path),peaks=new float[180];for(int x=0;x<peaks.Length;x++){int a=(int)((long)x*samples.Length/peaks.Length),b=(int)((long)(x+1)*samples.Length/peaks.Length);for(int i=a;i<b;i++)peaks[x]=Math.Max(peaks[x],Math.Abs(samples[i]));}return peaks;}
 }
@@ -61,7 +61,7 @@ public class StudioForm:Form {
  TakeStore store;SavedTake selected,loaded;NativePlayer player=new NativePlayer();Process inference;bool busy,cancelled,scrubbing;string enginePath;Timer timer=new Timer();int generationSerial,promptVersion;string lastIdea,lastExpansion;ProgressBar progress=new ProgressBar();Stopwatch generationWatch=new Stopwatch();string generationStage="Starting GPU worker";
  string BaseDir{get{return AppDomain.CurrentDomain.BaseDirectory;}}
  public StudioForm(){
-  Text="Tracksmith GEN / GPU Studio 0.6";ClientSize=new Size(1360,850);MinimumSize=new Size(1260,740);BackColor=bg;ForeColor=Color.FromArgb(237,238,244);Font=new Font("Segoe UI",10);StartPosition=FormStartPosition.CenterScreen;
+  Text="Tracksmith GEN / GPU Studio 0.7 / Audio-guided";ClientSize=new Size(1360,850);MinimumSize=new Size(1260,740);BackColor=bg;ForeColor=Color.FromArgb(237,238,244);Font=new Font("Segoe UI",10);StartPosition=FormStartPosition.CenterScreen;
   enginePath=AceBridge.DefaultRoot();string settings=Path.Combine(BaseDir,"gen-ace-root.txt");if(File.Exists(settings))enginePath=File.ReadAllText(settings).Trim();
   create.AutoScroll=true;details.AutoScroll=true;create.BackColor=surface;details.BackColor=surface;transport.BackColor=surface;Controls.AddRange(new Control[]{create,center,details,transport});
   LabelAt(create,"TRACKSMITH",24,20,260,35,19,true);var gen=LabelAt(create,"GEN  /  CREATE",25,58,260,28,11,true);gen.ForeColor=accent;
@@ -86,13 +86,13 @@ public class StudioForm:Form {
   cards.AutoScroll=true;cards.FlowDirection=FlowDirection.TopDown;cards.WrapContents=false;cards.BackColor=bg;center.Controls.Add(cards);
   status.ForeColor=muted;status.SetBounds(25,680,550,70);center.Controls.Add(status);progress.Style=ProgressBarStyle.Marquee;progress.MarqueeAnimationSpeed=35;progress.Visible=false;center.Controls.Add(progress);
   LabelAt(details,"SELECTED TAKE",22,28,240,25,10,true).ForeColor=muted;title.SetBounds(22,77,236,31);TextStyle(title);details.Controls.Add(title);
-  detailMeta.SetBounds(22,126,236,75);detailMeta.ForeColor=muted;details.Controls.Add(detailMeta);
+  detailMeta.SetBounds(22,126,236,90);detailMeta.ForeColor=muted;details.Controls.Add(detailMeta);
   LabelAt(details,"Prompt",22,220,230,24,10,true);detailPrompt.Multiline=true;detailPrompt.ReadOnly=true;detailPrompt.ScrollBars=ScrollBars.Vertical;detailPrompt.SetBounds(22,254,236,150);TextStyle(detailPrompt);details.Controls.Add(detailPrompt);
   ButtonAt(details,"Save name",22,426,236,36,()=>{NeedSelected();if(string.IsNullOrWhiteSpace(title.Text))throw new Exception("Enter a name first.");selected.Title=title.Text.Trim();store.Save();RefreshCards();playingTitle.Text=selected.Title;});
   favorite=ButtonAt(details,"Favorite",22,477,236,36,()=>{NeedSelected();selected.Favorite=!selected.Favorite;store.Save();SelectTake(selected,false);RefreshCards();});
-  ButtonAt(details,"Create variation",22,528,236,36,async()=>await Generate(true));
+  ButtonAt(details,"Create variation",22,528,236,36,()=>OpenReference());
   ButtonAt(details,"Export WAV",22,579,236,42,()=>Export());
-  ButtonAt(details,"Import WAV",22,636,236,36,()=>Import());
+  ButtonAt(details,"Import WAV / MP3",22,636,236,36,()=>Import());
   LabelAt(details,"Saved automatically on this PC.\nOriginal stereo WAV is preserved.",22,699,236,48,9,false).ForeColor=muted;
   play=ButtonAt(transport,"Play",25,23,90,40,()=>TogglePlay());playingTitle=LabelAt(transport,"Select a take",135,13,550,26,11,true);
   seek.Minimum=0;seek.Maximum=1000;seek.TickStyle=TickStyle.None;seek.SetBounds(128,44,650,30);transport.Controls.Add(seek);seek.MouseDown+=(s,e)=>scrubbing=true;seek.MouseUp+=(s,e)=>{scrubbing=false;try{if(loaded!=null)player.Seek((int)((long)player.Length*seek.Value/1000));}catch(Exception ex){Error(ex);}};
@@ -129,7 +129,7 @@ public class StudioForm:Form {
   if(visible.Length==0)LabelAt(cards,store.Items.Count==0?"Your first idea starts here.\nDescribe your music and click Multi Platinum.":"No takes match this view.",10,10,500,100,12,false).ForeColor=muted;
   cards.ResumeLayout();
  }
- void SelectTake(SavedTake t,bool refresh){selected=t;title.Text=t.Title;detailPrompt.Text=t.Prompt;detailMeta.Text=t.Instrument+"\n"+t.Mode+" / prompt BPM "+t.Tempo+"\n"+t.Created;favorite.Text=t.Favorite?"Remove favorite":"Add favorite";
+ void SelectTake(SavedTake t,bool refresh){selected=t;title.Text=t.Title;detailPrompt.Text=t.Prompt;detailMeta.Text=t.Instrument+"\n"+t.Mode+" / prompt BPM "+t.Tempo+"\n"+t.Created+(string.IsNullOrEmpty(t.ReferenceId)?"":"\nReference: "+t.SourceName+" / change "+t.VariationAmount);favorite.Text=t.Favorite?"Remove favorite":"Add favorite";
   if(t.Peaks==null){try{t.Peaks=TakeStore.WavePeaks(Path.Combine(store.Root,t.File));}catch(Exception ex){status.Text="Audio unavailable: "+ex.Message;}}
   if(refresh)RefreshCards();
  }
@@ -137,7 +137,10 @@ public class StudioForm:Form {
  static string Time(int ms){return (ms/60000)+":"+((ms/1000)%60).ToString("00");}
  void UpdateTransport(){if(busy)status.Text=generationStage+" / elapsed "+generationWatch.Elapsed.ToString(@"m\:ss");if(loaded==null)return;try{int length=player.Length,position=player.Position;if(!scrubbing)seek.Value=length==0?0:Math.Min(1000,(int)((long)position*1000/length));clock.Text=Time(position)+" / "+Time(length);if(position>=length-20&&player.Playing){player.Playing=false;play.Text="Play";}}catch{player.Close();loaded=null;play.Text="Play";}}
  void Export(){NeedSelected();using(var d=new SaveFileDialog{Filter="WAV audio|*.wav",FileName=string.Concat(selected.Title.Select(c=>Path.GetInvalidFileNameChars().Contains(c)?'_':c))+".wav"})if(d.ShowDialog()==DialogResult.OK){string source=Path.GetFullPath(Path.Combine(store.Root,selected.File));if(string.Equals(source,Path.GetFullPath(d.FileName),StringComparison.OrdinalIgnoreCase))return;File.Copy(source,d.FileName,true);status.Text="Exported original WAV: "+Path.GetFileName(d.FileName);}}
- void Import(){if(busy)return;using(var d=new OpenFileDialog{Filter="WAV audio|*.wav"})if(d.ShowDialog()==DialogResult.OK){var t=store.Add(d.FileName,Path.GetFileNameWithoutExtension(d.FileName),"Imported audio","Imported","Reference",(int)tempo.Value);SelectTake(t,true);status.Text="Imported for listening. Generation does not yet follow imported audio.";}}
+ void Import(){if(busy)return;using(var d=new OpenFileDialog{Filter="Audio recordings|*.wav;*.mp3"})if(d.ShowDialog(this)==DialogResult.OK)OpenReference(d.FileName);}
+ void OpenReference(){if(busy)return;NeedSelected();OpenReference(Path.Combine(store.Root,selected.File));}
+ void OpenReference(string path){if(busy)return;player.Close();loaded=null;play.Text="Play";using(var form=new ReferenceForm(store,path))form.ShowDialog(this);if(store.Items.Count>0)SelectTake(store.Items[0],true);else RefreshCards();status.Text="Audio-guided takes are saved in Your creations. Text generation still uses the ACE engine.";}
+
  void EngineSettings(){using(var d=new FolderBrowserDialog{Description="Choose ACE-Step-1.5 inside your existing TracksmithGEN-ACE-Step-GPU-Test-Kit folder",SelectedPath=Directory.Exists(enginePath)?enginePath:Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)})if(d.ShowDialog()==DialogResult.OK){if(!AceBridge.Valid(d.SelectedPath))throw new Exception("Choose the ACE-Step-1.5 folder containing .venv and acestep. No reinstall is required.");enginePath=d.SelectedPath;File.WriteAllText(Path.Combine(BaseDir,"gen-ace-root.txt"),enginePath);status.Text="ACE-Step GPU installation selected. Existing cached model will be reused.";}}
  void Cancel(){cancelled=true;generationStage="Cancelling GPU job";try{if(inference!=null&&!inference.HasExited)inference.Kill();}catch{}}
  async Task Generate(bool variation){
@@ -146,7 +149,7 @@ public class StudioForm:Form {
   int bpm=suggestions.Checked?(int)tempo.Value:0,length=(int)duration.Value,total=(int)count.Value;
   string chosenKey=suggestions.Checked?key.Text:"Any";
   try{
-   if(variation){NeedSelected();if(selected.Mode=="Reference")throw new Exception("Imported audio is for listening. Reference-following generation is not connected yet.");description=selected.Prompt;chosenMode=selected.Mode;bpm=selected.Tempo;chosenKey="Any";}
+   if(variation){NeedSelected();description=selected.Prompt;chosenMode=selected.Mode;bpm=selected.Tempo;chosenKey="Any";}
    else description=PromptBuilder.Compose(description,mode.SelectedIndex==1,bpm,chosenKey);
    if(!AceBridge.Valid(repo))throw new Exception("Use Engine settings to choose your existing ACE-Step-1.5 folder. No reinstall needed.");
    if(description.Length>512)throw new Exception("Shorten the complete prompt to 512 characters or fewer. Preview exact prompt shows what will be sent.");

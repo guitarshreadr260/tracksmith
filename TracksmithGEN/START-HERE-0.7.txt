@@ -1,0 +1,61 @@
+TRACKSMITH GEN 0.7 / AUDIO-GUIDED VARIATIONS
+
+QUICK START
+1. Close your old GEN window.
+2. Run UPDATE-GEN.cmd and choose the folder containing your existing GEN app.
+   It backs up the old program files and leaves GEN-Library and settings alone.
+   Or run this package's TracksmithGEN.exe separately with a new local library.
+3. Open TracksmithGEN.exe. Click Import WAV / MP3 and choose your recording.
+4. Choose a start time and a section from 5 to 30 seconds. Preview section
+   prepares a comparison copy. Click A / Original to hear that section.
+5. Describe the change. Set Variation amount (try 30-50%) and click Generate
+   variation. A lower amount tends to retain more of the source; higher values
+   allow more change. This control is the model's input noise level, not a
+   guaranteed measure of musical similarity.
+6. Click A / Original and B / Variation to compare. Switching preserves the
+   playback position. Stop playback, then click A or B to play again. B plays
+   the last completed variation; all generated takes appear in Your creations.
+7. Export variation copies the WAV. Original section and variations are saved
+   automatically in GEN-Library. Select any saved take -> Create variation to
+   open the same audio-guided workflow on that take.
+
+ENGINE
+Text-only Multi Platinum still uses your existing ACE-Step installation.
+Audio-guided variations use Stable Audio 3 Small Music in the separate working
+sa3-guitar test environment you already installed. No reinstall is needed.
+The app searches the existing extracted trial folders in Downloads. If that
+environment was moved, use Model settings in the variation window to choose
+its .venv\Scripts\python.exe. The worker uses cached assets offline and requires
+CUDA; it does not silently download weights or fall back to CPU.
+
+YOUR RECORDINGS
+Mono/stereo WAV and MP3 are supported. The selected section is decoded to a
+separate WAV. The original file is not changed. Source filename, section start,
+variation amount, seed and reference-take link are retained in the saved library.
+The model receives the selected audio, not just its filename or a prompt.
+Models, credentials and your recordings are not included in this package.
+
+LIMITS
+This is audio-to-audio variation, not instrument isolation, stem extraction,
+or bass/drum accompaniment generation. If you import a full mix, the full mix
+is the reference. Tempo/key and note-for-note preservation are not guaranteed.
+The imported reference is not peak-normalized, and A/B is not loudness-matched.
+Preview fallback may be mono; stored/exported WAVs preserve stereo.
+Audible quality is still for you to judge. Cancellation saves completed takes;
+use Cancel job and allow it to stop before closing the window.
+
+VALIDATION ON OCTOBER 20, 2026
+- Native C# build and existing regression suite passed.
+- Input tests: MP3 decode, crop boundaries, mono-to-stereo preparation, original
+  preservation, and audio-conditioning / seed / variation-amount contract.
+- Real RTX 4070 SUPER CUDA test: native bridge -> 5-second WAV-guided variation
+  -> original and generated take persisted and reopened with reference linkage.
+- Real dialog test with an MP3 sample: generation, saved takes, comparison
+  playback duration and seeking passed. These were sample-audio tests, not a
+  subjective assessment of your uploaded song.
+- Native main and variation dialogs rendered for layout inspection.
+
+SOURCE
+TracksmithGEN.cs, Studio.cs, AudioLab.cs, AceBridge.cs, ReferenceStudio.cs,
+ace_worker.py, reference_worker.py and build.ps1. test_reference_worker.py
+contains input/conditioning tests. The existing .NET compiler builds the GUI.
