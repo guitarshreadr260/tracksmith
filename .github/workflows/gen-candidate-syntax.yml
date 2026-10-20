@@ -1,0 +1,32 @@
+name: GEN candidate syntax
+on:
+  push:
+    branches: [gen-0.7-guitar-model-trial]
+    paths:
+      - 'TracksmithGEN/experiments/sa3-guitar/**'
+      - '.github/workflows/gen-candidate-syntax.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Parse Python trial
+        run: python -m py_compile TracksmithGEN/experiments/sa3-guitar/trial.py
+      - name: Parse PowerShell setup
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Join-Path $PWD 'TracksmithGEN/experiments/sa3-guitar/setup.ps1'),
+            [ref]$tokens, [ref]$errors) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
