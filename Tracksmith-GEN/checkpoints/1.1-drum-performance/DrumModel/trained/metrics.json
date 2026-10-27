@@ -1,0 +1,22 @@
+{
+  "files_by_split": {
+    "test": 129,
+    "train": 897,
+    "validation": 124
+  },
+  "training_bars": 17841,
+  "training_non_4_4_files_skipped": 10,
+  "evaluation": {
+    "validation": {
+      "bars": 2149,
+      "binary_cross_entropy_global": 0.27154654206648343,
+      "binary_cross_entropy_style": 0.2758227945993078
+    },
+    "test": {
+      "bars": 2232,
+      "binary_cross_entropy_global": 0.25496315759686516,
+      "binary_cross_entropy_style": 0.2464681091057728
+    }
+  },
+  "note": "Lower cross entropy is better; this does not measure musical quality or guitar alignment."
+}
