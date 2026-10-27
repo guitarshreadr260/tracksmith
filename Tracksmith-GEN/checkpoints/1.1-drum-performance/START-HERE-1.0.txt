@@ -1,0 +1,5 @@
+TRACKSMITH GEN 1.0 - GROOVE ENGINE
+
+Run ANALYZE-RIFF.cmd, select your WAV and save a NEW review HTML file. Confirm the green banner says 1.0. The page runs locally and does not upload your WAV. Set Variation to Developing or Active; Basic repeats the foundation. Enable fills for phrase endings. Adjust attack markers and phrase boundaries, then export GGD MIDI and import at bar 1 at the recorded tempo.
+
+This prototype selects among three original, hand-authored rock/half-time groove templates by comparing kick positions to detected attacks. It develops them over four bars and responds to strong local accents at Active. It does not use your supplied groove files or the trained model, transcribe the guitar, or understand complete song structure. Fills only occur when a following unmuted bar exists. Quiet spans can remove notes. Timing is on a 16th-note grid; swing shifts cymbals only. Listen and edit markers to evaluate the result.
