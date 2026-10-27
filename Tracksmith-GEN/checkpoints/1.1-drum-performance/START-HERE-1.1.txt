@@ -1,0 +1,9 @@
+TRACKSMITH GEN 1.1 - DRUM PERFORMANCE PROTOTYPE
+
+Run ANALYZE-RIFF.cmd and choose your guitar WAV, tempo, first drum bar, and a NEW HTML filename. Open the resulting 1.1 page. You can also open DEMO-RiffLab-1.1.html to see the interface.
+
+Adjust variation, guitar follow, energy, swing, cymbals and fills. Click squares in the Drum performance grid to add or remove hits; right-click a hit to change its velocity. Choose a bar in the dropdown. Save analysis + edits keeps your generated and edited drum notes. Export reviewed GGD drum MIDI writes the actual edited performance. Import at bar 1 at the displayed tempo, including the empty lead-in.
+
+Changing generator controls or regenerating all replaces manual drum edits. Regenerate selected bar restores its current generated pattern; it does not create a random alternative. After changing guitar markers, regenerate drums to apply those changes. The grid uses the existing GGD One Kit Wonder Metal note mapping; MIDI mapping is not yet configurable. Swing can shift cymbal notes off the grid.
+
+The drag button uses browser download drag support. Direct drops into Pro Tools and Tracksmith have not been tested and may not work; use Export MIDI and import the downloaded .mid if needed. The original WAV is not modified or uploaded. This remains a rule-based prototype, not a trained drummer or complete song-structure understanding.
