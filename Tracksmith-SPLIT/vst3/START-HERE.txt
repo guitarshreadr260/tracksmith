@@ -1,0 +1,21 @@
+TRACKSMITH SPLIT VST3 - FIRST TEST BUILD
+
+INSTALL: Close your DAW. Copy the complete Tracksmith SPLIT.vst3 folder into
+C:\Program Files\Common Files\VST3\ (Windows may ask for administrator approval).
+Reopen your VST3-compatible DAW and rescan plugins if needed.
+
+The plugin uses the existing Tracksmith-SPLIT-Build1 environment at
+Downloads\Tracksmith-SPLIT-Build1\Tracksmith-SPLIT-Build1\.venv.
+It selects an audio file and launches Demucs with CUDA in a separate process.
+Choose 4 or 6 stems, choose an output folder, and click SEPARATE STEMS.
+Keep the plugin editor open during separation. When complete, open the folder
+and import the WAV files into your DAW. It passes the insert audio through
+unchanged, and does not automatically read the DAW timeline or create tracks.
+Existing stem folders are not overwritten; choose another folder on a rerun.
+
+This is an experimental VST3 build. It has been compiled but has not been
+tested in a DAW or run through a complete separation. VST3 is not supported
+directly by Pro Tools, which uses AAX; this build is not an AAX plugin.
+The standalone mix/export, YouTube import and advanced lead/rhythm separation
+are not included in this initial VST3. Use the standalone app for those tasks.
+
