@@ -1,0 +1,5 @@
+Tracksmith GEN 0.9.3 - Groove Development
+
+Run ANALYZE-RIFF.cmd and analyze the WAV again to generate a new local review page. Previously generated HTML pages and DEMO-RiffLab.html contain the old engine. The browser page runs locally; no audio upload is required. Export MIDI and import at bar 1 with the same tempo and GGD Metal mapping.
+
+Within each four-bar phrase, the kick motif is reduced in bar two and developed with current guitar attacks in later bars. The snare adds quiet notes and can anticipate the last backbeat when a strong guitar attack is detected there. Phrase-start markers reset the cycle. Enable fills for a short phrase-ending fill. Detected rests can suppress hits. These are rule-based choices, so results depend on the detected attacks and may need marker edits.

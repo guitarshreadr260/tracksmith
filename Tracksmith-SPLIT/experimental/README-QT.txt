@@ -1,0 +1,16 @@
+TRACKSMITH SPLIT - QT STUDIO PREVIEW
+
+EXPERIMENTAL ADVANCED SEPARATION: Run SETUP-ADVANCED.cmd once. This creates a separate Python environment, downloads packages, and can require several GB. Internet and Git are required. On first split, model weights download separately. The model weights' training provenance and redistribution terms are unverified; use this build for evaluation, not distribution of the weights.
+
+First run SETUP-ADVANCED.cmd and then SETUP-ADVANCED-GPU.cmd in this extracted folder. The second installer changes only this build's advanced environment and checks NVIDIA CUDA. Separate a song using the 6-stem model or load an existing folder containing guitar.wav and/or drums.wav. Click SPLIT GUITAR or SPLIT DRUMS. Both advanced model stages request CUDA. The guitar model estimates lead; rhythm is the original guitar minus that estimate. It does not reliably isolate individual guitar performances. The drum model estimates kick, snare, toms, hi-hat, ride and crash. The original stem stays on disk and is unchecked in the mixer to avoid doubling; do not re-enable it alongside its sub-stems. Advanced files are stored under the output stem folder's advanced subfolder. Reloading the original folder currently loads the original stems only; advanced results can be loaded by selecting their subfolder. Output is only added if all files match the original sample rate, channels and length. The CUDA adapter is experimental and has not been tested with the actual guitar or drum model in this build.
+
+YOUTUBE IMPORT: Run SETUP-YOUTUBE.cmd once while connected to the internet. Start the app, click YOUTUBE LINK, paste a YouTube video link, and select OK. SPLIT downloads the audio, converts it to WAV, then starts separation with the selected model and device. Downloaded and converted files are saved in the output folder's YouTube Imports folder. Use videos you have permission to process. YouTube support can change; setup and real-video downloads have not been verified in this preview.
+
+Extract this ZIP and double-click START-SPLIT-QT.cmd. This uses the Build 1 environment in Downloads, including PySide6 installed there.
+
+Choose a song and model, then Separate Stems, or use Load existing stems for aligned WAV files. Select Include and adjust each level. Play Mix streams the stems together; changing levels or Include updates playback. Choose WAV, FLAC or MP3 in the output format selector for Export Mix or Export Stem. Mix export applies peak protection. Individual WAV export copies the original stem; FLAC and MP3 encode at the original level with peak protection. Stop stops playback.
+
+Use the POSITION slider below the waveforms to choose where the mix starts. Dragging it while the mix plays restarts playback at the selected position. Individual Play Stem buttons still play that stem from the beginning. Export remains full length.
+
+This is a preview. Waveforms are overviews, not editable. Live playback clips peaks that exceed full scale; reduce faders if the mix sounds distorted. The output device must support the stems' sample rate and channel count. Six-stem Demucs produces a combined guitar stem, not separate lead and rhythm. Meters display channel peaks during live mix playback. VST3 and detailed drum separation are not included. First use of a model may need a model download.
+

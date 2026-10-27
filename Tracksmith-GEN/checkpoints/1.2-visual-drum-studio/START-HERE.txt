@@ -1,0 +1,12 @@
+TRACKSMITH GEN 1.2 - VISUAL DRUM STUDIO
+
+Open TracksmithGEN-Visual-Drum-Studio.html in Microsoft Edge or Google Chrome. No Python or command window is required.
+
+1. Choose guitar WAV, set your session tempo, and set first drum bar. The WAV should include the same leading silence as your DAW session.
+2. Click Analyze guitar & generate drums. It stays on your computer. The demo WAV is included for trying the interface.
+3. Adjust variation, guitar follow, energy, swing, cymbals and fills. Changing these settings replaces manual drum edits.
+4. Select a bar in the drum performance grid. Click a square to add or remove a note; right-click a note to edit its velocity.
+5. Export reviewed GGD drum MIDI and import at bar 1 in your session at the same tempo. Save analysis + edits stores the MIDI edits for reopening. Loading the WAV again is necessary for guitar playback.
+
+The drag button is experimental and has not been verified in Pro Tools or Tracksmith. If drag does not work, import the exported MIDI file. The current mapping is GGD One Kit Wonder Metal factory mapping. Regenerate selected bar restores the current generated pattern, rather than creating a different random pattern. This prototype analyzes guitar energy and attacks, not chords or complete musical structure. It does not currently audition drum sounds; use your drum instrument in the DAW. The original WAV remains unchanged.
+
