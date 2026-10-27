@@ -1,0 +1,7 @@
+Tracksmith GEN 0.9.2 - Phrase Drummer
+
+Run ANALYZE-RIFF.cmd and select your guitar WAV. The browser opens a local offline review page; no upload or internet service is needed. Import exported MIDI at bar 1, including the lead-in, using the same tempo and GGD Metal map.
+
+The groove now adds a quiet snare ghost note on the second bar of a phrase, an occasional kick selected from strong guitar attacks on the third bar, and a small cymbal change on the fourth bar. Enable Short phrase-end fills to add a brief fill every fourth bar or before a marked phrase boundary. Quiet spans remain respected. Mark phrase starts to reset the four-bar cycle.
+
+This is an experimental rule-based arrangement, not a trained drummer. Test with your own guitar and adjust the detected attacks and phrase markers. The included demo HTML is from the previous version; analyze a WAV to generate a fresh page with the new engine. Your prior Riff Lab folder is unchanged.
