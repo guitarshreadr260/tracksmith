@@ -9,4 +9,4 @@ This checkpoint preserves SPLIT source alongside Tracksmith DAW Build 33. It doe
 
 No user audio, downloaded models, Python environments, installed binaries or private recordings are included. Startup scripts assume the Build 1 environment in Downloads; preserve that environment until an independent setup has been verified. The VST3 binary test package remains separate from this source checkpoint.
 
-This does not back up later GEN 1.x, Groove guitar preview, all older builds, local recordings, or other projects. Do not delete local files solely on the basis of this checkpoint.
+GEN 1.1 source and the GEN 1.2 visual prototype are in Tracksmith-GEN/checkpoints; demo audio and binaries are not included. This does not back up the Groove guitar preview source or executable, all older builds, local recordings, or other projects. Do not delete local files solely on the basis of this checkpoint.
