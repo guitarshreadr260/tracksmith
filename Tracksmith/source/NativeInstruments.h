@@ -14,6 +14,7 @@ inline juce::PluginDescription description(bool drums)
 std::unique_ptr<juce::AudioProcessor> create(const juce::PluginDescription&);
 inline juce::PluginDescription clickDescription(){auto d=description(true);d.name=d.descriptiveName="Tracksmith Click";d.fileOrIdentifier="tracksmith-native-click";d.uniqueId=0x5473434b;d.numOutputChannels=1;return d;}
 inline juce::PluginDescription tone3000Description(){auto d=description(false);d.name=d.descriptiveName="TONE3000";d.fileOrIdentifier="tracksmith-native-tone3000";d.uniqueId=0x54735433;d.manufacturerName="TONE3000";return d;}
+inline juce::PluginDescription sampleInstrumentDescription(bool bass){auto d=description(true);d.name=d.descriptiveName=bass?"Tracksmith Bass (Preview)":"Tracksmith Piano (Preview)";d.fileOrIdentifier=bass?"tracksmith-native-bass-preview":"tracksmith-native-piano-preview";d.uniqueId=bass?0x54734253:0x5473504e;return d;}
 void setNeuralOptions(juce::AudioProcessor*,bool enabled,float influence);
 void setGrooveLibrary(juce::AudioProcessor*,const juce::File&);
 void audition(juce::AudioProcessor*,int drum);

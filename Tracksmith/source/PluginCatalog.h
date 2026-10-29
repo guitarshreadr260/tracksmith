@@ -2,6 +2,20 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 namespace PluginCatalog
 {
+inline int categoryIndex(const juce::PluginDescription& d)
+{
+    if(d.isInstrument)return 0;
+    const auto meta=d.category.toLowerCase();const auto name=d.name.toLowerCase();
+    const auto has=[&](const char* word){return meta.contains(word)||name.contains(word);};
+    if(has("equaliz")||meta.containsWholeWord("eq")||name.containsWholeWord("eq"))return 1;
+    if(has("dynamics")||has("compress")||has("limiter")||has("gate")||has("de-ess")||has("deess")||has("expander"))return 2;
+    if(has("reverb")||has("plate")||has("room"))return 3;
+    if(has("delay")||has("echo"))return 4;
+    if(has("chorus")||has("flanger")||has("phaser")||has("modulation")||has("tremolo"))return 5;
+    if(meta.containsWholeWord("amp")||name.containsWholeWord("amp")||has("guitar")||has("distortion")||has("saturation")||has("overdrive"))return 6;
+    return 7;
+}
+inline const char* categoryName(int index){static constexpr const char* names[]={"Instruments","EQ","Dynamics","Reverb","Delay","Modulation","Guitar & Distortion","Other"};return names[juce::jlimit(0,7,index)];}
 inline juce::String key(const juce::PluginDescription& d){return d.pluginFormatName.toLowerCase()+"|"+d.manufacturerName.toLowerCase()+"|"+d.name.toLowerCase()+"|"+juce::String(d.uniqueId)+"|"+juce::String(d.isInstrument?1:0);}
 inline bool samePlugin(const juce::PluginDescription& a,const juce::PluginDescription& b)
 {

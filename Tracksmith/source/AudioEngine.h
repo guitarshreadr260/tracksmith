@@ -22,6 +22,9 @@ struct LoadedWav
     juce::Array<juce::var> waveform;
 };
 
+constexpr int64_t maximumAudioFileFrames = 32LL * 1024 * 1024;
+constexpr int64_t maximumSessionAudioFrames = 192LL * 1024 * 1024;
+
 inline LoadedWav decodeWav(const juce::File& file, int64_t maximumFrames, const std::function<bool()>& cancelled)
 {
         auto result = std::make_unique<LoadedWav>();
@@ -33,7 +36,7 @@ inline LoadedWav decodeWav(const juce::File& file, int64_t maximumFrames, const 
         else if (reader->numChannels < 1 || reader->numChannels > 2 || !std::isfinite(reader->sampleRate) || reader->sampleRate < 8000.0 || reader->sampleRate > 192000.0 || reader->lengthInSamples <= 0)
             result->error = "Use a mono or stereo WAV between 8 and 192 kHz.";
         else if (reader->lengthInSamples > maximumFrames)
-            result->error = "Import exceeds the 128 MiB per-file or 512 MiB session limit. Use a shorter WAV or clear another track.";
+            result->error = "Import exceeds the 256 MiB per-file or 1.5 GiB session audio limit. Use a shorter WAV or free session audio.";
         else
         {
             result->rate = reader->sampleRate;
@@ -72,7 +75,7 @@ public:
     bool load(const juce::File& file, int64_t frameBudget)
     {
         if (isThreadRunning()) return false;
-        cancelPendingUpdate(); pending.reset(); requestedFile = file; maximumFrames = std::min<int64_t>(16 * 1024 * 1024, frameBudget);
+        cancelPendingUpdate(); pending.reset(); requestedFile = file; maximumFrames = std::min<int64_t>(maximumAudioFileFrames, frameBudget);
         return startThread();
     }
 private:
@@ -94,7 +97,7 @@ private:
         if (result && onLoaded) onLoaded(std::move(*result));
     }
     juce::File requestedFile;
-    int64_t maximumFrames = 16 * 1024 * 1024;
+    int64_t maximumFrames = maximumAudioFileFrames;
     juce::CriticalSection resultLock; // Worker/message thread only; never audio.
     std::unique_ptr<LoadedWav> pending;
 };
@@ -116,6 +119,7 @@ public:
     SessionWorker() : Thread("Session files") {}
     ~SessionWorker() override { signalThreadShouldExit(); stopThread(-1); cancelPendingUpdate(); }
     bool isBusy()const{return busy.load();}
+    void pollCompletion(){handleUpdateNowIfNeeded();}
     bool open(const juce::File& file) { return begin(file, false, {}); }
     bool save(const juce::File& file, juce::var document) { return begin(file, true, std::move(document)); }
 private:
@@ -149,7 +153,7 @@ private:
                     {
                         const auto& file=files[source];if(file==juce::File())continue;
                         if(!file.existsAsFile()){result->missing.add(track.name+": "+file.getFileName());continue;}
-                        auto wav=std::make_unique<LoadedWav>(decodeWav(file,std::min<int64_t>(16*1024*1024,64*1024*1024-frames),[this]{return threadShouldExit();}));
+                        auto wav=std::make_unique<LoadedWav>(decodeWav(file,std::min<int64_t>(maximumAudioFileFrames,maximumSessionAudioFrames-frames),[this]{return threadShouldExit();}));
                         if(wav->error.isNotEmpty()){result->error=file.getFileName()+": "+wav->error;break;}
                         frames+=static_cast<int64_t>(wav->left.size());
                         for(const auto& clip:track.clips)if(clip.source==static_cast<int>(source) && clip.offset+clip.length>static_cast<double>(wav->left.size())/wav->rate+1.e-6){result->error="Clip exceeds source WAV: "+file.getFileName();break;}
@@ -209,9 +213,11 @@ public:
     std::array<const float*,2> liveSources {};int liveChannels=1;
     std::atomic<float> inputPeak { 0.0f };
     std::atomic<float> outputPeakLeft {0},outputPeakRight {0};
+    std::atomic<float> displayOutputLeft {0},displayOutputRight {0};
     std::atomic<int> inputMeterChannels { 1 };
     std::atomic<int> inputSource { 0 };
     std::array<std::atomic<float>, InputRouting::maximumInputs> inputChannelPeaks {};
+    std::array<std::atomic<float>, InputRouting::maximumInputs> displayInputPeaks {};
     std::atomic<int> mainOutputPair {0};
     std::atomic<int> deviceOutputCount {0};
     juce::String sessionDeviceKey;
@@ -302,7 +308,7 @@ public:
         if(plan.error)return juce::Result::fail(plan.error);
         const bool punching=plan.punch;
         if(!monitor.enabled.load())inputMeterChannels = channels;
-        const auto limit = static_cast<uint64_t>(std::max<int64_t>(0,std::min<int64_t>(16 * 1024 * 1024, importBudget(id,true)/static_cast<int64_t>(std::max<size_t>(1,recordingRoutes.size())))));
+        const auto limit = static_cast<uint64_t>(std::max<int64_t>(0,std::min<int64_t>(maximumAudioFileFrames, importBudget(id,true)/static_cast<int64_t>(std::max<size_t>(1,recordingRoutes.size())))));
         devices.removeAudioCallback(this);
         const auto started = recordingRoutes.empty()?recorder.start(file, rate, channels, limit):recorder.startGroup(recordingRoutes,rate,limit);
         playback.recordTracks.fill(false);for(const auto& route:recordingRoutes)playback.recordTracks[route.track]=true;
@@ -339,7 +345,7 @@ public:
         int64_t frames = 0;
         for (size_t id = 0; id < playback.tracks.size(); ++id)
             if (append || id != replacingTrack) frames += playback.tracks[id].residentFrames();
-        return std::max<int64_t>(0, 64 * 1024 * 1024 - frames);
+        return std::max<int64_t>(0, maximumSessionAudioFrames - frames);
     }
     void install(size_t id, LoadedWav& wav, bool append = false, double insertion = -1, bool punch = false, double end = 0, bool keepPlaying = false)
     {
@@ -494,6 +500,7 @@ public:
             float channelPeak = 0;
             for (int frame = 0; frame < count; ++frame) channelPeak = std::max(channelPeak, std::abs(InputRouting::sample(source[0], frame)));
             inputChannelPeaks[static_cast<size_t>(channel)].store(channelPeak, std::memory_order_relaxed);
+            accumulateMeterPeak(displayInputPeaks[static_cast<size_t>(channel)],channelPeak);
         }
         for (int channel = 0; channel < captureChannels; ++channel)
             for (int frame = 0; frame < count; ++frame) peak = std::max(peak, std::abs(InputRouting::sample(selected[static_cast<size_t>(channel)], frame)));
@@ -532,6 +539,7 @@ private:
     { renderAudio(inputs, inputChannels, outputs, channels, count);
         float l=0,r=0;for(int n=0;n<count;++n){const int pair=mainOutputPair.load(),left=pair*2,right=left+1;if(pair>=0&&left<channels&&outputs[left])l=std::max(l,std::abs(outputs[left][n]));if(pair>=0&&right<channels&&outputs[right])r=std::max(r,std::abs(outputs[right][n]));}
         outputPeakLeft=l;outputPeakRight=r;
+        accumulateMeterPeak(displayOutputLeft,l);accumulateMeterPeak(displayOutputRight,r);
     }
     void audioDeviceAboutToStart(juce::AudioIODevice* device) override
     {

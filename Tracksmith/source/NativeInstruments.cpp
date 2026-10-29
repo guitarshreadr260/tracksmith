@@ -1,5 +1,6 @@
 #include "NativeInstruments.h"
 #include "NativeClick.h"
+#include "NativeSfizzInstrument.h"
 #include "GrooveFull/PluginProcessor.h"
 using Groove=TracksmithGrooveFull::AvrxGrooveProcessor;
 class NativeGroove final : public Groove
@@ -28,6 +29,8 @@ public:
 std::unique_ptr<juce::AudioProcessor> NativeInstruments::create(const juce::PluginDescription& d)
 {
     if(d.pluginFormatName!="Tracksmith Native")return {};
+    if(d.fileOrIdentifier=="tracksmith-native-bass-preview")return std::make_unique<NativeSfizzInstrument>(true);
+    if(d.fileOrIdentifier=="tracksmith-native-piano-preview")return std::make_unique<NativeSfizzInstrument>(false);
     if(d.fileOrIdentifier==NativeClickProcessor::identifier)return std::make_unique<NativeClickProcessor>();
     if(d.fileOrIdentifier=="tracksmith-native-tone3000")return createTracksmithTone3000();
     if(d.fileOrIdentifier=="tracksmith-native-nam")return createTracksmithNativeNam();

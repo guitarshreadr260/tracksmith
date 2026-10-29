@@ -19,6 +19,7 @@
 #include "NativeInstruments.h"
 #include "ElasticWorker.h"
 #include "GenerationWorker.h"
+#include "SplitWorker.h"
 #include "AudioReference.h"
 #include "DrumStemExport.h"
 
@@ -93,6 +94,7 @@ public:
         stemWorker.onFinished=[this](StemResult result){stemActive=stemRendering=loading=pluginBusy=false;stemPlan=juce::var();stemInstance.reset();status=result.cancelled?"Drum stem render cancelled. No export folder was published.":result.error.isNotEmpty()?result.error:"Rendered drum stems to "+result.folder.getFullPathName()+(result.clipped?". Some outputs clipped; lower their instrument levels and render again.":"")+(result.silent.isEmpty()?"":". Silent outputs: "+result.silent.joinIntoString(", "));publish(true);};
         referenceWorker.onFinished=[this](AudioReferenceWorker::Result result){referenceBusy=false;if(result.revision!=sessionRevision)return;if(result.error.isEmpty()){audioReference=std::move(result);referenceMessage="Reference ready. Tempo and key are estimates; confirm them before generating.";}else referenceMessage=result.error;publish();};
         generationWorker.onFinished=[this](GenerationWorker::Result result){generationBusy=false;generationMessage=result.error.isNotEmpty()?result.error:"Variation ready. Audition it before inserting; timing and key are model requests, not guaranteed.";if(!result.items.empty()){generationRequest=result.request;for(auto& item:result.items)generationItems.push_back(std::move(item));if(generationItems.size()>4)generationItems.erase(generationItems.begin());}publish();};
+        splitWorker.onFinished=[this](SplitWorker::Result result){splitBusy=false;splitFolder=result.folder;splitRevision=result.revision;splitItems=std::move(result.stems);splitMessage=result.error.isNotEmpty()?result.error:"Six stems are ready. Stop playback, then add them to the session.";publish();};
         if(diagnostic)return;
         if (! juce::WebBrowserComponent::areOptionsSupported(makeOptions()))
         {
@@ -240,7 +242,7 @@ public:
         startupScan.onProgress=[safe=juce::Component::SafePointer<MainComponent>(this)](StartupScan::Progress p){if(!safe)return;safe->startupProgress=p;safe->pluginBusy=p.active;if(!p.active)safe->status=p.failed?"Studio ready. "+juce::String(p.failed)+" plugin(s) skipped after failed discovery; manual rescan is available in the insert menu.":"Studio ready. VST3 library checked.";safe->publish();};
         pluginBusy=true;startupScan.begin();
     }
-    ~MainComponent() override { referenceWorker.shutdown();generationWorker.shutdown();stemWorker.shutdown(); elasticWorker.shutdown();startupScan.shutdown();stopTimer();recoveryWorker.onFinished={};recoveryWorker.shutdown(); }
+    ~MainComponent() override { splitWorker.shutdown();referenceWorker.shutdown();generationWorker.shutdown();stemWorker.shutdown(); elasticWorker.shutdown();startupScan.shutdown();stopTimer();recoveryWorker.onFinished={};recoveryWorker.shutdown(); }
     void resized() override { browser.setBounds(getLocalBounds()); error.setBounds(getLocalBounds().reduced(30)); }
     void requestClose()
     {
@@ -279,6 +281,50 @@ public:
             send(R"({"type":"elasticPreview","action":"discard"})");check(!elasticPreview&&!loading&&lane.clips[0].source==sourceBefore&&lane.extra.size()==countBefore&&editRevision==revisionBefore&&undoClips.size()==historyBefore&&engine.playback.loop.load(),"discard restores audio/media/history/loop");
             send(R"({"type":"elastic","track":0,"id":1,"preview":true,"anchors":[{"source":0,"target":0},{"source":1,"target":1.1},{"source":2,"target":2}]})");wait();send(R"({"type":"elasticPreview","action":"original"})");send(R"({"type":"elasticPreview","action":"apply"})");check(!elasticPreview&&!loading&&lane.clips[0].elasticAnchors[1].target==1.1&&undoClips.size()==historyBefore+1,"apply correction while listening to original commits once");send(R"({"type":"undo"})");check(lane.clips[0].source==sourceBefore,"audition apply undo restores previous correction");
         }catch(const std::exception& e){failure=e.what();}report.replaceWithText(failure.isEmpty()?"PASS: attack suggestions without mutation, audition A/B/discard/apply/undo/loop safety; asynchronous Time Warp render, original PCM preservation, new media/provenance, WAV/session reopening, undo/redo, cache reuse, cancel safety and undoable original restoration.":"FAIL: "+failure);return failure.isEmpty();
+    }
+    bool splitRegression(const juce::File& input,const juce::File& report){
+        juce::String failure;
+        try{
+            auto check=[](bool ok,const char* why){if(!ok)throw std::runtime_error(why);};
+            trackCount=1;trackNames[0]="Original";engine.playback.tracks[0].left={.25f};engine.playback.tracks[0].right={.25f};
+            splitBusy=splitWorker.start(input,sessionRevision,engine.importBudget(1,true),report.getParentDirectory().getChildFile("split-regression-output"));check(splitBusy,"could not start split");
+            const auto deadline=juce::Time::getMillisecondCounterHiRes()+180000;
+            while(splitBusy&&juce::Time::getMillisecondCounterHiRes()<deadline){splitWorker.pollCompletion();juce::Thread::sleep(25);}
+            check(!splitBusy,"split timeout");if(splitItems.size()!=6)throw std::runtime_error(splitMessage.toStdString());
+            ++sessionRevision;command(juce::JSON::parse(R"({"type":"splitInsert"})"));check(trackCount==1,"changed session must not be modified");--sessionRevision;
+            command(juce::JSON::parse(R"({"type":"splitInsert"})"));check(trackCount==7,"six new tracks");check(engine.playback.tracks[0].left[0]==.25f,"original audio changed");
+            for(int i=1;i<7;++i){check(engine.playback.tracks[i].clips.size()==1,"stem clip missing");check(engine.playback.tracks[i].clips[0].start==0,"stems must align at zero");check(trackInfo[i].file.existsAsFile(),"stem file missing");}
+        }catch(const std::exception& e){failure=juce::String::fromUTF8(e.what());}
+        report.replaceWithText(failure.isEmpty()?"PASS: GPU separation, six WAVs, changed-session guard, aligned track insertion and source preservation.\n":"FAIL: "+failure+"\n");return failure.isEmpty();
+    }
+    bool splitLoadRegression(const juce::File& folder,const juce::File& report){
+        juce::String failure;
+        try{
+            auto check=[](bool ok,const char* why){if(!ok)throw std::runtime_error(why);};
+            trackCount=0;splitBusy=splitWorker.startExisting(folder,sessionRevision,engine.importBudget(0,true));check(splitBusy,"could not start loading");
+            const auto deadline=juce::Time::getMillisecondCounterHiRes()+180000;
+            while(splitBusy&&juce::Time::getMillisecondCounterHiRes()<deadline){splitWorker.pollCompletion();juce::Thread::sleep(25);}
+            check(!splitBusy,"load timeout");if(splitItems.size()!=6)throw std::runtime_error(splitMessage.toStdString());
+            int64_t frames=0;for(const auto& wav:splitItems)frames+=int64_t(wav.left.size());check(frames>64LL*1024*1024,"fixture does not exceed old session limit");
+            command(juce::JSON::parse(R"({"type":"splitInsert"})"));check(trackCount==6,"six tracks not inserted");
+            const auto file=report.getSiblingFile("split-large-session.tracksmith");auto saved=currentSession();check(SessionFile::write(file,SessionFile::encode(saved,file)).wasOk(),"session save failed");
+            SessionWorker reopening;bool done=false;juce::String error;int count=0;reopening.onFinished=[&](SessionJobResult result){error=result.error;for(auto& wav:result.audio)if(wav)++count;done=true;};
+            check(reopening.open(file),"session reopen failed to start");const auto limit=juce::Time::getMillisecondCounterHiRes()+180000;
+            while(!done&&juce::Time::getMillisecondCounterHiRes()<limit){reopening.pollCompletion();juce::Thread::sleep(25);}
+            if(error.isNotEmpty())throw std::runtime_error(error.toStdString());check(done&&count==6,"session reopen did not restore all six stems");
+        }catch(const std::exception& e){failure=juce::String::fromUTF8(e.what());}
+        report.replaceWithText(failure.isEmpty()?"PASS: saved long stems exceed old memory limit, load, insert, save and reopen.\n":"FAIL: "+failure+"\n");return failure.isEmpty();
+    }
+    bool meterCatalogRegression(const juce::File& report){
+        juce::String failure;
+        try{
+            auto check=[](bool ok,const char* why){if(!ok)throw std::runtime_error(why);};
+            auto core=std::make_unique<PlaybackCore>();core->deviceRate=48000;auto& track=core->tracks[0];track.sourceRate=48000;track.gain=1;track.smoothLeft=track.smoothRight=1;track.left.assign(2048,0);track.right.assign(2048,0);track.left[2]=.8f;track.right[2]=.4f;core->refreshDuration();core->playing=true;
+            float left[512]{},right[512]{};float* outputs[]={left,right};core->render(outputs,2,512);core->render(outputs,2,512);
+            check(track.peakLeft.load()==0,"fixture second callback should be silent");check(std::abs(track.displayLeft.exchange(0)-.8f)<.001f,"left transient lost between UI updates");check(std::abs(track.displayRight.exchange(0)-.4f)<.001f,"right transient lost between UI updates");check(track.displayLeft.exchange(0)==0,"meter did not clear after reading");
+            juce::PluginDescription d;d.name="Plain";d.category="Fx|EQ";check(PluginCatalog::categoryIndex(d)==1,"EQ metadata");d.category="Fx|Dynamics";check(PluginCatalog::categoryIndex(d)==2,"dynamics metadata");d.category="";d.name="Tracksmith Plate";check(PluginCatalog::categoryIndex(d)==3,"reverb name");d.name="Digital Delay";check(PluginCatalog::categoryIndex(d)==4,"delay name");d.name="Sample Utility";check(PluginCatalog::categoryIndex(d)==7,"unknown effect category");d.isInstrument=true;check(PluginCatalog::categoryIndex(d)==0,"instrument category");
+        }catch(const std::exception& e){failure=juce::String::fromUTF8(e.what());}
+        report.replaceWithText(failure.isEmpty()?"PASS: stereo transient capture between callbacks, reset, and plugin category mapping.\n":"FAIL: "+failure+"\n");return failure.isEmpty();
     }
     bool workflowRegression(const juce::File& report){
         juce::String failure;const auto check=[](bool ok,const char* why){if(!ok)throw std::runtime_error(why);};
@@ -879,12 +925,18 @@ private:
         const auto gate=stock.getParentDirectory().getChildFile("Tracksmith Gate.vst3");
         const auto eq=stock.getParentDirectory().getChildFile("Tracksmith EQ 7.vst3");
         auto descriptions=std::make_shared<juce::Array<juce::PluginDescription>>(pluginLibrary()->getTypes());
-        juce::PopupMenu menu;menu.addSectionHeader("Plugin browser · saved VST3s");
-        for(int i=0;i<descriptions->size();++i){const auto& d=descriptions->getReference(i);if(d.name=="Tracksmith NAM"||d.name=="AVRX NAM")continue;if(query.isNotEmpty()&&!(d.name+" "+d.manufacturerName).containsIgnoreCase(query))continue;const bool allowed=!d.isInstrument||(channel<128&&engine.plugins.midiLanes[channel].enabled&&index==0);menu.addItem(100+i,d.name+" — "+d.manufacturerName+(d.isInstrument?" (Instrument)":""),allowed);}
+        juce::PopupMenu menu;menu.addSectionHeader("Plugin browser - categories");
+        std::array<juce::PopupMenu,8> categories;std::array<int,8> counts{};
+        for(int i=0;i<descriptions->size();++i){const auto& d=descriptions->getReference(i);if(d.name=="Tracksmith NAM"||d.name=="AVRX NAM")continue;if(query.isNotEmpty()&&!(d.name+" "+d.manufacturerName).containsIgnoreCase(query))continue;const bool allowed=!d.isInstrument||(channel<128&&engine.plugins.midiLanes[channel].enabled&&index==0);const int group=PluginCatalog::categoryIndex(d);categories[size_t(group)].addItem(100+i,d.name+" - "+d.manufacturerName+(d.isInstrument?" (Instrument)":""),allowed);++counts[size_t(group)];}
         const auto& unavailable=engine.plugins.channels[channel][static_cast<size_t>(index)];menu.addItem(3,"Retry unavailable insert with saved settings",unavailable&&!unavailable->instance);
         menu.addItem(4,"Search plugins...");menu.addSeparator();
-        auto stockFallback=[&](int id,const juce::File& file){bool listed=false;for(const auto& d:*descriptions)if(juce::File(d.fileOrIdentifier).getFileName()==file.getFileName()){listed=true;break;}if(file.exists()&&!listed)menu.addItem(id,file.getFileNameWithoutExtension());};
-        stockFallback(11,plate);stockFallback(12,delay);stockFallback(9,limiter);stockFallback(10,deesser);stockFallback(8,fet);stockFallback(7,busComp);stockFallback(6,gate);stockFallback(5,eq);menu.addItem(13,"TONE3000 · Built in");menu.addItem(2,"Add / rescan VST3...");
+        auto stockFallback=[&](int id,const juce::File& file,int group){bool listed=false;for(const auto& d:*descriptions)if(juce::File(d.fileOrIdentifier).getFileName()==file.getFileName()){listed=true;break;}if(file.exists()&&!listed&&(query.isEmpty()||file.getFileNameWithoutExtension().containsIgnoreCase(query))){categories[size_t(group)].addItem(id,file.getFileNameWithoutExtension());++counts[size_t(group)];}};
+        stockFallback(11,plate,3);stockFallback(12,delay,4);stockFallback(9,limiter,2);stockFallback(10,deesser,2);stockFallback(8,fet,2);stockFallback(7,busComp,2);stockFallback(6,gate,2);stockFallback(5,eq,1);
+        if(query.isEmpty()||juce::String("TONE3000").containsIgnoreCase(query)){categories[6].addItem(13,"TONE3000 - Built in");++counts[6];}
+        if(query.isEmpty()||juce::String("Tracksmith Piano").containsIgnoreCase(query)){categories[0].addItem(14,"Tracksmith Piano (Preview)",channel<128&&engine.plugins.midiLanes[channel].enabled&&index==0);++counts[0];}
+        if(query.isEmpty()||juce::String("Tracksmith Bass").containsIgnoreCase(query)){categories[0].addItem(15,"Tracksmith Bass (Preview)",channel<128&&engine.plugins.midiLanes[channel].enabled&&index==0);++counts[0];}
+        for(int group=0;group<8;++group)if(counts[size_t(group)])menu.addSubMenu(PluginCatalog::categoryName(group),categories[size_t(group)]);
+        menu.addItem(2,"Add / rescan VST3...");
         menu.showMenuAsync(juce::PopupMenu::Options(),[safe=juce::Component::SafePointer<MainComponent>(this),channel,index,stock,eq,gate,busComp,fet,limiter,deesser,plate,delay,descriptions](int result)
         {
             if(!safe||safe->loading||safe->sessionBusy||safe->recordingBusy||safe->pluginBusy)return;
@@ -904,6 +956,7 @@ private:
             else if(result==6)safe->discoverPlugin(gate,channel,index);
             else if(result==5)safe->discoverPlugin(eq,channel,index);
             else if(result==13)safe->createInsert(channel,index,NativeInstruments::tone3000Description());
+            else if(result==14||result==15)safe->createInsert(channel,index,NativeInstruments::sampleInstrumentDescription(result==15));
             else if(result==2)safe->choosePlugin(channel,index);
             else if(result>=100&&result-100<descriptions->size()){
                 const auto d=descriptions->getReference(result-100);
@@ -1128,13 +1181,14 @@ private:
         object->setProperty("autosaveEnabled",autosaveEnabled);object->setProperty("autosaveBusy",recoveryWorker.isBusy());object->setProperty("autosaveTime",static_cast<double>(lastAutosaveTime));object->setProperty("autosaveNotice",autosaveNotice);
         juce::Array<juce::var> recoveryItems;for(const auto& entry:recoveries){auto* item=new juce::DynamicObject();item->setProperty("id",entry.id);item->setProperty("name",entry.name);item->setProperty("time",static_cast<double>(entry.time));recoveryItems.add(juce::var(item));}object->setProperty("recoveries",recoveryItems);
         object->setProperty("stemPlan",stemPlan);object->setProperty("stemProgress",stemWorker.progress.load());
+        auto* splitState=new juce::DynamicObject;splitState->setProperty("busy",splitBusy);splitState->setProperty("ready",!splitItems.empty());splitState->setProperty("message",splitMessage);object->setProperty("split",juce::var(splitState));
         object->setProperty("exportBusy", false);
         object->setProperty("exportProgress", 0.0);
         object->setProperty("playing", engine.playback.playing.load());
         object->setProperty("seconds", engine.playback.seconds.load());
         object->setProperty("duration", engine.playback.duration());
         object->setProperty("peak", engine.playback.peak.load());
-        object->setProperty("peakLeft",engine.outputPeakLeft.load());object->setProperty("peakRight",engine.outputPeakRight.load());
+        object->setProperty("peakLeft",engine.displayOutputLeft.exchange(0));object->setProperty("peakRight",engine.displayOutputRight.exchange(0));
         object->setProperty("clipping", engine.playback.clipping.load());
         object->setProperty("sampleRate", device ? device->getCurrentSampleRate() : 0.0);
         object->setProperty("driver", engine.devices.getCurrentAudioDeviceType());
@@ -1185,7 +1239,7 @@ private:
             const auto names = device->getInputChannelNames(); const auto active = device->getActiveInputChannels();
             for (int index = 0; index < std::min(names.size(),InputRouting::maximumInputs); ++index) inputNames.add((ioSettings.inputs[index].isEmpty()?names[index]:ioSettings.inputs[index])+(active[index]?"":" (disabled)"));
         }
-        for (auto& peak : engine.inputChannelPeaks) inputPeaks.add(peak.load());
+        for (auto& peak : engine.displayInputPeaks) inputPeaks.add(peak.exchange(0));
         object->setProperty("generationLibrary",generationGrooveFolder.isDirectory()?generationGrooveFolder.getFileName():juce::String("Bundled grooves"));object->setProperty("inputNames", inputNames); object->setProperty("inputPeaks", inputPeaks);
         juce::Array<juce::var> automation;
         for(int id=0;id<trackCount;++id){const auto& t=engine.playback.tracks[id];auto* lane=new juce::DynamicObject();lane->setProperty("track",id);lane->setProperty("mode",t.automationMode.load());const bool read=Automation::reads(t.automationMode.load(),t.volumeTouched.load(),t.volumeLatched.load(),engine.playback.automationBypass.load());const double time=engine.playback.seconds.load();lane->setProperty("gain",read?Automation::value(t.volumeAutomation,time,t.gain.load()):t.gain.load());lane->setProperty("panValue",Automation::reads(t.automationMode.load(),t.panTouched.load(),t.panLatched.load(),engine.playback.automationBypass.load())?Automation::value(t.panAutomation,time,t.pan.load()):t.pan.load());if(includeWaveform&&automationCurvesChanged){lane->setProperty("volume",SessionFile::encodeAutomation(t.volumeAutomation));lane->setProperty("pan",SessionFile::encodeAutomation(t.panAutomation));}automation.add(juce::var(lane));}
@@ -1217,8 +1271,8 @@ private:
             detail->setProperty("id", static_cast<int>(id));
             detail->setProperty("fileName", trackInfo[id].fileName);
             detail->setProperty("duration", track.duration());
-            detail->setProperty("peak", track.peak.load());
-            detail->setProperty("peakLeft",track.peakLeft.load());detail->setProperty("peakRight",track.peakRight.load());
+            detail->setProperty("peak", track.displayPeak.exchange(0));
+            detail->setProperty("peakLeft",track.displayLeft.exchange(0));detail->setProperty("peakRight",track.displayRight.exchange(0));
             if (includeWaveform) detail->setProperty("waveform", trackInfo[id].waveform);
             tracks.add(juce::var(detail));
         }
@@ -1263,7 +1317,7 @@ private:
                 const auto route=engine.playback.routingSnapshot(id);lane->setProperty("output",route.output);lane->setProperty("hardwarePair",route.hardwarePair);juce::Array<juce::var> sends;for(const auto& send:route.sends){auto* item=new juce::DynamicObject();item->setProperty("target",send.target);item->setProperty("gain",send.gain);item->setProperty("pre",send.pre);item->setProperty("muted",send.muted);sends.add(juce::var(item));}lane->setProperty("sends",sends);lane->setProperty("id", id); lane->setProperty("name", trackNames[static_cast<size_t>(id)]);
                 lane->setProperty("stereoLeft",engine.playback.tracks[id].stereoLeft.load());lane->setProperty("stereoRight",engine.playback.tracks[id].stereoRight.load());
                 lane->setProperty("height",trackHeights[id]);lane->setProperty("color",trackColors[id]);lane->setProperty("displayOrder",trackRanks[id]);lane->setProperty("gain", c.gain); lane->setProperty("pan", c.pan); lane->setProperty("muted", c.muted);
-                const auto& nativeSlot=engine.plugins.channels[id][0];if(nativeSlot&&nativeSlot->description.pluginFormatName=="Tracksmith Native"){if(nativeSlot->description.fileOrIdentifier=="tracksmith-native-click")lane->setProperty("clickTrack",true);else lane->setProperty("ezInstrument",nativeSlot->description.isInstrument?"drums":"guitar");if(nativeSlot->description.isInstrument)lane->setProperty("drumNoteMap",NativeInstruments::grooveNoteMap(nativeSlot->instance.get()));}
+                const auto& nativeSlot=engine.plugins.channels[id][0];if(nativeSlot&&nativeSlot->description.pluginFormatName=="Tracksmith Native"){if(nativeSlot->description.fileOrIdentifier=="tracksmith-native-click")lane->setProperty("clickTrack",true);else if(nativeSlot->description.fileOrIdentifier=="tracksmith-native-groove-drums")lane->setProperty("ezInstrument","drums");else if(!nativeSlot->description.isInstrument)lane->setProperty("ezInstrument","guitar");if(nativeSlot->description.fileOrIdentifier=="tracksmith-native-groove-drums")lane->setProperty("drumNoteMap",NativeInstruments::grooveNoteMap(nativeSlot->instance.get()));}
                 lane->setProperty("inputSource",engine.trackInputs[id].load());lane->setProperty("inputChannels",engine.trackInputChannels[id].load());lane->setProperty("solo", c.solo); lane->setProperty("armed", c.armed); lanes.add(juce::var(lane));
             }
             project->setProperty("tracks", lanes); object->setProperty("project", juce::var(project));
@@ -1354,6 +1408,36 @@ private:
     {
         if (! message.isObject()) return;
         const auto type = message.getProperty("type", {}).toString();
+        if(type=="splitChoose"){
+            if(splitBusy||chooser)return;
+            chooser=std::make_unique<juce::FileChooser>("Choose audio to split",juce::File(),"*.wav;*.mp3;*.flac;*.m4a");
+            chooser->launchAsync(juce::FileBrowserComponent::openMode|juce::FileBrowserComponent::canSelectFiles,[safe=juce::Component::SafePointer<MainComponent>(this)](const juce::FileChooser& dialog){
+                if(!safe)return;const auto input=dialog.getResult();
+                if(input.existsAsFile()){safe->splitItems.clear();safe->splitBusy=safe->splitWorker.start(input,safe->sessionRevision,safe->engine.importBudget(size_t(safe->trackCount),true));safe->splitMessage=safe->splitBusy?"Separating six stems on the GPU. This may take several minutes.":"SPLIT is already running.";safe->publish();}
+                juce::MessageManager::callAsync([safe]{if(safe)safe->chooser.reset();});
+            });return;
+        }
+        if(type=="splitReveal"){if(splitFolder.isDirectory())splitFolder.revealToUser();return;}
+        if(type=="splitLoad"){
+            if(splitBusy||chooser)return;
+            const auto start=juce::File::getSpecialLocation(juce::File::userDocumentsDirectory).getChildFile("Tracksmith SPLIT Results");
+            chooser=std::make_unique<juce::FileChooser>("Choose the saved SPLIT result folder",start,"*");
+            chooser->launchAsync(juce::FileBrowserComponent::openMode|juce::FileBrowserComponent::canSelectDirectories,[safe=juce::Component::SafePointer<MainComponent>(this)](const juce::FileChooser& dialog){
+                if(!safe)return;const auto folder=dialog.getResult();
+                if(folder.isDirectory()){safe->splitItems.clear();safe->splitBusy=safe->splitWorker.startExisting(folder,safe->sessionRevision,safe->engine.importBudget(size_t(safe->trackCount),true));safe->splitMessage=safe->splitBusy?"Loading saved stems.":"SPLIT is already running.";safe->publish();}
+                juce::MessageManager::callAsync([safe]{if(safe)safe->chooser.reset();});
+            });return;
+        }
+        if(type=="splitInsert"){
+            if(splitItems.empty())return;
+            if(splitRevision!=sessionRevision){splitMessage="The session changed during separation. The stems are saved in the output folder; import them manually.";publish();return;}
+            if(loading||recordingBusy||sessionBusy||pluginBusy||exportBusy||elasticBusy||stemActive||engine.playback.playing.load()){splitMessage="Stop playback and finish current operations before adding stems.";publish();return;}
+            int64_t frames=0;for(const auto& wav:splitItems)frames+=int64_t(wav.left.size());
+            if(trackCount+int(splitItems.size())>128||frames>engine.importBudget(size_t(trackCount),true)){splitMessage="Not enough track slots or session memory. Your stems are saved in the output folder.";publish();return;}
+            for(auto& wav:splitItems){const int track=trackCount;auto* add=new juce::DynamicObject;add->setProperty("type","addTrack");add->setProperty("kind","AUDIO");add->setProperty("name",wav.name);add->setProperty("inputChannels",2);command(juce::var(add));if(trackCount!=track+1){splitMessage="Could not add all tracks. Remaining WAVs are saved in the output folder.";splitItems.clear();publish(true);return;}
+                engine.install(size_t(track),wav,false,0);trackInfo[track].fileName=wav.name;trackInfo[track].file=wav.file;trackInfo[track].waveform=wav.waveform;syncPlaylist(track);}
+            splitItems.clear();undoClips.clear();redoClips.clear();midiRedo.clear();clearBatchHistory();markDirty();applyChannels();splitMessage="Added six aligned stems at the start of the session. Original audio is unchanged.";publish(true);return;
+        }
         if(type=="generateReferenceClear"){if(generationBusy||referenceBusy)return;audioReference={};referenceMessage="Reference removed.";publish();return;}
         if(type=="generateReference"){
             if(generationBusy||referenceBusy||loading||recordingBusy||sessionBusy||pluginBusy||exportBusy||elasticBusy||stemActive||engine.playback.playing.load()){referenceMessage="Stop playback and finish the current operation before analyzing a clip.";publish();return;}
@@ -1991,6 +2075,7 @@ private:
     ElasticWorker elasticWorker;bool elasticBusy=false,elasticCancelled=false;int elasticTrack=-1;TimelineClip elasticClip;
     AudioReferenceWorker referenceWorker;bool referenceBusy=false;AudioReferenceWorker::Result audioReference;juce::String referenceMessage;
     GenerationWorker generationWorker;bool generationBusy=false;juce::String generationMessage="Local instrumental prototype · ACE-Step engine on this computer.";GenerationWorker::Request generationRequest;std::vector<GenerationWorker::Item> generationItems;
+    SplitWorker splitWorker; bool splitBusy=false; int splitRevision=0; juce::File splitFolder; std::vector<LoadedWav> splitItems; juce::String splitMessage="Choose a file to separate into six stems.";
     WavLoader loader;
     SessionWorker sessionWorker;
     GrooveWorker grooveWorker;
@@ -2025,7 +2110,10 @@ public:
         juce::StringArray tokens;tokens.addTokens(args,true);tokens.removeEmptyStrings();
         if(tokens.size()==3&&tokens[0]=="--scan-vst3"){PluginDiscovery::scan(tokens[1].unquoted(),tokens[2].unquoted());quit();return;}
         if(tokens.size()==2&&tokens[0]=="--workflow-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->workflowRegression(juce::File(tokens[1].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
+        if(tokens.size()==2&&tokens[0]=="--meter-catalog-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->meterCatalogRegression(juce::File(tokens[1].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==3&&tokens[0]=="--reference-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->referenceRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
+        if(tokens.size()==3&&tokens[0]=="--split-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->splitRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
+        if(tokens.size()==3&&tokens[0]=="--split-load-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->splitLoadRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==2&&tokens[0]=="--generation-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->generationRegression(juce::File(tokens[1].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==2&&tokens[0]=="--mixer-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->mixerRegression(juce::File(tokens[1].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}
         if(tokens.size()==3&&tokens[0]=="--clipboard-regression"){auto test=std::make_unique<MainComponent>(true);const bool ok=test->clipboardRegression(juce::File(tokens[1].unquoted()),juce::File(tokens[2].unquoted()));test.reset();setApplicationReturnValue(ok?0:1);quit();return;}

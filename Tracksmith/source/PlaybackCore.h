@@ -9,6 +9,7 @@
 #include "ClipLayout.h"
 #include "MixerRouting.h"
 #include "Automation.h"
+#include "MeterPeak.h"
 #include <memory>
 
 // Samples and duration change only while the device callback is detached.
@@ -58,6 +59,7 @@ public:
             return 0;
         }
         std::atomic<float> gain { 0.75f }, pan { 0.0f }, peak { 0.0f }, peakLeft { 0.0f }, peakRight { 0.0f };
+        mutable std::atomic<float> displayPeak {0}, displayLeft {0}, displayRight {0};
         std::atomic<bool> muted { false }, solo { false };
         float smoothLeft = 0.0f, smoothRight = 0.0f; // Callback-owned.
         bool loaded() const noexcept { return routing.aux || midiTrack || (timelineEnabled ? !clips.empty() : !left.empty()); }
@@ -250,7 +252,7 @@ public:
         }
         if (!repeating && cursorSeconds + 1.0e-9 >= sessionLength)
         { cursorSeconds = sessionLength; playing.store(false, std::memory_order_relaxed); }
-        for(size_t id=0;id<maxTracks;++id){tracks[id].peak.store(trackPeaks[id],std::memory_order_relaxed);tracks[id].peakLeft=meterLeft[id];tracks[id].peakRight=meterRight[id];}
+        for(size_t id=0;id<maxTracks;++id){tracks[id].peak.store(trackPeaks[id],std::memory_order_relaxed);tracks[id].peakLeft=meterLeft[id];tracks[id].peakRight=meterRight[id];accumulateMeterPeak(tracks[id].displayPeak,trackPeaks[id]);accumulateMeterPeak(tracks[id].displayLeft,meterLeft[id]);accumulateMeterPeak(tracks[id].displayRight,meterRight[id]);}
         double audibleSeconds = capturing ? cursorSeconds : std::clamp(cursorSeconds - latencySeconds, startSeconds, sourceLength);
         if (repeating && loopHasWrapped && framesSinceSeek >= static_cast<uint64_t>(playbackLatencyFrames))
             audibleSeconds = loopStart + std::fmod(std::fmod(cursorSeconds - latencySeconds-loopStart,sessionLength-loopStart) + sessionLength-loopStart,sessionLength-loopStart);
@@ -366,7 +368,7 @@ private:
             }
             writeHardware(outputs,channels,frames,offset,clipped);
         }
-        for(size_t id=0;id<maxTracks;++id){tracks[id].peak=peaks[id];tracks[id].peakLeft=meterLeft[id];tracks[id].peakRight=meterRight[id];}peak=level;clipping=clipped;
+        for(size_t id=0;id<maxTracks;++id){tracks[id].peak=peaks[id];tracks[id].peakLeft=meterLeft[id];tracks[id].peakRight=meterRight[id];accumulateMeterPeak(tracks[id].displayPeak,peaks[id]);accumulateMeterPeak(tracks[id].displayLeft,meterLeft[id]);accumulateMeterPeak(tracks[id].displayRight,meterRight[id]);}peak=level;clipping=clipped;
     }
     double cursorSeconds = 0.0, lengthSeconds = 0.0;
     double startSeconds = 0.0;
