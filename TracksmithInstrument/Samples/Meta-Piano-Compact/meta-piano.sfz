@@ -1,0 +1,41 @@
+// Meta Piano: reference SFZ map of README.md.
+// Every key A0-C8 (MIDI 21-108) is sampled, so each region plays only its own key.
+//
+// Velocity splits are README's 1-31 / 32-63 / 64-95 / 96-127, crossfaded
+// equal-power over 16 steps centred on each split. The layers keep their
+// recorded levels (about 20 dB apart, pp to ff), so velocity selects and blends
+// layers rather than scaling gain.
+
+<global>
+ampeg_release=0.035
+amp_veltrack=0
+pitch_random=5
+amp_random=1.5
+
+<group> lovel=1 hivel=39 xfout_lovel=24 xfout_hivel=39
+<region> lokey=21 hikey=42 pitch_keycenter=36 sample=INSPiano_Vel01_C2_01.wav
+<region> lokey=43 hikey=54 pitch_keycenter=48 sample=INSPiano_Vel01_C3_01.wav
+<region> lokey=55 hikey=66 pitch_keycenter=60 sample=INSPiano_Vel01_C4_01.wav
+<region> lokey=67 hikey=78 pitch_keycenter=72 sample=INSPiano_Vel01_C5_01.wav
+<region> lokey=79 hikey=108 pitch_keycenter=84 sample=INSPiano_Vel01_C6_01.wav
+
+<group> lovel=24 hivel=71 xfin_lovel=24 xfin_hivel=39 xfout_lovel=56 xfout_hivel=71
+<region> lokey=21 hikey=42 pitch_keycenter=36 sample=INSPiano_Vel02_C2_01.wav
+<region> lokey=43 hikey=54 pitch_keycenter=48 sample=INSPiano_Vel02_C3_01.wav
+<region> lokey=55 hikey=66 pitch_keycenter=60 sample=INSPiano_Vel02_C4_01.wav
+<region> lokey=67 hikey=78 pitch_keycenter=72 sample=INSPiano_Vel02_C5_01.wav
+<region> lokey=79 hikey=108 pitch_keycenter=84 sample=INSPiano_Vel02_C6_01.wav
+
+<group> lovel=56 hivel=103 xfin_lovel=56 xfin_hivel=71 xfout_lovel=88 xfout_hivel=103
+<region> lokey=21 hikey=42 pitch_keycenter=36 sample=INSPiano_Vel03_C2_01.wav
+<region> lokey=43 hikey=54 pitch_keycenter=48 sample=INSPiano_Vel03_C3_01.wav
+<region> lokey=55 hikey=66 pitch_keycenter=60 sample=INSPiano_Vel03_C4_01.wav
+<region> lokey=67 hikey=78 pitch_keycenter=72 sample=INSPiano_Vel03_C5_01.wav
+<region> lokey=79 hikey=108 pitch_keycenter=84 sample=INSPiano_Vel03_C6_01.wav
+
+<group> lovel=88 hivel=127 xfin_lovel=88 xfin_hivel=103
+<region> lokey=21 hikey=42 pitch_keycenter=36 sample=INSPiano_Vel04_C2_01.wav
+<region> lokey=43 hikey=54 pitch_keycenter=48 sample=INSPiano_Vel04_C3_01.wav
+<region> lokey=55 hikey=66 pitch_keycenter=60 sample=INSPiano_Vel04_C4_01.wav
+<region> lokey=67 hikey=78 pitch_keycenter=72 sample=INSPiano_Vel04_C5_01.wav
+<region> lokey=79 hikey=108 pitch_keycenter=84 sample=INSPiano_Vel04_C6_01.wav

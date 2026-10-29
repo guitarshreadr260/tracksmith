@@ -1,0 +1,8 @@
+<control>
+<group>
+ampeg_attack=0.005 ampeg_release=0.35
+<region> sample=SyntheticKey_C2.wav lokey=0 hikey=41 pitch_keycenter=36
+<region> sample=SyntheticKey_C3.wav lokey=42 hikey=53 pitch_keycenter=48
+<region> sample=SyntheticKey_C4.wav lokey=54 hikey=65 pitch_keycenter=60
+<region> sample=SyntheticKey_C5.wav lokey=66 hikey=77 pitch_keycenter=72
+<region> sample=SyntheticKey_C6.wav lokey=78 hikey=127 pitch_keycenter=84

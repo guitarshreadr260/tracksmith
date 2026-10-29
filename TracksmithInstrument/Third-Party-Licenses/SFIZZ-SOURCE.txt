@@ -1,0 +1,3 @@
+sfizz source: https://github.com/sfztools/sfizz
+Build source commit: f5c6e29f23b8057867c08e88f5f6ac6738baa30b
+See accompanying license files for sfizz and its dependencies.
